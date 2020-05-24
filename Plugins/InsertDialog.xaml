@@ -39,9 +39,9 @@
             IsReadOnly="True"
         >
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Device Number" Width="4*" Binding="{Binding deviceNumber}"/>
-                <DataGridTextColumn Header="Manufacturer" Width="5*" Binding="{Binding manufacturer}"/>
-                <DataGridTextColumn Header="Catalog Number" Width="7*" Binding="{Binding catalogNumber}"/>
+                <DataGridTextColumn Header="Device Number" Width="4*" Binding="{Binding DeviceNumber}"/>
+                <DataGridTextColumn Header="Manufacturer" Width="5*" Binding="{Binding Manufacturer}"/>
+                <DataGridTextColumn Header="Catalog Number" Width="7*" Binding="{Binding CatalogNumber}"/>
             </DataGrid.Columns>
         </DataGrid>
         <TextBlock
