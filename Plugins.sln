@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PanelInsert", "Plugins\PanelInsert.csproj", "{D1C0153D-08BB-4A7F-8B42-3D92811678CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1C0153D-08BB-4A7F-8B42-3D92811678CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1C0153D-08BB-4A7F-8B42-3D92811678CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1C0153D-08BB-4A7F-8B42-3D92811678CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1C0153D-08BB-4A7F-8B42-3D92811678CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA49190E-AE40-430E-81FD-F4268ADC3207}
+	EndGlobalSection
+EndGlobal
