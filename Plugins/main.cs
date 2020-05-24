@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.OleDb;
 using System.Windows;
@@ -9,6 +10,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using Autodesk.Electrical.Project;
+using System.Linq;
 
 namespace PanelInsert
 {
@@ -40,6 +42,64 @@ namespace PanelInsert
 
     public class ComponentCollection : ObservableCollection<Component>
     {
+        public class Frequency
+        {
+            public string Name { get; set; }
+            public int Count { get; set; }
+        }
 
+        public List<string> SelectedInstallations { get; set; }
+
+        public IEnumerable<Frequency> InstallationList
+        {
+            get
+            {
+                return from component in this
+                       group component by component.Installation into installation
+                       orderby installation.Count() descending
+                       where !ExcludedInstallations.Contains(installation.Key)
+                       select new Frequency
+                       {
+                           Name = installation.Key,
+                           Count = installation.Count()
+                       };
+
+            }
+        }
+
+        public List<string> ExcludedInstallations = new List<string>
+        {
+            "",
+            "CABLE",
+            "MOTOR",
+            "SENSOR",
+            "VALVE PACK"
+        };
+
+        public IEnumerable<Frequency> LocationList
+        {
+            get
+            {
+                var currentInstallation = from component in this
+                                          where this.SelectedInstallations.Contains(component.Installation)
+                                          select component;
+
+                return from component in currentInstallation
+                       group component by component.Location into location
+                       orderby location.Count() descending
+                       where !ExcludedLocations.Contains(location.Key)
+                       select new Frequency
+                       {
+                           Name = location.Key,
+                           Count = location.Count()
+                       };
+
+            }
+        }
+
+        public List<string> ExcludedLocations = new List<string>
+        {
+            ""
+        };
     }
 }

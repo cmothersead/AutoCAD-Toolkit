@@ -44,8 +44,26 @@ namespace PanelInsert
                     CatalogNumber = odr["CAT"].ToString(),
                     Installation = odr["INST"].ToString(),
                     Location = odr["LOC"].ToString(),
-                });
+                    Family = odr["FAMILY"].ToString()
+                }); ;
             }
+
+            instList.ItemsSource = componentCollection.InstallationList;
+            instList.DisplayMemberPath = "Name";
+            instList.SelectAll();
+
+            locList.ItemsSource = componentCollection.LocationList;
+        }
+
+        private void instList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComponentCollection componentCollection = (ComponentCollection)this.Resources["components"];
+            componentCollection.SelectedInstallations = new System.Collections.Generic.List<string>();
+            foreach (ComponentCollection.Frequency inst in instList.SelectedItems)
+            {
+                componentCollection.SelectedInstallations.Add(inst.Name);
+            }
+            locList.ItemsSource = componentCollection.LocationList;
         }
     }
 }
