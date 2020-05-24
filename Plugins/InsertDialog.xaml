@@ -27,12 +27,12 @@
             Text="Components"
         />
         <DataGrid 
-            Name="panelGrid"
+            x:Name="panelGrid"
             ItemsSource="{Binding Source={StaticResource cvsComponents}}"
             Grid.Column="0"
             Grid.Row="1"
             CanUserResizeRows="False"
-            CanUserResizeColumns="True"
+            CanUserResizeColumns="False"
             CanUserSortColumns="False"
             Margin="10,0,5,10"
             AutoGenerateColumns="False"

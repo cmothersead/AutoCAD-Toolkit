@@ -28,11 +28,6 @@ namespace PanelInsert
         {
             InitializeComponent();
             ComponentCollection componentCollection = (ComponentCollection)this.Resources["components"];
-            FillCollection(componentCollection);
-        }
-
-        private void FillCollection(ComponentCollection componentCollection)
-        {
             OleDbConnection con = Connect.ProjectDatabase();
             con.Open();
 
@@ -42,15 +37,15 @@ namespace PanelInsert
 
             while (odr.Read())
             {
-                PanelInsert.Component component = new PanelInsert.Component();
-                component.deviceNumber = odr["TAGNAME"].ToString();
-                component.manufacturer = odr["MFG"].ToString();
-                component.catalogNumber = odr["CAT"].ToString();
-                component.installation = odr["INST"].ToString();
-                component.location = odr["LOC"].ToString();
-                componentCollection.Add(component);
+                componentCollection.Add(new PanelInsert.Component()
+                {
+                    deviceNumber = odr["TAGNAME"].ToString(),
+                    manufacturer = odr["MFG"].ToString(),
+                    catalogNumber = odr["CAT"].ToString(),
+                    installation = odr["INST"].ToString(),
+                    location = odr["LOC"].ToString(),
+                });
             }
         }
-
     }
 }
