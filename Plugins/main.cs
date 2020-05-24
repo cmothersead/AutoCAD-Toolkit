@@ -30,11 +30,12 @@ namespace PanelInsert
 
     public class Component
     {
-        public string deviceNumber { get; set; }
-        public string manufacturer { get; set; }
-        public string catalogNumber { get; set; }
-        public string installation { get; set; }
-        public string location { get; set; }
+        public string DeviceNumber { get; set; }
+        public string Manufacturer { get; set; }
+        public string CatalogNumber { get; set; }
+        public string Installation { get; set; }
+        public string Location { get; set; }
+        public string Family { get; set; }
     }
 
     public class ComponentCollection : ObservableCollection<Component>

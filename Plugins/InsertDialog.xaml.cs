@@ -39,11 +39,11 @@ namespace PanelInsert
             {
                 componentCollection.Add(new PanelInsert.Component()
                 {
-                    deviceNumber = odr["TAGNAME"].ToString(),
-                    manufacturer = odr["MFG"].ToString(),
-                    catalogNumber = odr["CAT"].ToString(),
-                    installation = odr["INST"].ToString(),
-                    location = odr["LOC"].ToString(),
+                    DeviceNumber = odr["TAGNAME"].ToString(),
+                    Manufacturer = odr["MFG"].ToString(),
+                    CatalogNumber = odr["CAT"].ToString(),
+                    Installation = odr["INST"].ToString(),
+                    Location = odr["LOC"].ToString(),
                 });
             }
         }
