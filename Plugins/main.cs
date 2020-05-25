@@ -48,7 +48,8 @@ namespace PanelInsert
             public int Count { get; set; }
         }
 
-        public List<string> SelectedInstallations { get; set; }
+        public List<string> SelectedInstallations { get; set; } = new List<string>();
+        public List<string> SelectedLocations { get; set; } = new List<string>();
 
         public IEnumerable<Frequency> InstallationList
         {

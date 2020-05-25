@@ -48,22 +48,50 @@ namespace PanelInsert
                 }); ;
             }
 
-            instList.ItemsSource = componentCollection.InstallationList;
-            instList.DisplayMemberPath = "Name";
-            instList.SelectAll();
+            InstList.ItemsSource = componentCollection.InstallationList;
+            InstList.DisplayMemberPath = "Name";
 
-            locList.ItemsSource = componentCollection.LocationList;
+            LocList.ItemsSource = componentCollection.LocationList;
+            LocList.DisplayMemberPath = "Name";
         }
 
-        private void instList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void InstList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComponentCollection componentCollection = (ComponentCollection)this.Resources["components"];
             componentCollection.SelectedInstallations = new System.Collections.Generic.List<string>();
-            foreach (ComponentCollection.Frequency inst in instList.SelectedItems)
+            foreach (ComponentCollection.Frequency inst in InstList.SelectedItems)
             {
                 componentCollection.SelectedInstallations.Add(inst.Name);
             }
-            locList.ItemsSource = componentCollection.LocationList;
+            LocList.ItemsSource = componentCollection.LocationList;
+            CollectionViewSource cvsComponents = (CollectionViewSource)this.Resources["cvsComponents"];
+            cvsComponents.View.Refresh();
+        }
+
+        private void LocList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComponentCollection componentCollection = (ComponentCollection)this.Resources["components"];
+            componentCollection.SelectedLocations = new System.Collections.Generic.List<string>();
+            foreach (ComponentCollection.Frequency loc in LocList.SelectedItems)
+            {
+                componentCollection.SelectedLocations.Add(loc.Name);
+            }
+            CollectionViewSource cvsComponents = (CollectionViewSource)this.Resources["cvsComponents"];
+            cvsComponents.View.Refresh();
+        }
+
+        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
+        {
+            ComponentCollection componentCollection = (ComponentCollection)this.Resources["components"];
+            Component component = (Component)e.Item;
+            if (componentCollection.SelectedInstallations.Contains(component.Installation) & componentCollection.SelectedLocations.Contains(component.Location))
+            {
+                e.Accepted = true;
+            }
+            else
+            {
+                e.Accepted = false;
+            }
         }
     }
 }

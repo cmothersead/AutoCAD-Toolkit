@@ -7,7 +7,7 @@
              mc:Ignorable="d" Title="From Schematic List" Height="500">
     <Window.Resources>
         <local:ComponentCollection x:Key="components"/>
-        <CollectionViewSource x:Key="cvsComponents" Source="{StaticResource components}">
+        <CollectionViewSource x:Key="cvsComponents" Source="{StaticResource components}" Filter="CollectionViewSource_Filter">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Family"/>
             </CollectionViewSource.GroupDescriptions>
@@ -42,33 +42,6 @@
             AutoGenerateColumns="False"
             IsReadOnly="True"
         >
-            <!--<DataGrid.GroupStyle>
-                --><!-- Style for groups at top level. --><!--
-                <GroupStyle>
-                    <GroupStyle.ContainerStyle>
-                        <Style TargetType="{x:Type GroupItem}">
-                            <Setter Property="Margin" Value="0,0,0,5"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type GroupItem}">
-                                        <Expander IsExpanded="True" Background="#FF112255" BorderBrush="#FF002255" Foreground="#FFEEEEEE" BorderThickness="1,1,1,5">
-                                            <Expander.Header>
-                                                <DockPanel>
-                                                    <TextBlock FontWeight="Bold" Text="{Binding Path=Family}" Margin="5,0,0,0" Width="100"/>
-                                                    <TextBlock FontWeight="Bold" Text="Test"/>
-                                                </DockPanel>
-                                            </Expander.Header>
-                                            <Expander.Content>
-                                                <ItemsPresenter />
-                                            </Expander.Content>
-                                        </Expander>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </GroupStyle.ContainerStyle>
-                </GroupStyle>
-            </DataGrid.GroupStyle>-->
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Device Number" Width="4*" Binding="{Binding DeviceNumber}">
                     <DataGridTextColumn.HeaderStyle>
@@ -94,14 +67,14 @@
             Text="Installation"
         />
         <ListView 
-            Name="instList"
+            Name="InstList"
             Grid.Column="1"
             Grid.Row="1"
             Height="100"
             VerticalAlignment="Top"
             Margin="5,0,5,0"
             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-            SelectionChanged="instList_SelectionChanged"
+            SelectionChanged="InstList_SelectionChanged"
         >
         </ListView>
         <TextBlock
@@ -111,7 +84,7 @@
             Text="Location"
         />
         <ListView
-            Name="locList"
+            Name="LocList"
             DisplayMemberPath="Name"
             Grid.Column="2"
             Grid.Row="1"
@@ -119,6 +92,7 @@
             VerticalAlignment="Top"
             Margin="5,0,10,0"
             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+            SelectionChanged="LocList_SelectionChanged"
         >
         </ListView>
     </Grid>
