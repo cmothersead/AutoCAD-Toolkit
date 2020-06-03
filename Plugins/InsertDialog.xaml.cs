@@ -21,9 +21,7 @@ using System.Windows.Shapes;
 
 namespace PanelInsert
 {
-    /// <summary>
-    /// Interaction logic for UserControl1.xaml
-    /// </summary>
+
     public partial class InsertDialog : Window
     {
 

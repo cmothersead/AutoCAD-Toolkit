@@ -17,7 +17,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition/>
-            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -37,13 +36,19 @@
             Grid.Row="1"
             CanUserResizeRows="False"
             CanUserResizeColumns="False"
+            CanUserReorderColumns="False"
             CanUserSortColumns="False"
             Margin="10,0,5,10"
             AutoGenerateColumns="False"
+            HorizontalScrollBarVisibility="Hidden"
+            GridLinesVisibility="None"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+            VirtualizingPanel.VirtualizationMode="Recycling"
             IsReadOnly="True"
         >
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Device Number" Width="4*" Binding="{Binding DeviceTag}">
+                <DataGridTextColumn Header="Device Number" Binding="{Binding DeviceTag}">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -56,9 +61,31 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Manufacturer" Width="5*" Binding="{Binding Manufacturer}"/>
-                <DataGridTextColumn Header="Catalog Number" Width="7*" Binding="{Binding CatalogNumber}"/>
+                <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
+                <DataGridTextColumn Header="Catalog Number" Binding="{Binding CatalogNumber}"/>
             </DataGrid.Columns>
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                                        <Expander IsExpanded="False" Background="SkyBlue">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </StackPanel>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
         </DataGrid>
         <TextBlock
             Grid.Column="1"
