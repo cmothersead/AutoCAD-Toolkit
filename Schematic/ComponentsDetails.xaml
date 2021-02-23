@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="ICA.Schematic.ComponentsDetails"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ICA.Schematic"
+             mc:Ignorable="d">
+    <Grid>
+        <Image Source="1489M1.png" Height="40" Width="40"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Content="Protection Type" Grid.Column="0" Grid.Row="0"/>
+            <Label Content="Rated Current" Grid.Column="0" Grid.Row="1"/>
+            <Label Content="Trip Curve" Grid.Column="0" Grid.Row="2"/>
+            <Label Content="Pole Count" Grid.Column="0" Grid.Row="3"/>
+            <ComboBox Name="Type_ComboBox" Height="28" Grid.Column="1" Grid.Row="0"/>
+            <ComboBox Name="Rating_ComboBox" Height="28" Grid.Column="1" Grid.Row="1"/>
+            <ComboBox Name="TripCurve_ComboBox" Height="28" Grid.Column="1" Grid.Row="2"/>
+            <ComboBox Name="Poles_ComboBox" Height="28" Grid.Column="1" Grid.Row="3"/>
+        </Grid>
+    </Grid>
+</UserControl>

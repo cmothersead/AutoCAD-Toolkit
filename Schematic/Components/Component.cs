@@ -9,86 +9,34 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Component
+namespace ICA.Schematic.Components
 {
-    public class ComponentInstance
+    public class Component
     {
-        public BlockReference BlockReference;
-        public AttributeReference Tag;
-        public AttributeReference Family;
-        public AttributeReference[] Desc = new AttributeReference[3];
-        public AttributeReference Mfg;
-        public AttributeReference Cat;
-        public AttributeReference Inst;
-        public AttributeReference Loc;
+        public BlockReference BlockReference { get; set; }
+        public AttributeReference Tag { get; set; }
+        public AttributeReference Family { get; set; }
+        public List<AttributeReference> Desc { get; set; }
+        public AttributeReference Mfg { get; set; }
+        public AttributeReference Cat { get; set; }
+        public AttributeReference Inst { get; set; }
+        public AttributeReference Loc { get; set; }
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static void OpenDialog()
         {
-            ComponentInstance componentToEdit = new ComponentInstance();
+            Component componentToEdit = new Component();
             componentToEdit.Select();
             componentToEdit.Edit();
         }
 
         public void Edit()
         {
-            EditComponentWindow editWindow = new EditComponentWindow();
-            editWindow.Component = this;
-            if(Desc[0].Invisible)
+            EditWindow editWindow = new EditWindow
             {
-                editWindow.Description_Checkbox.IsChecked = true;
-            }
-            if(Mfg.Invisible & Cat.Invisible)
-            {
-                editWindow.Catalog_Checkbox.IsChecked = true;
-            }
-            if(Inst.Invisible)
-            {
-                editWindow.Installation_Checkbox.IsChecked = true;
-            }
-            if((bool)Application.ShowModalWindow(editWindow))
-            {
-                if ((bool)editWindow.Description_Checkbox.IsChecked)
-                {
-                    Desc[0].Hide();
-                    Desc[1].Hide();
-                    Desc[2].Hide();
-                }
-                else
-                {
-                    Desc[0].Unhide();
-                    Desc[1].Unhide();
-                    Desc[2].Unhide();
-                }
-                if((bool)editWindow.Catalog_Checkbox.IsChecked)
-                {
-                    Mfg.Hide();
-                    Cat.Hide();
-                }
-                else
-                {
-                    Mfg.Unhide();
-                    Cat.Unhide();
-                }
-                if((bool)editWindow.Installation_Checkbox.IsChecked)
-                {
-                    Inst.Hide();
-                    Loc.Hide();
-                }
-                else
-                {
-                    Inst.Unhide();
-                    Loc.Unhide();
-                }
-                Desc[0].SetValue(editWindow.Description1_TextBox.Text);
-                Desc[1].SetValue(editWindow.Description2_TextBox.Text);
-                Desc[2].SetValue(editWindow.Description3_TextBox.Text);
-                Mfg.SetValue(editWindow.Manufacturer_ComboBox.SelectedValue as String);
-                Cat.SetValue(editWindow.Catalog_ComboBox.SelectedValue as String);
-                Inst.SetValue(editWindow.Installation_TextBox.Text);
-                Loc.SetValue(editWindow.Location_TextBox.Text);
-                CollapseAttributeStack();
-            }
+                Component = this
+            };
+            Application.ShowModalWindow(editWindow);
         }
 
         public void Select()
@@ -100,8 +48,10 @@ namespace Component
                 PromptSelectionResult selectionResult = currentEditor.SelectImplied();
                 if (selectionResult.Status == PromptStatus.Error)
                 {
-                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions();
-                    selectionOptions.SingleOnly = true;
+                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions
+                    {
+                        SingleOnly = true
+                    };
                     selectionResult = currentEditor.GetSelection(selectionOptions);
                 }
                 else
@@ -125,9 +75,12 @@ namespace Component
                                     Family = BlockReference.GetAttributeReference("FAMILY");
                                     Mfg = BlockReference.GetAttributeReference("MFG");
                                     Cat = BlockReference.GetAttributeReference("CAT");
-                                    Desc[0] = BlockReference.GetAttributeReference("DESC1");
-                                    Desc[1] = BlockReference.GetAttributeReference("DESC2");
-                                    Desc[2] = BlockReference.GetAttributeReference("DESC3");
+                                    Desc = new List<AttributeReference>
+                                    {
+                                        BlockReference.GetAttributeReference("DESC1"),
+                                        BlockReference.GetAttributeReference("DESC2"),
+                                        BlockReference.GetAttributeReference("DESC3")
+                                    };
                                     Inst = BlockReference.GetAttributeReference("INST");
                                     Loc = BlockReference.GetAttributeReference("LOC");
                                 }
@@ -145,7 +98,6 @@ namespace Component
                 currentEditor.WriteMessage(ex.Message);
             }
         }
-
 
         public void CollapseAttributeStack()
         {
