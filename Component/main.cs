@@ -22,7 +22,7 @@ namespace Component
         public AttributeReference Inst;
         public AttributeReference Loc;
 
-        [CommandMethod("TESTEDIT", CommandFlags.UsePickSet)]
+        [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static void OpenDialog()
         {
             ComponentInstance componentToEdit = new ComponentInstance();
@@ -83,6 +83,10 @@ namespace Component
                 Desc[0].SetValue(editWindow.Description1_TextBox.Text);
                 Desc[1].SetValue(editWindow.Description2_TextBox.Text);
                 Desc[2].SetValue(editWindow.Description3_TextBox.Text);
+                Mfg.SetValue(editWindow.Manufacturer_ComboBox.SelectedValue as String);
+                Cat.SetValue(editWindow.Catalog_ComboBox.SelectedValue as String);
+                Inst.SetValue(editWindow.Installation_TextBox.Text);
+                Loc.SetValue(editWindow.Location_TextBox.Text);
                 CollapseAttributeStack();
             }
         }
