@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,6 +40,11 @@ namespace ICA.Schematic.Components.EditWindowControls
             get { return Part_ComboBox.SelectedItem as Part; }
             set { Part_ComboBox.SelectedItem = value; }
         }
+        public ObservableCollection<Part> Parts
+        {
+            get { return (ObservableCollection<Part>)Part_ComboBox.ItemsSource; }
+            set { Part_ComboBox.ItemsSource = value; }
+        }
         public bool? IsChecked
         {
             get { return PartNumber_Checkbox.IsChecked; }
@@ -52,26 +58,37 @@ namespace ICA.Schematic.Components.EditWindowControls
 
         public async void Initialize(string family, string manufacturer, string part)
         {
+            Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
+            Manufacturers = new ObservableCollection<Manufacturer>
+                {
+                    new Manufacturer
+                    {
+                        ManufacturerName = manufacturer
+                    }
+                };
+            Manufacturer = Manufacturers[0];
+            Parts = new ObservableCollection<Part>
+                {
+                    new Part
+                    {
+                        PartNumber = part
+                    }
+                };
+            Part = Parts[0];
             try
             {
                 Family = await FamilyProcessor.GetFamilyAsync(family);
 
-                var manufacturersList = await ManufacturerProcessor.GetManufacturersAsync(Family.FamilyId);
-                foreach (var item in manufacturersList)
-                {
-                    item.ManufacturerName = item.ManufacturerName.ToUpper();
-                }
-                Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-                Manufacturer_ComboBox.ItemsSource = manufacturersList;
-                Manufacturer = manufacturersList.Single(m => m.ManufacturerName == manufacturer);
-                Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
+                Manufacturers = await LoadManufacturers(Family.FamilyId);
+                Manufacturer = Manufacturers.Single(m => m.ManufacturerName == manufacturer);
 
-                var partsList = await PartProcessor.GetPartNumbersAsync(Family.FamilyId, Manufacturer.ManufacturerId);
-                Part_ComboBox.ItemsSource = partsList;
-                Part = partsList.Single(p => p.PartNumber == part);
+                Parts = await LoadParts(Family.FamilyId, Manufacturer.ManufacturerId);
+                Part = Parts.Single(p => p.PartNumber == part);
+
+                Manufacturer_ComboBox.IsEnabled = true;
                 Part_ComboBox.IsEnabled = true;
             }
-            catch (System.Net.Http.HttpRequestException)
+            catch (HttpRequestException)
             {
                 Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Unable to connect to parts list");
             }
@@ -83,22 +100,19 @@ namespace ICA.Schematic.Components.EditWindowControls
                     if (newPart != null)
                     {
                         await LoadManufacturers(newPart.FamilyId);
-                        if (Manufacturer.ManufacturerId != newPart.ManufacturerId)
-                        {
-                            Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-                            Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
-                            Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
-                        }
+                        Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
+
                         await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
                         Part_ComboBox.SelectedValue = newPart.PartId;
                     }
                 }
             }
+            Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
         }
 
         private async void Manufacturer_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(Manufacturer != null)
+            if (Manufacturer != null)
             {
                 await LoadParts(Family.FamilyId, Manufacturer.ManufacturerId);
                 Part_ComboBox.IsEnabled = true;
@@ -107,22 +121,17 @@ namespace ICA.Schematic.Components.EditWindowControls
             {
                 Part_ComboBox.IsEnabled = false;
             }
-            
+
         }
 
-        public async Task LoadParts(int familyId, int manufacturerId)
+        public async Task<ObservableCollection<Part>> LoadParts(int familyId, int manufacturerId)
         {
-            Part_ComboBox.ItemsSource = await PartProcessor.GetPartNumbersAsync(familyId, manufacturerId);
+            return await PartProcessor.GetPartNumbersAsync(familyId, manufacturerId);
         }
 
-        public async Task LoadManufacturers(int familyId)
+        public async Task<ObservableCollection<Manufacturer>> LoadManufacturers(int familyId)
         {
-            var manufacturersList = await ManufacturerProcessor.GetManufacturersAsync(familyId);
-            foreach (var item in manufacturersList)
-            {
-                item.ManufacturerName = item.ManufacturerName.ToUpper();
-            }
-            Manufacturer_ComboBox.ItemsSource = manufacturersList;
+            return await ManufacturerProcessor.GetManufacturersUppercaseAsync(familyId);
         }
 
         private void ManufacturerDefault_CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -142,14 +151,14 @@ namespace ICA.Schematic.Components.EditWindowControls
         private async void AddPart_Button_Click(object sender, RoutedEventArgs e)
         {
             Part newPart = await AddPart(Family, Manufacturer);
-            if ( newPart != null)
+            if (newPart != null)
             {
                 Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
                 await LoadManufacturers(newPart.FamilyId);
                 Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
-                Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
                 await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
                 Part_ComboBox.SelectedValue = newPart.PartId;
+                Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
             }
         }
 
@@ -165,7 +174,6 @@ namespace ICA.Schematic.Components.EditWindowControls
             {
                 return await PartProcessor.CreatePartAsync(addPartWindow.Family.FamilyId, addPartWindow.Manufacturer.ManufacturerId, addPartWindow.Part_TextBox.Text);
             }
-
             return null;
         }
     }

@@ -30,7 +30,7 @@
                     <ColumnDefinition Width="32"/>
                 </Grid.ColumnDefinitions>
                 <Label Name="Manufacturer_Label" Content ="Manufacturer" FlowDirection="RightToLeft" Grid.Column="0" Grid.Row="0"/>
-                <ComboBox Name="Manufacturer_ComboBox" DisplayMemberPath="ManufacturerName" SelectedValuePath="ManufacturerId" SelectionChanged="Manufacturer_ComboBox_SelectionChanged" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="2"/>
+                <ComboBox Name="Manufacturer_ComboBox" DisplayMemberPath="ManufacturerName" SelectedValuePath="ManufacturerId" SelectionChanged="Manufacturer_ComboBox_SelectionChanged" VerticalContentAlignment="Center" IsEnabled="False" Grid.Column="1" Grid.Row="0" Margin="2"/>
                 <CheckBox Name="ManufacturerDefault_CheckBox" Content="Default" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Checked="ManufacturerDefault_CheckBox_Checked" Unchecked="ManufacturerDefault_CheckBox_Unchecked" IsEnabled="False">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.75" ScaleY="0.75"/>

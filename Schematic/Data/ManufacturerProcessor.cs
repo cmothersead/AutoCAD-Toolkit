@@ -24,5 +24,25 @@ namespace ICA.Schematic.Data
                 }
             }
         }
+
+        public static async Task<ObservableCollection<Manufacturer>> GetManufacturersUppercaseAsync(int familyId)
+        {
+            using (HttpResponseMessage response = await APIHelper.APIClient.GetAsync("https://localhost:44364/api/families/" + familyId + "/manufacturers"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var manufacturers = await response.Content.ReadAsAsync<ObservableCollection<Manufacturer>>();
+                    foreach(var manufacturer in manufacturers)
+                    {
+                        manufacturer.ManufacturerName = manufacturer.ManufacturerName.ToUpper();
+                    }
+                    return manufacturers;
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
     }
 }
