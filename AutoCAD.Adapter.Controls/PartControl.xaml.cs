@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,10 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ICA.Schematic.Data;
-using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
-namespace ICA.Schematic.Components.EditWindowControls
+namespace AutoCAD.Adapter.Controls
 {
     /// <summary>
     /// Interaction logic for PartControl.xaml
@@ -35,14 +29,14 @@ namespace ICA.Schematic.Components.EditWindowControls
             get { return (ObservableCollection<Manufacturer>)Manufacturer_ComboBox.ItemsSource; }
             set { Manufacturer_ComboBox.ItemsSource = value; }
         }
-        public Part Part
+        public IPart Part
         {
             get { return Part_ComboBox.SelectedItem as Part; }
             set { Part_ComboBox.SelectedItem = value; }
         }
-        public ObservableCollection<Part> Parts
+        public ObservableCollection<IPart> Parts
         {
-            get { return (ObservableCollection<Part>)Part_ComboBox.ItemsSource; }
+            get { return (ObservableCollection<IPart>)Part_ComboBox.ItemsSource; }
             set { Part_ComboBox.ItemsSource = value; }
         }
         public bool? IsChecked
@@ -56,7 +50,7 @@ namespace ICA.Schematic.Components.EditWindowControls
             InitializeComponent();
         }
 
-        public async void Initialize(string family, string manufacturer, string part)
+        public void Initialize(string family, string manufacturer, string part)
         {
             Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
             Manufacturers = new ObservableCollection<Manufacturer>
@@ -67,7 +61,7 @@ namespace ICA.Schematic.Components.EditWindowControls
                     }
                 };
             Manufacturer = Manufacturers[0];
-            Parts = new ObservableCollection<Part>
+            Parts = new ObservableCollection<IPart>
                 {
                     new Part
                     {
@@ -75,6 +69,12 @@ namespace ICA.Schematic.Components.EditWindowControls
                     }
                 };
             Part = Parts[0];
+            Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
+        }
+
+        public async void Populate(string family, string manufacturer, string part)
+        {
+            Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
             try
             {
                 Family = await FamilyProcessor.GetFamilyAsync(family);
@@ -96,7 +96,7 @@ namespace ICA.Schematic.Components.EditWindowControls
             {
                 if (MessageBox.Show("Part data does not match existing part. Create new?", "Invalid Part Data", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    Part newPart = await AddPart(Family, Manufacturer, part);
+                    IPart newPart = await AddPart(Family, Manufacturer, part);
                     if (newPart != null)
                     {
                         await LoadManufacturers(newPart.FamilyId);
@@ -124,7 +124,7 @@ namespace ICA.Schematic.Components.EditWindowControls
 
         }
 
-        public async Task<ObservableCollection<Part>> LoadParts(int familyId, int manufacturerId)
+        public async Task<ObservableCollection<IPart>> LoadParts(int familyId, int manufacturerId)
         {
             return await PartProcessor.GetPartNumbersAsync(familyId, manufacturerId);
         }
@@ -150,7 +150,7 @@ namespace ICA.Schematic.Components.EditWindowControls
 
         private async void AddPart_Button_Click(object sender, RoutedEventArgs e)
         {
-            Part newPart = await AddPart(Family, Manufacturer);
+            IPart newPart = await AddPart(Family, Manufacturer);
             if (newPart != null)
             {
                 Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
@@ -162,7 +162,7 @@ namespace ICA.Schematic.Components.EditWindowControls
             }
         }
 
-        private async Task<Part> AddPart(Family family, Manufacturer manufacturer, string partNumber = "")
+        private async Task<IPart> AddPart(Family family, Manufacturer manufacturer, string partNumber = "")
         {
             AddPartWindow addPartWindow = new AddPartWindow(
                 family,

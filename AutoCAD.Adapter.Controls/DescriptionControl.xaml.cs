@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,10 +11,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ICA.Schematic.Components.EditWindowControls
+namespace AutoCAD.Adapter.Controls
 {
     /// <summary>
-    /// Interaction logic for Description.xaml
+    /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class DescriptionControl : UserControl
     {
@@ -50,10 +48,10 @@ namespace ICA.Schematic.Components.EditWindowControls
             }
         }
 
-        public bool? IsChecked 
-        { 
+        public bool? IsChecked
+        {
             get { return Description_Checkbox.IsChecked; }
-            set { Description_Checkbox.IsChecked = value; } 
+            set { Description_Checkbox.IsChecked = value; }
         }
 
         public DescriptionControl()
