@@ -1,0 +1,42 @@
+﻿<Window x:Class="ICA.AutoCAD.Adapter.Windows.Views.EditView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Controls;assembly=AutoCAD.Adapter.Controls"
+        xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels"
+        mc:Ignorable="d"
+        Title="Edit Component"
+        MinWidth="620"
+        Loaded="EditWindow_Loaded"
+        Background="#FFE4E4E4"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:EditViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Margin="10" Grid.Column="0">
+            <controls:TagControl Name="TagControl" Text="{Binding Tag}"/>
+            <controls:InstallationControl Name="InstallationControl" Installation="{Binding Installation}" Location="{Binding Location}"/>
+        </StackPanel>
+
+        <StackPanel Margin="10" Grid.Column="1">
+            <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}"/>
+            <controls:PartControl Name="PartControl"/>
+            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
+                <Button Name="OK_Button" Content="OK" Click="OK_Button_Click" HorizontalAlignment="Right" Height="28" Width="65" Margin="2"/>
+                <Button Name="Cancel_Button" Content="Cancel" Click="Cancel_Button_Click" IsCancel="True" Height="28" Width="65" Margin="2"/>
+            </StackPanel>
+        </StackPanel>
+        
+    </Grid>
+</Window>

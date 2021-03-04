@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,84 +14,47 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AutoCAD.Adapter.Controls
+namespace ICA.AutoCAD.Adapter.Controls
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class DescriptionControl : UserControl
     {
-        public List<string> Text
+        public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register(
+                "ItemsSource",
+                typeof(IEnumerable),
+                typeof(DescriptionControl));
+        public IEnumerable ItemsSource
         {
-            get
-            {
-                List<string> text = new List<string>();
-                foreach (TextBox textBox in Description_StackPanel.Children)
-                {
-                    text.Add(textBox.Text);
-                }
-                return text;
-            }
-
-            set
-            {
-                Description_StackPanel.Children.RemoveRange(0, Description_StackPanel.Children.Count);
-                if (value.Count == 0)
-                {
-                    AddTextbox();
-                }
-                else
-                {
-                    foreach (string text in value)
-                    {
-                        AddTextbox(text);
-                    }
-                    AddTextbox();
-                }
-            }
+            get => (IEnumerable)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
         public bool? IsChecked
         {
-            get { return Description_Checkbox.IsChecked; }
-            set { Description_Checkbox.IsChecked = value; }
+            get => Description_Checkbox.IsChecked;
+            set => Description_Checkbox.IsChecked = value;
+        }
+
+        public event EventHandler Checked;
+        private void Description_Checkbox_Checked(object sender, RoutedEventArgs e)
+        {
+            Checked?.Invoke(this, e);
+        }
+
+        public event EventHandler Unchecked;
+        private void Description_Checkbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Unchecked?.Invoke(this, e);
         }
 
         public DescriptionControl()
         {
             InitializeComponent();
-            AddTextbox();
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox thisTextBox = e.Source as TextBox;
-            int index = Description_StackPanel.Children.IndexOf(thisTextBox);
-
-            if (!String.IsNullOrWhiteSpace(thisTextBox.Text))
-            {
-                if (Description_StackPanel.Children.Count == index + 1)
-                {
-                    AddTextbox();
-                }
-            }
-            else
-            {
-                Description_StackPanel.Children.Remove(Description_StackPanel.Children[index]);
-                Description_StackPanel.Children[index].Focus();
-            }
-        }
-
-        private void AddTextbox(string text = "")
-        {
-            Description_StackPanel.Children.Add(new TextBox
-            {
-                Text = text,
-                Height = 28,
-                Margin = new Thickness(2),
-                VerticalContentAlignment = VerticalAlignment.Center,
-                CharacterCasing = CharacterCasing.Upper
-            });
-        }
+        
     }
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ICA.AutoCAD.Adapter.Controls.Properties {
+namespace ICA.AutoCAD.Adapter.Windows.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ICA.AutoCAD.Adapter.Controls.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ICA.AutoCAD.Adapter.Controls.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ICA.AutoCAD.Adapter.Windows.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

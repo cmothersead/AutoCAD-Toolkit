@@ -1,6 +1,12 @@
-﻿using System;
+﻿using ICA.AutoCAD.Adapter;
+using ICA.Schematic.Data;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,8 +16,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Autodesk.AutoCAD.ApplicationServices;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
-namespace AutoCAD.Adapter.Controls
+namespace ICA.AutoCAD.Adapter.Controls
 {
     /// <summary>
     /// Interaction logic for PartControl.xaml
@@ -90,21 +98,21 @@ namespace AutoCAD.Adapter.Controls
             }
             catch (HttpRequestException)
             {
-                Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Unable to connect to parts list");
+                Autodesk.AutoCAD.ApplicationServices.Core.Application.ShowAlertDialog("Unable to connect to parts list");
             }
             catch (InvalidOperationException)
             {
                 if (MessageBox.Show("Part data does not match existing part. Create new?", "Invalid Part Data", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    IPart newPart = await AddPart(Family, Manufacturer, part);
-                    if (newPart != null)
-                    {
-                        await LoadManufacturers(newPart.FamilyId);
-                        Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
+                    //IPart newPart = await AddPart(Family, Manufacturer, part);
+                    //if (newPart != null)
+                    //{
+                    //    await LoadManufacturers(newPart.FamilyId);
+                    //    Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
 
-                        await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
-                        Part_ComboBox.SelectedValue = newPart.PartId;
-                    }
+                    //    await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
+                    //    Part_ComboBox.SelectedValue = newPart.PartId;
+                    //}
                 }
             }
             Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
@@ -148,33 +156,33 @@ namespace AutoCAD.Adapter.Controls
             Manufacturer_ComboBox.IsEnabled = true;
         }
 
-        private async void AddPart_Button_Click(object sender, RoutedEventArgs e)
+        private void AddPart_Button_Click(object sender, RoutedEventArgs e)
         {
-            IPart newPart = await AddPart(Family, Manufacturer);
-            if (newPart != null)
-            {
-                Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-                await LoadManufacturers(newPart.FamilyId);
-                Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
-                await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
-                Part_ComboBox.SelectedValue = newPart.PartId;
-                Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
-            }
+            //IPart newPart = await AddPart(Family, Manufacturer);
+            //if (newPart != null)
+            //{
+            //    Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
+            //    await LoadManufacturers(newPart.FamilyId);
+            //    Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
+            //    await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
+            //    Part_ComboBox.SelectedValue = newPart.PartId;
+            //    Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
+            //}
         }
 
-        private async Task<IPart> AddPart(Family family, Manufacturer manufacturer, string partNumber = "")
-        {
-            AddPartWindow addPartWindow = new AddPartWindow(
-                family,
-                Manufacturers,
-                manufacturer,
-                partNumber
-            );
-            if ((bool)Application.ShowModalWindow(addPartWindow))
-            {
-                return await PartProcessor.CreatePartAsync(addPartWindow.Family.FamilyId, addPartWindow.Manufacturer.ManufacturerId, addPartWindow.Part_TextBox.Text);
-            }
-            return null;
-        }
+        //private async Task<IPart> AddPart(Family family, Manufacturer manufacturer, string partNumber = "")
+        //{
+        //    //AddPartWindow addPartWindow = new AddPartWindow(
+        //    //    family,
+        //    //    Manufacturers,
+        //    //    manufacturer,
+        //    //    partNumber
+        //    //);
+        //    //if ((bool)Application.ShowModalWindow(addPartWindow))
+        //    //{
+        //    //    return await PartProcessor.CreatePartAsync(addPartWindow.Family.FamilyId, addPartWindow.Manufacturer.ManufacturerId, addPartWindow.Part_TextBox.Text);
+        //    //}
+        //    return null;
+        //}
     }
 }

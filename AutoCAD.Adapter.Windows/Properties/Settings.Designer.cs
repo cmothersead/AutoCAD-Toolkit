@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ICA.AutoCAD.Adapter.Controls.Properties {
+namespace ICA.AutoCAD.Adapter.Windows.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

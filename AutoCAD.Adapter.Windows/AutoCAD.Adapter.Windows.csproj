@@ -4,17 +4,19 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2983AAA5-E4F4-41C3-99D0-936497DEF141}</ProjectGuid>
-    <OutputType>library</OutputType>
-    <RootNamespace>ICA.AutoCAD.Adapter.Controls</RootNamespace>
-    <AssemblyName>AutoCAD.Adapter.Controls</AssemblyName>
+    <ProjectGuid>{88A9421B-73D7-4CF8-8916-1C9046EE0E88}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>ICA.AutoCAD.Adapter.Windows</RootNamespace>
+    <AssemblyName>AutoCAD.Adapter.Windows</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,19 +34,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AcCoreMgd">
-      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcCoreMgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcDbMgd">
-      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcDbMgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcMgd">
-      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcMgd.dll</HintPath>
-    </Reference>
-    <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
-      <HintPath>..\packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -60,36 +54,33 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TagControl.xaml.cs">
-      <DependentUpon>TagControl.xaml</DependentUpon>
-    </Compile>
-    <Page Include="DescriptionControl.xaml">
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="Views\AddPartWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="DescriptionControl.xaml.cs">
-      <DependentUpon>DescriptionControl.xaml</DependentUpon>
-    </Compile>
-    <Page Include="InstallationControl.xaml">
+    <Page Include="Views\EditView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PartControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
-    <Page Include="TagControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
+    <Compile Include="Models\Tag.cs" />
+    <Compile Include="Views\AddPartWindow.xaml.cs">
+      <DependentUpon>AddPartWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Models\Description.cs" />
+    <Compile Include="ViewModels\EditViewModel.cs" />
+    <Compile Include="Views\EditView.xaml.cs">
+      <DependentUpon>EditView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InstallationControl.xaml.cs">
-      <DependentUpon>InstallationControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PartControl.xaml.cs">
-      <DependentUpon>PartControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -107,22 +98,24 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoCAD.Adapter\AutoCAD.Adapter.csproj">
-      <Project>{e318c1c8-25fe-4ea0-b2fc-d9b3d27c24ce}</Project>
-      <Name>AutoCAD.Adapter</Name>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoCAD.Adapter.Controls\AutoCAD.Adapter.Controls.csproj">
+      <Project>{2983aaa5-e4f4-41c3-99d0-936497def141}</Project>
+      <Name>AutoCAD.Adapter.Controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\Schematic\Schematic.csproj">
-      <Project>{62e2152a-0316-4966-ba17-08d846223fd3}</Project>
+      <Project>{62E2152A-0316-4966-BA17-08D846223FD3}</Project>
       <Name>Schematic</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AutoCAD.Adapter.Controls
+namespace ICA.AutoCAD.Adapter.Controls
 {
     /// <summary>
     /// Interaction logic for TagControl.xaml
@@ -23,10 +23,16 @@ namespace AutoCAD.Adapter.Controls
             InitializeComponent();
         }
 
-        public string Text
+        public static readonly DependencyProperty TextProperty =
+            DependencyProperty.Register(
+                "Text",
+                typeof(object),
+                typeof(TagControl)
+                );
+        public object Text
         {
-            get { return Tag_TextBox.Text; }
-            set { Tag_TextBox.Text = value; }
+            get => GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
