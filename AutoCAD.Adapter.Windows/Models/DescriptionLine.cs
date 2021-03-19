@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter.Windows.Models
 {
@@ -38,5 +39,22 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
         /// Occurs when <see cref="Value"/> takes on a non-null, non-empty value
         /// </summary>
         public event EventHandler Filled;
+
+        public override bool Equals(object compare)
+        {
+            return Value == ((DescriptionLine)compare).Value;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1571931217;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_value);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Value);
+            return hashCode;
+        }
+
+        public static bool operator ==(DescriptionLine x, DescriptionLine y) => x.Equals(y);
+        public static bool operator !=(DescriptionLine x, DescriptionLine y) => !x.Equals(y);
+
     }
 }
