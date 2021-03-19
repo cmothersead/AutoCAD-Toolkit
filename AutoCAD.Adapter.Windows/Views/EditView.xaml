@@ -8,7 +8,6 @@
         mc:Ignorable="d"
         Title="Edit Component"
         MinWidth="620"
-        Loaded="EditWindow_Loaded"
         Background="#FFE4E4E4"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize">

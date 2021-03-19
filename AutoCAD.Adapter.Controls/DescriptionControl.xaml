@@ -27,7 +27,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBox Name="Value_TextBox" Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource UppercaseDefault}" TextChanged="TextBox_TextChanged"/>
+                        <TextBox Name="Value_TextBox" Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource UppercaseDefault}"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
