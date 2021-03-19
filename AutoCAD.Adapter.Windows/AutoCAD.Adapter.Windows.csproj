@@ -66,6 +66,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="Models\DescriptionCollection.cs" />
+    <Compile Include="Models\Family.cs" />
+    <Compile Include="Models\Manufacturer.cs" />
+    <Compile Include="Models\Part.cs" />
     <Compile Include="Models\Tag.cs" />
     <Compile Include="Views\AddPartWindow.xaml.cs">
       <DependentUpon>AddPartWindow.xaml</DependentUpon>
@@ -74,7 +78,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\Description.cs" />
+    <Compile Include="Models\DescriptionLine.cs" />
     <Compile Include="ViewModels\EditViewModel.cs" />
     <Compile Include="Views\EditView.xaml.cs">
       <DependentUpon>EditView.xaml</DependentUpon>

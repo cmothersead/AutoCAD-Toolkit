@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace ICA.AutoCAD.Adapter.Controls
 {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Interaction logic for DescriptionControl.xaml
     /// </summary>
     public partial class DescriptionControl : UserControl
     {
@@ -41,18 +38,6 @@ namespace ICA.AutoCAD.Adapter.Controls
         {
             Unchecked?.Invoke(this, e);
         }
-
-        public event TextChangedEventHandler TextChanged;
-        /// <summary>
-        /// Temporary workaround to add/remove empty description lines
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextChanged?.Invoke(this, e);
-
-       }
 
         public DescriptionControl()
         {

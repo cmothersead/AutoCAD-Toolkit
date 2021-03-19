@@ -31,7 +31,7 @@
 
         <StackPanel Margin="10" Grid.Column="1">
             <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}"/>
-            <controls:PartControl Name="PartControl"/>
+            <controls:PartControl Name="PartControl" Family="{Binding Family}"/>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
                 <Button Name="OK_Button" Content="OK" Click="OK_Button_Click" HorizontalAlignment="Right" Height="28" Width="65" Margin="2"/>
                 <Button Name="Cancel_Button" Content="Cancel" Click="Cancel_Button_Click" IsCancel="True" Height="28" Width="65" Margin="2"/>
