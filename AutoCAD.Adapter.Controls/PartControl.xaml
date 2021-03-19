@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d">
-    <GroupBox ToolTip="Catalog information">
+    <GroupBox ToolTip="Catalog information" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PartControl}}">
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
-                <Label Content="Part Data" VerticalContentAlignment="Center"/>
-                <CheckBox Name="PartNumber_Checkbox" Content="Hide" Margin="5,8,5,0">
+                <Label Content="Part Data"/>
+                <CheckBox Name="PartNumber_Checkbox" Content="Hide" VerticalAlignment="Center" VerticalContentAlignment="Center">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
                     </CheckBox.LayoutTransform>
@@ -19,27 +20,28 @@
         <StackPanel>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="32"/>
-                    <RowDefinition Height="32"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="32"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="5"/>
                 </Grid.ColumnDefinitions>
-                <Label Name="Manufacturer_Label" Content ="Manufacturer" FlowDirection="RightToLeft" Grid.Column="0" Grid.Row="0"/>
-                <ComboBox Name="Manufacturer_ComboBox" DisplayMemberPath="ManufacturerName" SelectedValuePath="ManufacturerId" SelectionChanged="Manufacturer_ComboBox_SelectionChanged" VerticalContentAlignment="Center" IsEnabled="False" Grid.Column="1" Grid.Row="0" Margin="2"/>
+                <Label Name="Manufacturer_Label" Content="Manufacturer" Grid.Column="0" Grid.Row="0"/>
+                <ComboBox Name="Manufacturer_ComboBox" ItemsSource="{Binding Family.Manufacturers}" SelectedItem="{Binding CurrentManufacturer}" DisplayMemberPath="Name" SelectionChanged="Manufacturer_ComboBox_SelectionChanged" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="2"/>
                 <CheckBox Name="ManufacturerDefault_CheckBox" Content="Default" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Checked="ManufacturerDefault_CheckBox_Checked" Unchecked="ManufacturerDefault_CheckBox_Unchecked" IsEnabled="False">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.75" ScaleY="0.75"/>
                     </CheckBox.LayoutTransform>
                 </CheckBox>
 
-                <Label Name="Part_Label" Content ="Part Number" FlowDirection="RightToLeft" Grid.Row="1" Grid.Column="0"/>
-                <ComboBox x:Name="Part_ComboBox" DisplayMemberPath="PartNumber" SelectedValuePath="PartId" VerticalContentAlignment="Center" IsEnabled="False" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"/>
-                <Button x:Name="PartSearch_Button" Margin="2" Grid.Column="3" Grid.Row="1">
+                <Label Name="Part_Label" Content="Part Number" Grid.Row="1" Grid.Column="0"/>
+                <ComboBox Name="Part_ComboBox" ItemsSource="{Binding CurrentManufacturer.Parts}" DisplayMemberPath="Number" SelectedValue="Id" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"/>
+                <Button Name="PartSearch_Button" Margin="2" Grid.Column="3" Grid.Row="1">
                     <Button.Content>
                         <fa:FontAwesome Icon="Search" Foreground="DimGray"/>
                     </Button.Content>
@@ -72,7 +74,7 @@
                             <fa:FontAwesome Icon="Plus" Foreground="Green"/>
                         </Button>
                         <Button Name="EditPart_Button" Margin="2" Width="20" IsEnabled="False">
-                            <fa:FontAwesome Icon="Edit" Margin="2"/>
+                            <fa:FontAwesome Icon="Edit"/>
                         </Button>
                     </StackPanel>
                 </StackPanel>

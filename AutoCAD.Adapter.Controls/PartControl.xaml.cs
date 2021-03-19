@@ -1,5 +1,4 @@
 ﻿using ICA.AutoCAD.Adapter;
-using ICA.Schematic.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,39 +17,60 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Autodesk.AutoCAD.ApplicationServices;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using System.Collections;
+using System.ComponentModel;
 
 namespace ICA.AutoCAD.Adapter.Controls
 {
     /// <summary>
     /// Interaction logic for PartControl.xaml
     /// </summary>
-    public partial class PartControl : UserControl
+    public partial class PartControl : UserControl, INotifyPropertyChanged
     {
-        public Family Family { get; set; }
-        public Manufacturer Manufacturer
+        public static readonly DependencyProperty FamilyProperty =
+                DependencyProperty.Register(
+                "Family",
+                typeof(object),
+                typeof(PartControl));
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string property)
         {
-            get { return Manufacturer_ComboBox.SelectedItem as Manufacturer; }
-            set { Manufacturer_ComboBox.SelectedItem = value; }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
-        public ObservableCollection<Manufacturer> Manufacturers
+
+        public object Family
         {
-            get { return (ObservableCollection<Manufacturer>)Manufacturer_ComboBox.ItemsSource; }
-            set { Manufacturer_ComboBox.ItemsSource = value; }
+            get => GetValue(FamilyProperty);
+            set => SetValue(FamilyProperty, value);
         }
-        public IPart Part
+
+        private object _currentManufacturer;
+        public object CurrentManufacturer
         {
-            get { return Part_ComboBox.SelectedItem as Part; }
-            set { Part_ComboBox.SelectedItem = value; }
+            get => _currentManufacturer;
+            set
+            {
+                _currentManufacturer = value;
+                OnPropertyChanged("CurrentManufacturer");
+            }
         }
-        public ObservableCollection<IPart> Parts
-        {
-            get { return (ObservableCollection<IPart>)Part_ComboBox.ItemsSource; }
-            set { Part_ComboBox.ItemsSource = value; }
-        }
+
+        //public static readonly DependencyProperty ManufacturersItemsSourceProperty =
+        //    DependencyProperty.Register(
+        //        "ManufacturersItemsSource",
+        //        typeof(IEnumerable),
+        //        typeof(PartControl));
+        //public IEnumerable ManufacturersItemsSource
+        //{
+        //    get => (IEnumerable)GetValue(ManufacturersItemsSourceProperty);
+        //    set => SetValue(ManufacturersItemsSourceProperty, value);
+        //}
+
         public bool? IsChecked
         {
-            get { return PartNumber_Checkbox.IsChecked; }
-            set { PartNumber_Checkbox.IsChecked = value; }
+            get => PartNumber_Checkbox.IsChecked;
+            set => PartNumber_Checkbox.IsChecked = value;
         }
 
         public PartControl()
@@ -58,97 +78,87 @@ namespace ICA.AutoCAD.Adapter.Controls
             InitializeComponent();
         }
 
-        public void Initialize(string family, string manufacturer, string part)
+        //public void Initialize(string family, string manufacturer, string part)
+        //{
+        //    Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
+        //    Manufacturers = new ObservableCollection<Manufacturer>
+        //        {
+        //            new Manufacturer
+        //            {
+        //                ManufacturerName = manufacturer
+        //            }
+        //        };
+        //    Manufacturer = Manufacturers[0];
+        //    Parts = new ObservableCollection<IPart>
+        //        {
+        //            new Part
+        //            {
+        //                PartNumber = part
+        //            }
+        //        };
+        //    Part = Parts[0];
+        //    Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
+        //}
+
+        //public async void Populate(string family, string manufacturer, string part)
+        //{
+        //    Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
+        //    try
+        //    {
+        //        Family = await FamilyProcessor.GetFamilyAsync(family);
+
+        //        Manufacturers = await LoadManufacturers(Family.FamilyId);
+        //        Manufacturer = Manufacturers.Single(m => m.ManufacturerName == manufacturer);
+
+        //        Parts = await LoadParts(Family.FamilyId, Manufacturer.ManufacturerId);
+        //        Part = Parts.Single(p => p.PartNumber == part);
+
+        //        Manufacturer_ComboBox.IsEnabled = true;
+        //        Part_ComboBox.IsEnabled = true;
+        //    }
+        //    catch (HttpRequestException)
+        //    {
+        //        Autodesk.AutoCAD.ApplicationServices.Core.Application.ShowAlertDialog("Unable to connect to parts list");
+        //    }
+        //    catch (InvalidOperationException)
+        //    {
+        //        if (MessageBox.Show("Part data does not match existing part. Create new?", "Invalid Part Data", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+        //        {
+        //            //IPart newPart = await AddPart(Family, Manufacturer, part);
+        //            //if (newPart != null)
+        //            //{
+        //            //    await LoadManufacturers(newPart.FamilyId);
+        //            //    Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
+
+        //            //    await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
+        //            //    Part_ComboBox.SelectedValue = newPart.PartId;
+        //            //}
+        //        }
+        //    }
+        //    Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
+        //}
+
+        private void Manufacturer_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-            Manufacturers = new ObservableCollection<Manufacturer>
-                {
-                    new Manufacturer
-                    {
-                        ManufacturerName = manufacturer
-                    }
-                };
-            Manufacturer = Manufacturers[0];
-            Parts = new ObservableCollection<IPart>
-                {
-                    new Part
-                    {
-                        PartNumber = part
-                    }
-                };
-            Part = Parts[0];
-            Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
         }
 
-        public async void Populate(string family, string manufacturer, string part)
-        {
-            Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-            try
-            {
-                Family = await FamilyProcessor.GetFamilyAsync(family);
+        //public async Task<ObservableCollection<IPart>> LoadParts(int familyId, int manufacturerId)
+        //{
+        //    return await PartProcessor.GetPartNumbersAsync(familyId, manufacturerId);
+        //}
 
-                Manufacturers = await LoadManufacturers(Family.FamilyId);
-                Manufacturer = Manufacturers.Single(m => m.ManufacturerName == manufacturer);
-
-                Parts = await LoadParts(Family.FamilyId, Manufacturer.ManufacturerId);
-                Part = Parts.Single(p => p.PartNumber == part);
-
-                Manufacturer_ComboBox.IsEnabled = true;
-                Part_ComboBox.IsEnabled = true;
-            }
-            catch (HttpRequestException)
-            {
-                Autodesk.AutoCAD.ApplicationServices.Core.Application.ShowAlertDialog("Unable to connect to parts list");
-            }
-            catch (InvalidOperationException)
-            {
-                if (MessageBox.Show("Part data does not match existing part. Create new?", "Invalid Part Data", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-                {
-                    //IPart newPart = await AddPart(Family, Manufacturer, part);
-                    //if (newPart != null)
-                    //{
-                    //    await LoadManufacturers(newPart.FamilyId);
-                    //    Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
-
-                    //    await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
-                    //    Part_ComboBox.SelectedValue = newPart.PartId;
-                    //}
-                }
-            }
-            Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
-        }
-
-        private async void Manufacturer_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (Manufacturer != null)
-            {
-                await LoadParts(Family.FamilyId, Manufacturer.ManufacturerId);
-                Part_ComboBox.IsEnabled = true;
-            }
-            else
-            {
-                Part_ComboBox.IsEnabled = false;
-            }
-
-        }
-
-        public async Task<ObservableCollection<IPart>> LoadParts(int familyId, int manufacturerId)
-        {
-            return await PartProcessor.GetPartNumbersAsync(familyId, manufacturerId);
-        }
-
-        public async Task<ObservableCollection<Manufacturer>> LoadManufacturers(int familyId)
-        {
-            return await ManufacturerProcessor.GetManufacturersUppercaseAsync(familyId);
-        }
+        //public async Task<ObservableCollection<Manufacturer>> LoadManufacturers(int familyId)
+        //{
+        //    return await ManufacturerProcessor.GetManufacturersUppercaseAsync(familyId);
+        //}
 
         private void ManufacturerDefault_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Manufacturer_ComboBox.IsEnabled = false;
-            if ((int)Manufacturer_ComboBox.SelectedValue != 5)
-            {
-                Manufacturer_ComboBox.SelectedValue = 5;
-            }
+            //if ((int)Manufacturer_ComboBox.SelectedValue != 5)
+            //{
+            //    Manufacturer_ComboBox.SelectedValue = 5;
+            //}
         }
 
         private void ManufacturerDefault_CheckBox_Unchecked(object sender, RoutedEventArgs e)

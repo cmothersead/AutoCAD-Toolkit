@@ -5,6 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/TextBox.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <GroupBox DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:DescriptionControl}}">
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
@@ -20,7 +27,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBox Text="{Binding Value}" Margin="2" Padding="3" CharacterCasing="Upper"/>
+                        <TextBox Name="Value_TextBox" Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource UppercaseDefault}" TextChanged="TextBox_TextChanged"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

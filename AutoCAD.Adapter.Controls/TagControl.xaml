@@ -6,20 +6,27 @@
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/TextBox.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <GroupBox Header="Tag" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TagControl}}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="32"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox Name="Tag_TextBox" Height="28" VerticalContentAlignment="Center" Margin="2" Grid.Column="0" Text="{Binding Text}" IsEnabled="False"/>
-            <CheckBox Content="Manual" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="2" Padding="2" Grid.Column="1" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">
+            <TextBox Name="Tag_TextBox" Style="{StaticResource Default}" Grid.Column="0" Text="{Binding Text}" IsEnabled="False"/>
+            <CheckBox Content="Manual" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="1" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">
                 <CheckBox.LayoutTransform>
                     <ScaleTransform ScaleX="0.75" ScaleY="0.75"/>
                 </CheckBox.LayoutTransform>
             </CheckBox>
-            <Button Margin="2" Grid.Column="2">
+            <Button Margin="2" Width="24" Grid.Column="2">
                 <Button.Content>
                     <fa:FontAwesome Icon="Cog" Foreground="DimGray"/>
                 </Button.Content>

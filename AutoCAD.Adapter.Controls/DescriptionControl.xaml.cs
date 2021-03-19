@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ICA.AutoCAD.Adapter.Controls
 {
@@ -50,11 +42,30 @@ namespace ICA.AutoCAD.Adapter.Controls
             Unchecked?.Invoke(this, e);
         }
 
+        public event TextChangedEventHandler TextChanged;
+        /// <summary>
+        /// Temporary workaround to add/remove empty description lines
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextChanged?.Invoke(this, e);
+
+       }
+
         public DescriptionControl()
         {
             InitializeComponent();
         }
 
-        
+        public bool FocusItem(int index)
+        {
+            ContentPresenter c = Description_ItemsControl.ItemContainerGenerator.ContainerFromIndex(index) as ContentPresenter;
+            c.ApplyTemplate();
+            TextBox textBox = c.ContentTemplate.FindName("Value_TextBox", c) as TextBox;
+            textBox.Focus();
+            return true;
+        }
     }
 }
