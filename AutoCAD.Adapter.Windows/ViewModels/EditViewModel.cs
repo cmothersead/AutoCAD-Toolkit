@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using ICA.AutoCAD.Adapter.Windows.Models;
+using ICA.Schematic;
+using ICA.Schematic.Data;
+using Family = ICA.AutoCAD.Adapter.Windows.Models.Family;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
@@ -15,62 +20,39 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         public EditViewModel()
         {
-            Description = new DescriptionCollection
+        }
+
+        public EditViewModel(ISymbol symbol)
+        {
+            Tag = symbol.Tag;
+            Description = new DescriptionCollection(symbol.Description);
+            Installation = symbol.Enclosure;
+            Location = symbol.Location;
+        }
+
+        public async Task LoadFamilyDataAsync()
+        {
+            int familyId = await FamilyProcessor.GetFamilyIdAsync(Family.FamilyCode);
+            var manufacturers = await ManufacturerProcessor.GetManufacturersUppercaseAsync(familyId);
+            foreach (var manufacturer in manufacturers)
             {
-                "New",
-                "Data"
-            };
-            Family = new Family
-            {
-                FamilyCode = "CB",
-                Manufacturers = new ObservableCollection<Manufacturer>
+                var items = await PartProcessor.GetPartNumbersAsync(familyId, manufacturer.ManufacturerId);
+                var parts = new ObservableCollection<Models.Part>();
+                foreach (var item in items)
                 {
-                    new Manufacturer
+                    parts.Add(new Models.Part
                     {
-                        Name = "ALLEN-BRADLEY",
-                        Parts = new ObservableCollection<Part>
-                        {
-                            new Part
-                            {
-                                Id = 1,
-                                Number = "1492-SPM1C020"
-                            },
-                            new Part
-                            {
-                                Id = 2,
-                                Number = "1492-SPM1C050"
-                            },
-                            new Part
-                            {
-                                Id = 3,
-                                Number = "1492-SPM1C200"
-                            }
-                        }
-                    },
-                    new Manufacturer
-                    {
-                        Name = "SPRECHER + SCHUH",
-                        Parts = new ObservableCollection<Part>
-                        {
-                            new Part
-                            {
-                                Id = 4,
-                                Number = "PART1"
-                            },
-                            new Part
-                            {
-                                Id = 5,
-                                Number = "PART2"
-                            },
-                            new Part
-                            {
-                                Id = 6,
-                                Number = "PART3"
-                            }
-                        }
-                    }
+                        Id = item.PartId,
+                        Number = item.PartNumber
+                    });
                 }
-            };
+                Family.Manufacturers.Add(new Models.Manufacturer
+                {
+                    Name = manufacturer.ManufacturerName,
+                    Parts = parts
+                });
+            }
+            Family.IsLoaded = true;
         }
     }
 }

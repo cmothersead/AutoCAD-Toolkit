@@ -50,9 +50,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="ParentSymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">
+      <Project>{88a9421b-73d7-4cf8-8916-1c9046ee0e88}</Project>
+      <Name>AutoCAD.Adapter.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoCAD\AutoCAD.csproj">
+      <Project>{fbb7192a-a07f-4017-9f9c-984c7b7c6843}</Project>
+      <Name>AutoCAD</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Schematic\Schematic.csproj">
       <Project>{62e2152a-0316-4966-ba17-08d846223fd3}</Project>
       <Name>Schematic</Name>

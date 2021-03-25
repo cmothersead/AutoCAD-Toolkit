@@ -1,26 +1,29 @@
 ﻿using Autodesk.AutoCAD.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ICA.Schematic;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.ApplicationServices.Core;
+using ICA.Schematic;
+using ICA.AutoCAD.Adapter.Windows.ViewModels;
+using ICA.AutoCAD.Adapter.Windows.Views;
 
 namespace ICA.AutoCAD.Adapter
 {
     public static class Commands
     {
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
-        public static void Edit()
+        public static async void EditAsync()
         {
-            //EditWindow editWindow = new EditWindow(SelectSymbol());
-            //Application.ShowModalWindow(editWindow);
+            var editViewModel = new EditViewModel(SelectSymbol());
+            await editViewModel.LoadFamilyDataAsync();
+            var editWindow = new EditView(editViewModel);
+            Application.ShowModalWindow(editWindow);
         }
 
+        /// <summary>
+        /// Prompts for selection of a schematic symbol from the current drawing, or selects the implied symbol
+        /// </summary>
+        /// <returns></returns>
         public static ISymbol SelectSymbol()
         {
             Document currentDocument = Application.DocumentManager.MdiActiveDocument;
