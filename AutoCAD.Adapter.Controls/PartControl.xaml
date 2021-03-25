@@ -32,7 +32,7 @@
                     <ColumnDefinition Width="5"/>
                 </Grid.ColumnDefinitions>
                 <Label Name="Manufacturer_Label" Content="Manufacturer" Grid.Column="0" Grid.Row="0"/>
-                <ComboBox Name="Manufacturer_ComboBox" ItemsSource="{Binding Family.Manufacturers}" SelectedItem="{Binding CurrentManufacturer}" DisplayMemberPath="Name" SelectionChanged="Manufacturer_ComboBox_SelectionChanged" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="2"/>
+                <ComboBox Name="Manufacturer_ComboBox" ItemsSource="{Binding Family.Manufacturers}" SelectedItem="{Binding SelectedManufacturer}" DisplayMemberPath="Name" SelectionChanged="Manufacturer_ComboBox_SelectionChanged" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="2"/>
                 <CheckBox Name="ManufacturerDefault_CheckBox" Content="Default" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Checked="ManufacturerDefault_CheckBox_Checked" Unchecked="ManufacturerDefault_CheckBox_Unchecked" IsEnabled="False">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.75" ScaleY="0.75"/>
@@ -40,7 +40,7 @@
                 </CheckBox>
 
                 <Label Name="Part_Label" Content="Part Number" Grid.Row="1" Grid.Column="0"/>
-                <ComboBox Name="Part_ComboBox" ItemsSource="{Binding CurrentManufacturer.Parts}" DisplayMemberPath="Number" SelectedValue="Id" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"/>
+                <ComboBox Name="Part_ComboBox" ItemsSource="{Binding SelectedManufacturer.Parts}" SelectedItem="{Binding SelectedPart}" DisplayMemberPath="Number" SelectedValue="Id" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"/>
                 <Button Name="PartSearch_Button" Margin="2" Grid.Column="3" Grid.Row="1">
                     <Button.Content>
                         <fa:FontAwesome Icon="Search" Foreground="DimGray"/>

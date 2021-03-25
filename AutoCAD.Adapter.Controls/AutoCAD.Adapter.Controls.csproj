@@ -123,10 +123,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoCAD.Adapter\AutoCAD.Adapter.csproj">
-      <Project>{e318c1c8-25fe-4ea0-b2fc-d9b3d27c24ce}</Project>
-      <Name>AutoCAD.Adapter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Schematic\Schematic.csproj">
       <Project>{62e2152a-0316-4966-ba17-08d846223fd3}</Project>
       <Name>Schematic</Name>

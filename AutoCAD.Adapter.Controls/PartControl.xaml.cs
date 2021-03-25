@@ -28,16 +28,10 @@ namespace ICA.AutoCAD.Adapter.Controls
     public partial class PartControl : UserControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty FamilyProperty =
-                DependencyProperty.Register(
+            DependencyProperty.Register(
                 "Family",
                 typeof(object),
                 typeof(PartControl));
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
 
         public object Family
         {
@@ -45,27 +39,35 @@ namespace ICA.AutoCAD.Adapter.Controls
             set => SetValue(FamilyProperty, value);
         }
 
-        private object _currentManufacturer;
-        public object CurrentManufacturer
+        public static readonly DependencyProperty SelectedManufacturerProperty =
+            DependencyProperty.Register(
+                "SelectedManufacturer",
+                typeof(object),
+                typeof(PartControl));
+
+        public object SelectedManufacturer
         {
-            get => _currentManufacturer;
-            set
-            {
-                _currentManufacturer = value;
-                OnPropertyChanged("CurrentManufacturer");
-            }
+            get => GetValue(SelectedManufacturerProperty);
+            set => SetValue(SelectedManufacturerProperty, value);
         }
 
-        //public static readonly DependencyProperty ManufacturersItemsSourceProperty =
-        //    DependencyProperty.Register(
-        //        "ManufacturersItemsSource",
-        //        typeof(IEnumerable),
-        //        typeof(PartControl));
-        //public IEnumerable ManufacturersItemsSource
-        //{
-        //    get => (IEnumerable)GetValue(ManufacturersItemsSourceProperty);
-        //    set => SetValue(ManufacturersItemsSourceProperty, value);
-        //}
+        public static readonly DependencyProperty SelectedPartProperty =
+            DependencyProperty.Register(
+                "SelectedPart",
+                typeof(object),
+                typeof(PartControl));
+
+        public object SelectedPart
+        {
+            get => GetValue(SelectedPartProperty);
+            set => SetValue(SelectedPartProperty, value);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        }
 
         public bool? IsChecked
         {
@@ -78,87 +80,13 @@ namespace ICA.AutoCAD.Adapter.Controls
             InitializeComponent();
         }
 
-        //public void Initialize(string family, string manufacturer, string part)
-        //{
-        //    Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-        //    Manufacturers = new ObservableCollection<Manufacturer>
-        //        {
-        //            new Manufacturer
-        //            {
-        //                ManufacturerName = manufacturer
-        //            }
-        //        };
-        //    Manufacturer = Manufacturers[0];
-        //    Parts = new ObservableCollection<IPart>
-        //        {
-        //            new Part
-        //            {
-        //                PartNumber = part
-        //            }
-        //        };
-        //    Part = Parts[0];
-        //    Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
-        //}
-
-        //public async void Populate(string family, string manufacturer, string part)
-        //{
-        //    Manufacturer_ComboBox.SelectionChanged -= Manufacturer_ComboBox_SelectionChanged;
-        //    try
-        //    {
-        //        Family = await FamilyProcessor.GetFamilyAsync(family);
-
-        //        Manufacturers = await LoadManufacturers(Family.FamilyId);
-        //        Manufacturer = Manufacturers.Single(m => m.ManufacturerName == manufacturer);
-
-        //        Parts = await LoadParts(Family.FamilyId, Manufacturer.ManufacturerId);
-        //        Part = Parts.Single(p => p.PartNumber == part);
-
-        //        Manufacturer_ComboBox.IsEnabled = true;
-        //        Part_ComboBox.IsEnabled = true;
-        //    }
-        //    catch (HttpRequestException)
-        //    {
-        //        Autodesk.AutoCAD.ApplicationServices.Core.Application.ShowAlertDialog("Unable to connect to parts list");
-        //    }
-        //    catch (InvalidOperationException)
-        //    {
-        //        if (MessageBox.Show("Part data does not match existing part. Create new?", "Invalid Part Data", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-        //        {
-        //            //IPart newPart = await AddPart(Family, Manufacturer, part);
-        //            //if (newPart != null)
-        //            //{
-        //            //    await LoadManufacturers(newPart.FamilyId);
-        //            //    Manufacturer_ComboBox.SelectedValue = newPart.ManufacturerId;
-
-        //            //    await LoadParts(newPart.FamilyId, newPart.ManufacturerId);
-        //            //    Part_ComboBox.SelectedValue = newPart.PartId;
-        //            //}
-        //        }
-        //    }
-        //    Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
-        //}
-
         private void Manufacturer_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
 
-        //public async Task<ObservableCollection<IPart>> LoadParts(int familyId, int manufacturerId)
-        //{
-        //    return await PartProcessor.GetPartNumbersAsync(familyId, manufacturerId);
-        //}
-
-        //public async Task<ObservableCollection<Manufacturer>> LoadManufacturers(int familyId)
-        //{
-        //    return await ManufacturerProcessor.GetManufacturersUppercaseAsync(familyId);
-        //}
-
         private void ManufacturerDefault_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Manufacturer_ComboBox.IsEnabled = false;
-            //if ((int)Manufacturer_ComboBox.SelectedValue != 5)
-            //{
-            //    Manufacturer_ComboBox.SelectedValue = 5;
-            //}
         }
 
         private void ManufacturerDefault_CheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -179,20 +107,5 @@ namespace ICA.AutoCAD.Adapter.Controls
             //    Manufacturer_ComboBox.SelectionChanged += Manufacturer_ComboBox_SelectionChanged;
             //}
         }
-
-        //private async Task<IPart> AddPart(Family family, Manufacturer manufacturer, string partNumber = "")
-        //{
-        //    //AddPartWindow addPartWindow = new AddPartWindow(
-        //    //    family,
-        //    //    Manufacturers,
-        //    //    manufacturer,
-        //    //    partNumber
-        //    //);
-        //    //if ((bool)Application.ShowModalWindow(addPartWindow))
-        //    //{
-        //    //    return await PartProcessor.CreatePartAsync(addPartWindow.Family.FamilyId, addPartWindow.Manufacturer.ManufacturerId, addPartWindow.Part_TextBox.Text);
-        //    //}
-        //    return null;
-        //}
     }
 }
