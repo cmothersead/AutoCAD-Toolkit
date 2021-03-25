@@ -102,62 +102,40 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Components\AddPartWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Components\EditWindowControls\DescriptionControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Components\EditWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="ComponentsDetails.xaml.cs">
       <DependentUpon>ComponentsDetails.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\AddPartWindow.xaml.cs">
-      <DependentUpon>AddPartWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Components\EditWindowControls\DescriptionControl.xaml.cs">
-      <DependentUpon>DescriptionControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Components\EditWindowControls\InstallationControl.xaml.cs">
-      <DependentUpon>InstallationControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Components\EditWindowControls\PartControl.xaml.cs">
-      <DependentUpon>PartControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Components\EditWindowControls\TagControl.xaml.cs">
-      <DependentUpon>TagControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Data\APIHelper.cs" />
-    <Compile Include="Data\Part.cs" />
+    <Compile Include="Data\Parts\CircuitBreaker.cs" />
+    <Compile Include="Data\Parts\Connector.cs" />
+    <Compile Include="Data\Parts\Contacts\BreakerContact.cs" />
+    <Compile Include="Data\Parts\Contacts\ConvertibleContact.cs" />
+    <Compile Include="Data\Parts\Contacts\GroundedPowerContact.cs" />
+    <Compile Include="Data\Parts\Contacts\NormallyClosedContact.cs" />
+    <Compile Include="Data\Parts\Contacts\NormallyOpenContact.cs" />
+    <Compile Include="Data\Parts\Contacts\PowerContact.cs" />
+    <Compile Include="Data\Parts\ICable.cs" />
+    <Compile Include="Data\Parts\IConnector.cs" />
+    <Compile Include="Data\Parts\Contacts\IContact.cs" />
+    <Compile Include="Data\Parts\IMulticonductor.cs" />
+    <Compile Include="Data\Parts\ICircuitProtector.cs" />
+    <Compile Include="Data\Parts\IConductor.cs" />
+    <Compile Include="Data\Parts\IPart.cs" />
     <Compile Include="Data\PartProcessor.cs" />
     <Compile Include="Data\Family.cs" />
     <Compile Include="Data\FamilyProcessor.cs" />
     <Compile Include="Data\Manufacturer.cs" />
     <Compile Include="Components\Component.cs" />
-    <Compile Include="Components\EditWindow.xaml.cs">
-      <DependentUpon>EditWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Components\EditWindowControls\InstallationControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Components\EditWindowControls\PartControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Components\EditWindowControls\TagControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\ManufacturerProcessor.cs" />
+    <Compile Include="Data\Parts\ITerminal.cs" />
+    <Compile Include="Data\Parts\Multiconductor.cs" />
+    <Compile Include="Data\Parts\Part.cs" />
+    <Compile Include="Data\Parts\Voltage.cs" />
+    <Compile Include="IHideableAttributes.cs" />
+    <Compile Include="IParentSymbol.cs" />
+    <Compile Include="ISymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -193,6 +171,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoCAD\AutoCAD.csproj">
+      <Project>{fbb7192a-a07f-4017-9f9c-984c7b7c6843}</Project>
+      <Name>AutoCAD</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

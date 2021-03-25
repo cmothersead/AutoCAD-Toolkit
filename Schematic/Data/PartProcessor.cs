@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ICA.Schematic.Data
 {
-    class PartProcessor
+    public class PartProcessor
     {
         public static async Task<ObservableCollection<Part>> GetPartNumbersAsync(int familyId, int manufacturerId)
         {

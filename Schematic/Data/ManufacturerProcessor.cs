@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ICA.Schematic.Data
 {
-    class ManufacturerProcessor
+    public class ManufacturerProcessor
     {
         public static async Task<ObservableCollection<Manufacturer>> GetManufacturersAsync(int familyId)
         {
