@@ -12,17 +12,15 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
     /// </summary>
     public partial class EditView : Window
     {
-        public ParentSymbol Symbol;
-
         public EditView()
         {
             InitializeComponent();
         }
 
-        public EditView(ParentSymbol symbol)
+        public EditView(EditViewModel editViewModel)
         {
-            Symbol = symbol;
             InitializeComponent();
+            DataContext = editViewModel;
         }
 
         private void OK_Button_Click(object sender, RoutedEventArgs e)

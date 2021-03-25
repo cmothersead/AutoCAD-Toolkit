@@ -14,9 +14,6 @@
     <Window.DataContext>
         <vm:EditViewModel/>
     </Window.DataContext>
-    <Window.Resources>
-        
-    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -30,7 +27,7 @@
 
         <StackPanel Margin="10" Grid.Column="1">
             <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}"/>
-            <controls:PartControl Name="PartControl" Family="{Binding Family}"/>
+            <controls:PartControl Name="PartControl" Family="{Binding Family}" SelectedManufacturer="{Binding Family.CurrentManufacturer}" SelectedPart="{Binding Family.CurrentPart}" IsEnabled="{Binding Family.IsLoaded}"/>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
                 <Button Name="OK_Button" Content="OK" Click="OK_Button_Click" HorizontalAlignment="Right" Height="28" Width="65" Margin="2"/>
                 <Button Name="Cancel_Button" Content="Cancel" Click="Cancel_Button_Click" IsCancel="True" Height="28" Width="65" Margin="2"/>
