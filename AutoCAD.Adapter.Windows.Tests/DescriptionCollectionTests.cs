@@ -50,11 +50,26 @@ namespace AutoCAD.Adapter.Windows.Models.Tests
 
         [Theory]
         [MemberData(nameof(Data))]
-        public void AddsWhenFilled(DescriptionCollection descriptionLines)
+        public void AddsNewEmptyWhenFilled(DescriptionCollection descriptionLines)
         {
             int expected = descriptionLines.Count + 1;
 
             descriptionLines[descriptionLines.Count - 1].Value = "1";
+
+            int actual = descriptionLines.Count;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void AddRejectsNullOrEmptyValue()
+        {
+            DescriptionCollection descriptionLines = new DescriptionCollection();
+
+            int expected = descriptionLines.Count;
+
+            descriptionLines.Add("");
+            descriptionLines.Add(new DescriptionLine(""));
 
             int actual = descriptionLines.Count;
 

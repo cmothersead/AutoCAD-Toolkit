@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 
 namespace ICA.AutoCAD.Adapter.Windows.Models
 {
@@ -19,6 +19,19 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
             AddEmpty();
         }
 
+        /// <summary>
+        /// Constructor to initialize from an <see cref="IEnumerable{T}"/>
+        /// </summary>
+        /// <param name="value"></param>
+        public DescriptionCollection(IEnumerable<string> value)
+        {
+            AddEmpty();
+            foreach(string item in value)
+            {
+                Add(item);
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -29,6 +42,8 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
         /// <param name="item"></param>
         public new void Add(DescriptionLine item)
         {
+            if (string.IsNullOrEmpty(item.Value))
+                return;
             item.Emptied += DescriptionLine_Emptied;
             Insert(Count - 1, item);
         }
