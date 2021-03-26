@@ -8,11 +8,11 @@ namespace ICA.Schematic.Data
 {
     public class Part : IPart
     {
-        public int PartId { get; set; }
-        public int FamilyId => Family.FamilyId;
-        public int ManufacturerId => Manufacturer.ManufacturerId;
+        public int Id { get; set; }
+        public int FamilyId => Family.Id;
+        public int ManufacturerId => Manufacturer.Id;
         public Family Family { get; }
         public Manufacturer Manufacturer { get; set; }
-        public string PartNumber { get; set; }
+        public string Number { get; set; }
     }
 }

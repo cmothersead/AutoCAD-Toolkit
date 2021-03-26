@@ -1,8 +1,11 @@
-﻿namespace ICA.Schematic.Data
+﻿using System.Collections.Generic;
+
+namespace ICA.Schematic.Data
 {
     public class Family
     {
-        public int FamilyId { get; set; }
-        public string FamilyCode { get; set; }
+        public int Id { get; set; }
+        public string Code { get; set; }
+        public IEnumerable<Manufacturer> Manufacturers { get; set; }
     }
 }

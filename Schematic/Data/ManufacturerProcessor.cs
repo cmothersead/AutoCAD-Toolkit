@@ -34,7 +34,7 @@ namespace ICA.Schematic.Data
                     var manufacturers = await response.Content.ReadAsAsync<ObservableCollection<Manufacturer>>();
                     foreach(var manufacturer in manufacturers)
                     {
-                        manufacturer.ManufacturerName = manufacturer.ManufacturerName.ToUpper();
+                        manufacturer.Name = manufacturer.Name.ToUpper();
                     }
                     return manufacturers;
                 }
