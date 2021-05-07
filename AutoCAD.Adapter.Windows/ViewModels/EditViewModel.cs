@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using ICA.Schematic;
@@ -12,10 +9,11 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
     public class EditViewModel
     {
-        public string Tag { get; set; }
+        ISymbol _symbol;
+        public string Tag => _symbol.Tag;
         public DescriptionCollection Description { get; set; }
-        public string Installation { get; set; }
-        public string Location { get; set; }
+        public string Installation => _symbol.Enclosure;
+        public string Location => _symbol.Location;
         public Family Family { get; set; }
 
         public EditViewModel()
@@ -24,10 +22,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         public EditViewModel(ISymbol symbol)
         {
-            Tag = symbol.Tag;
-            Description = new DescriptionCollection(symbol.Description);
-            Installation = symbol.Enclosure;
-            Location = symbol.Location;
+            _symbol = symbol;
+            Description = new DescriptionCollection(_symbol.Description);
         }
 
         public async Task LoadFamilyDataAsync()
