@@ -14,6 +14,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -67,10 +69,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Models\DescriptionCollection.cs" />
-    <Compile Include="Models\Family.cs" />
-    <Compile Include="Models\Manufacturer.cs" />
-    <Compile Include="Models\Part.cs" />
     <Compile Include="Models\Tag.cs" />
+    <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\FamilyViewModel.cs" />
     <Compile Include="Views\AddPartWindow.xaml.cs">
       <DependentUpon>AddPartWindow.xaml</DependentUpon>
     </Compile>

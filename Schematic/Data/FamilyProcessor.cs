@@ -40,20 +40,20 @@ namespace ICA.Schematic.Data
             }
         }
 
-        //public static async Task<Family> GetFamilyAsync(string familyCode)
-        //{
-        //    using (HttpResponseMessage response = await APIHelper.APIClient.GetAsync("https://localhost:44364/api/families/" + familyCode))
-        //    {
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            return await response.Content.ReadAsAsync<Family>();
-        //        }
-        //        else
-        //        {
-        //            throw new Exception(response.ReasonPhrase);
-        //        }
-        //    }
-        //}
+        public static async Task<Family> GetFamilyAsync(string familyCode)
+        {
+            using (HttpResponseMessage response = await APIHelper.APIClient.GetAsync("https://localhost:44364/api/families/" + familyCode))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<Family>();
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
 
         public static async Task<ObservableCollection<Family>> GetFamiliesAsync()
         {

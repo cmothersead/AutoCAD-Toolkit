@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using ICA.Schematic;
@@ -7,14 +7,23 @@ using Family = ICA.AutoCAD.Adapter.Windows.Models.Family;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
-    public class EditViewModel
+    public class EditViewModel : BaseViewModel
     {
         ISymbol _symbol;
         public string Tag => _symbol.Tag;
         public DescriptionCollection Description { get; set; }
         public string Installation => _symbol.Enclosure;
         public string Location => _symbol.Location;
-        public Family Family { get; set; }
+        private FamilyViewModel _family;
+        public FamilyViewModel Family
+        {
+            get => _family;
+            set
+            {
+                _family = value;
+                OnPropertyChanged(nameof(Family));
+            }
+        }
 
         public EditViewModel()
         {
@@ -22,32 +31,18 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         public EditViewModel(ISymbol symbol)
         {
-            _symbol = symbol;
-            Description = new DescriptionCollection(_symbol.Description);
+            _symbol = symbol
+            Description = new DescriptionCollection(symbol.Description);
         }
 
         public async Task LoadFamilyDataAsync()
         {
-            int familyId = await FamilyProcessor.GetFamilyIdAsync(Family.FamilyCode);
-            var manufacturers = await ManufacturerProcessor.GetManufacturersUppercaseAsync(familyId);
-            foreach (var manufacturer in manufacturers)
-            {
-                var items = await PartProcessor.GetPartNumbersAsync(familyId, manufacturer.ManufacturerId);
-                var parts = new ObservableCollection<Models.Part>();
-                foreach (var item in items)
-                {
-                    parts.Add(new Models.Part
-                    {
-                        Id = item.PartId,
-                        Number = item.PartNumber
-                    });
-                }
-                Family.Manufacturers.Add(new Models.Manufacturer
-                {
-                    Name = manufacturer.ManufacturerName,
-                    Parts = parts
-                });
-            }
+            string code = Family.FamilyCode;
+            string currentManufacturerName = Family.CurrentManufacturer.Name;
+            string currentPartNumber = Family.CurrentPart.Number;
+            Family = await FamilyProcessor.GetFamilyAsync(code);
+            Family.CurrentManufacturer = Family.Manufacturers.Single(m => m.Name == currentManufacturerName);
+            Family.CurrentPart = Family.CurrentManufacturer.Parts.Single(p => p.Number == currentPartNumber);
             Family.IsLoaded = true;
         }
     }

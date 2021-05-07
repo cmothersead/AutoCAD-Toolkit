@@ -8,11 +8,11 @@ namespace ICA.Schematic.Data.Parts
 {
     public class CircuitBreaker : IPart
     {
-        public int PartId { get; set; }
-        public Family Family { get; } = new Family { FamilyId = 3, FamilyCode = "CB" };
+        public int Id { get; set; }
+        public Family Family { get; } = new Family { Id = 3, Code = "CB" };
         public Manufacturer Manufacturer { get; set; }
-        public int FamilyId => Family.FamilyId;
-        public int ManufacturerId => Manufacturer.ManufacturerId;
-        public string PartNumber { get; set; }
+        public int FamilyId => Family.Id;
+        public int ManufacturerId => Manufacturer.Id;
+        public string Number { get; set; }
     }
 }

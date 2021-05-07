@@ -1,8 +1,11 @@
-﻿namespace ICA.Schematic.Data
+﻿using System.Collections.Generic;
+
+namespace ICA.Schematic.Data
 {
     public class Manufacturer
     {
-        public int ManufacturerId { get; set; }
-        public string ManufacturerName { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public IEnumerable<Part> Parts { get; set; }
     }
 }
