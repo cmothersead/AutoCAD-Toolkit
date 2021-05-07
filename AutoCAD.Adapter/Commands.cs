@@ -6,6 +6,8 @@ using Autodesk.AutoCAD.ApplicationServices.Core;
 using ICA.Schematic;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
+using System.Collections.Generic;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -18,6 +20,70 @@ namespace ICA.AutoCAD.Adapter
             await editViewModel.LoadFamilyDataAsync();
             var editWindow = new EditView(editViewModel);
             Application.ShowModalWindow(editWindow);
+        }
+
+        [CommandMethod("MOUNT")]
+        public static void ToggleMountingLayers()
+        {
+            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+            LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
+            if (mountingLayer == null)
+                return;
+
+            if (mountingLayer.IsFrozen)
+                ShowMountingLayers();
+            else
+                HideMountingLayers();
+
+            currentDocument.Editor.Regen();
+        }
+
+        public static void HideMountingLayers()
+        {
+            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+            List<string> mountingLayers = new List<string>
+            {
+                "MOUNTING",
+                "BOUNDS",
+                "CLEARANCE"
+            };
+            List<string> viewingLayers = new List<string>
+            {
+                "COMPONENTS",
+                "WIPEOUT"
+            };
+            foreach (string layerName in mountingLayers)
+            {
+                currentDocument.FreezeLayer(layerName);
+            }
+            foreach (string layerName in viewingLayers)
+            {
+                currentDocument.ThawLayer(layerName);
+            }
+        }
+
+        public static void ShowMountingLayers()
+        {
+            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+            List<string> mountingLayers = new List<string>
+            {
+                "MOUNTING",
+                "BOUNDS",
+                "CLEARANCE"
+            };
+            List<string> viewingLayers = new List<string>
+            {
+                "COMPONENTS",
+                "WIPEOUT"
+            };
+            foreach (string layerName in mountingLayers)
+            {
+                currentDocument.ThawLayer(layerName);
+            }
+            foreach (string layerName in viewingLayers)
+            {
+                currentDocument.FreezeLayer(layerName);
+            }
         }
 
         /// <summary>
