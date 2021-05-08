@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using ICA.Schematic;
 using ICA.Schematic.Data;
-using Family = ICA.AutoCAD.Adapter.Windows.Models.Family;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {

@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCAD.Adapter", "AutoCAD.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCAD.Adapter.Windows", "AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj", "{88A9421B-73D7-4CF8-8916-1C9046EE0E88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schematic.Tests", "Schematic.Tests\Schematic.Tests.csproj", "{F4088E92-F058-4953-8379-2E7700DBE779}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCAD.Adapter.Windows.Tests", "AutoCAD.Adapter.Windows.Tests\AutoCAD.Adapter.Windows.Tests.csproj", "{5E9EB276-999C-4603-8F6A-8C1E247E02CF}"
 EndProject
 Global
@@ -55,10 +53,6 @@ Global
 		{88A9421B-73D7-4CF8-8916-1C9046EE0E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88A9421B-73D7-4CF8-8916-1C9046EE0E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88A9421B-73D7-4CF8-8916-1C9046EE0E88}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F4088E92-F058-4953-8379-2E7700DBE779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4088E92-F058-4953-8379-2E7700DBE779}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4088E92-F058-4953-8379-2E7700DBE779}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4088E92-F058-4953-8379-2E7700DBE779}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E9EB276-999C-4603-8F6A-8C1E247E02CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E9EB276-999C-4603-8F6A-8C1E247E02CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E9EB276-999C-4603-8F6A-8C1E247E02CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
