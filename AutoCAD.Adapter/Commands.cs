@@ -54,11 +54,11 @@ namespace ICA.AutoCAD.Adapter
             };
             foreach (string layerName in mountingLayers)
             {
-                currentDocument.FreezeLayer(layerName);
+                currentDocument.GetLayer(layerName).Freeze();
             }
             foreach (string layerName in viewingLayers)
             {
-                currentDocument.ThawLayer(layerName);
+                currentDocument.GetLayer(layerName).Thaw();
             }
         }
 
@@ -78,11 +78,11 @@ namespace ICA.AutoCAD.Adapter
             };
             foreach (string layerName in mountingLayers)
             {
-                currentDocument.ThawLayer(layerName);
+                currentDocument.GetLayer(layerName).Thaw();
             }
             foreach (string layerName in viewingLayers)
             {
-                currentDocument.FreezeLayer(layerName);
+                currentDocument.GetLayer(layerName).Freeze();
             }
         }
 
