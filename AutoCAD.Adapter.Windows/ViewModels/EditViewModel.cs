@@ -31,7 +31,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         public EditViewModel(ISymbol symbol)
         {
-            _symbol = symbol
+            _symbol = symbol;
             Description = new DescriptionCollection(symbol.Description);
         }
 
