@@ -24,10 +24,6 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             }
         }
 
-        public EditViewModel()
-        {
-        }
-
         public EditViewModel(ISymbol symbol)
         {
             _symbol = symbol;
