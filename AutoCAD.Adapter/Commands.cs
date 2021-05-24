@@ -13,6 +13,8 @@ namespace ICA.AutoCAD.Adapter
 {
     public static class Commands
     {
+        private static bool? MountMode = null;
+
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
         {
@@ -26,14 +28,22 @@ namespace ICA.AutoCAD.Adapter
         public static void ToggleMountingLayers()
         {
             Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-            LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
-            if (mountingLayer == null)
-                return;
+            if (MountMode is null)
+            {
+                LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
+                if (mountingLayer == null)
+                    return;
+                if (mountingLayer.IsFrozen)
+                    MountMode = false;
+                else
+                    MountMode = true;
+            }
 
-            if (mountingLayer.IsFrozen)
-                ShowMountingLayers();
-            else
+            if (MountMode is true)
                 HideMountingLayers();
+            else
+                ShowMountingLayers();
+            MountMode = !MountMode;
 
             currentDocument.Editor.Regen();
         }
