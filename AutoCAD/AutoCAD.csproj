@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ObjectSnap.cs" />
+    <Compile Include="SystemVariables.cs" />
     <Compile Include="AttributeReferenceExtensions.cs" />
     <Compile Include="BlockReferenceExtensions.cs" />
     <Compile Include="DocumentExtensions.cs" />

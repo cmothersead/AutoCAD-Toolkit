@@ -13,7 +13,34 @@ namespace ICA.AutoCAD.Adapter
 {
     public static class Commands
     {
-        private static bool? MountMode = null;
+        private static bool _mountMode;
+        public static bool MountMode
+        {
+            get
+            {
+                Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+                LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
+                return !mountingLayer.IsFrozen;
+            }
+            set
+            {
+                if(value)
+                {
+                    ShowMountingLayers();
+                    PreviousSnapMode = SystemVariables.GridSnap;
+                    SystemVariables.GridSnap = false;
+                }
+                else
+                {
+                    HideMountingLayers();
+                    if (PreviousSnapMode)
+                        SystemVariables.GridSnap = true;
+                }
+                _mountMode = value;
+                Application.DocumentManager.MdiActiveDocument.Editor.Regen();
+            }
+        }
+        private static bool PreviousSnapMode;
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
@@ -24,28 +51,15 @@ namespace ICA.AutoCAD.Adapter
             Application.ShowModalWindow(editWindow);
         }
 
+        /// <summary>
+        /// Toggles between layer states to help with manual mounting of panel components
+        /// </summary>
         [CommandMethod("MOUNT")]
         public static void ToggleMountingLayers()
         {
-            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-            if (MountMode is null)
-            {
-                LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
-                if (mountingLayer == null)
-                    return;
-                if (mountingLayer.IsFrozen)
-                    MountMode = false;
-                else
-                    MountMode = true;
-            }
-
-            if (MountMode is true)
-                HideMountingLayers();
-            else
-                ShowMountingLayers();
-            MountMode = !MountMode;
-
-            currentDocument.Editor.Regen();
+            var test = ObjectSnap.Endpoint;
+            ObjectSnap.Endpoint = false;
+            //MountMode = !MountMode;
         }
 
         public static void HideMountingLayers()
