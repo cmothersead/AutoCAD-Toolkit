@@ -27,20 +27,26 @@ namespace ICA.AutoCAD.Adapter
                 if(value)
                 {
                     ShowMountingLayers();
-                    PreviousSnapMode = SystemVariables.GridSnap;
+                    PreviousGridSnap = SystemVariables.GridSnap;
                     SystemVariables.GridSnap = false;
+                    PreviousObjectSnap = ObjectSnap.Value;
+                    ObjectSnap.None();
+                    ObjectSnap.Endpoint = true;
+                    ObjectSnap.Perpendicular = true;
                 }
                 else
                 {
                     HideMountingLayers();
-                    if (PreviousSnapMode)
+                    if (PreviousGridSnap)
                         SystemVariables.GridSnap = true;
+                    ObjectSnap.Value = PreviousObjectSnap;
                 }
                 _mountMode = value;
                 Application.DocumentManager.MdiActiveDocument.Editor.Regen();
             }
         }
-        private static bool PreviousSnapMode;
+        private static bool PreviousGridSnap;
+        public static short PreviousObjectSnap;
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
@@ -57,9 +63,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("MOUNT")]
         public static void ToggleMountingLayers()
         {
-            var test = ObjectSnap.Endpoint;
-            ObjectSnap.Endpoint = false;
-            //MountMode = !MountMode;
+            MountMode = !MountMode;
         }
 
         public static void HideMountingLayers()

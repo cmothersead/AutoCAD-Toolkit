@@ -31,29 +31,85 @@ namespace ICA.AutoCAD
 
         public static bool Endpoint
         {
-            get
-            {
-                return Get(Type.Endpoint);
-            }
-            set
-            {
-                Set(Type.Endpoint, value);
-            }
+            get => Get(Type.Endpoint);
+            set => Set(Type.Endpoint, value);
         }
-        public static bool Midpoint;
-        public static bool Center;
-        public static bool Node;
-        public static bool Quadrant;
-        public static bool Intersection;
-        public static bool Insertion;
-        public static bool Perpendicular;
-        public static bool Tangent;
-        public static bool Nearest;
-        public static bool GeometricCenter;
-        public static bool ApparentIntersection;
-        public static bool Extension;
-        public static bool Parallel;
-        public static bool IsEnabled;
+        public static bool Midpoint
+        {
+            get => Get(Type.Midpoint);
+            set => Set(Type.Midpoint, value);
+        }
+        public static bool Center
+        {
+            get => Get(Type.Center);
+            set => Set(Type.Center, value);
+        }
+        public static bool Node
+        {
+            get => Get(Type.Node);
+            set => Set(Type.Node, value);
+        }
+        public static bool Quadrant
+        {
+            get => Get(Type.Quadrant);
+            set => Set(Type.Quadrant, value);
+        }
+        public static bool Intersection
+        {
+            get => Get(Type.Intersection);
+            set => Set(Type.Intersection, value);
+        }
+        public static bool Insertion
+        {
+            get => Get(Type.Insertion);
+            set => Set(Type.Insertion, value);
+        }
+        public static bool Perpendicular
+        {
+            get => Get(Type.Perpendicular);
+            set => Set(Type.Perpendicular, value);
+        }
+        public static bool Tangent
+        {
+            get => Get(Type.Tangent);
+            set => Set(Type.Tangent, value);
+        }
+        public static bool Nearest
+        {
+            get => Get(Type.Nearest);
+            set => Set(Type.Nearest, value);
+        }
+        public static bool GeometricCenter
+        {
+            get => Get(Type.GeometricCenter);
+            set => Set(Type.GeometricCenter, value);
+        }
+        public static bool ApparentIntersection
+        {
+            get => Get(Type.ApparentIntersection);
+            set => Set(Type.ApparentIntersection, value);
+        }
+        public static bool Extension
+        {
+            get => Get(Type.Extension);
+            set => Set(Type.Extension, value);
+        }
+        public static bool Parallel
+        {
+            get => Get(Type.Parallel);
+            set => Set(Type.Parallel, value);
+        }
+        public static bool IsEnabled
+        {
+            get => !Get(Type.Disable);
+            set => Set(Type.Disable, !value);
+        }
+
+        public static short Value
+        {
+            get => Get();
+            set => Set(value);
+        }
 
         private static short Get()
         {
@@ -77,15 +133,11 @@ namespace ICA.AutoCAD
         {
             if (Get(type) != value)
                 if (value)
-                    Set((short)(Get() + 2 ^ ((int)type)));
+                    Set((short)(Get() + Math.Pow(2,(int)type)));
                 else
                 {
-                    var test = Get();
-                    var test2 = 2 ^ (int)type;
-                    test = (short)(test - (short)2 ^ (short)type);
-                    Set((short)(test - 2 ^ ((int)type)));
+                    Set((short)(Get() - Math.Pow(2, (int)type)));
                 }
-                    
         }
 
         public static void None()
