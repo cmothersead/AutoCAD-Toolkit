@@ -13,14 +13,18 @@ namespace ICA.AutoCAD.Adapter
 {
     public static class Commands
     {
-        private static bool _mountMode;
+        private static bool? _mountMode;
         public static bool MountMode
         {
             get
             {
-                Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-                LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
-                return !mountingLayer.IsFrozen;
+                if(_mountMode is null)
+                {
+                    Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+                    LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
+                    return !mountingLayer.IsFrozen;
+                }
+                return (bool)_mountMode;
             }
             set
             {
