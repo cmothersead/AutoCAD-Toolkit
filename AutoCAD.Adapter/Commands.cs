@@ -8,6 +8,8 @@ using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+using Autodesk.AutoCAD.Geometry;
+using System.IO;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -168,6 +170,39 @@ namespace ICA.AutoCAD.Adapter
             {
                 currentEditor.WriteMessage(ex.Message);
             }
+            return null;
+        }
+    
+        [CommandMethod("TESTINSERT")]
+        public static void Insert()
+        {
+            InsertSymbol("HCB1", new Point2d(0, 0));
+        }
+
+        public static ISymbol InsertSymbol(string name, Point2d location, float scale = 1, bool editDialog = false)
+        {
+            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+            Database database = currentDocument.Database;
+            BlockTable blockTable = database.GetBlockTable();
+            BlockTableRecord record;
+            if (blockTable.Has(name))
+                record = blockTable.GetBlockTableRecord(name);
+            else
+                record = blockTable.LoadExternalBlockTableRecord("C:/Users/cmotherseadicacontro/OneDrive - icacontrol.com/Electrical Library/libs/schematic/library/HCB1.dwg");
+
+            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                BlockReference insertion = new BlockReference(Point3d.Origin, record.ObjectId);
+                insertion.Insert(database, transaction);
+                var jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, insertion);
+
+                if (jig.Run() != PromptStatus.OK)
+                    return null;
+
+                transaction.Commit();
+            }
+            
+
             return null;
         }
     }

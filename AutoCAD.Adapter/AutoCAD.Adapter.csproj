@@ -98,6 +98,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="ParentSymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SymbolJig.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

@@ -93,6 +93,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockTableExtensions.cs" />
+    <Compile Include="DatabaseExtensions.cs" />
     <Compile Include="ObjectSnap.cs" />
     <Compile Include="SystemVariables.cs" />
     <Compile Include="AttributeReferenceExtensions.cs" />
