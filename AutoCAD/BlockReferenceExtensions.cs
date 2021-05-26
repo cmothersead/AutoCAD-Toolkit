@@ -5,6 +5,12 @@ namespace ICA.AutoCAD
 {
     public static class BlockReferenceExtensions
     {
+        /// <summary>
+        /// Gets readonly <see cref="AttributeReference"/> with the given tag, if it exists. Returns null if none found.
+        /// </summary>
+        /// <param name="blockReference"></param>
+        /// <param name="tag">Name of the attribute reference to retrieve</param>
+        /// <returns></returns>
         public static AttributeReference GetAttributeReference(this BlockReference blockReference, string tag)
         {
             using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
@@ -21,19 +27,21 @@ namespace ICA.AutoCAD
             return null;
         }
 
-        public static AttributeReference GetAttributeReference(this BlockReference blockReference, ObjectId id)
-        {
-            using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
-            {
-                return transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
-            }
-        }
-
+        /// <summary>
+        /// Returns true if the <see cref="BlockReference"/>'s <see cref="AttributeCollection"/> contains any elements
+        /// </summary>
+        /// <param name="blockReference"></param>
+        /// <returns></returns>
         public static bool HasAttributes(this BlockReference blockReference)
         {
             return blockReference.AttributeCollection.Count > 0;
         }
 
+        /// <summary>
+        /// Moves <see cref="BlockReference"/> to given <see cref="Point3d"/> within self-contained transaction.
+        /// </summary>
+        /// <param name="blockRefrerence"></param>
+        /// <param name="position">New origin point for the reference</param>
         public static void MoveTo(this BlockReference blockRefrerence, Point3d position)
         {
             using (Transaction transaction = blockRefrerence.Database.TransactionManager.StartTransaction())
@@ -43,6 +51,12 @@ namespace ICA.AutoCAD
             }
         }
 
+        /// <summary>
+        /// Moves <see cref="BlockReference"/> to given <see cref="Point3d"/> within passed transaction.
+        /// </summary>
+        /// <param name="blockRefrerence"></param>
+        /// <param name="position">New origin point for the reference</param>
+        /// <param name="transaction">Transaction dependency for the operation</param>
         public static void MoveTo(this BlockReference blockRefrerence, Point3d position, Transaction transaction)
         {
             Matrix3d transform = Matrix3d.Displacement(blockRefrerence.Position.GetVectorTo(position));
@@ -50,6 +64,11 @@ namespace ICA.AutoCAD
             blockReferenceWriteMode.TransformBy(transform);
         }
 
+        /// <summary>
+        /// Adds reference to the passed <see cref="Database"/> within self-contained transaction.
+        /// </summary>
+        /// <param name="blockReference"></param>
+        /// <param name="database">Database to append the reference to</param>
         public static void Insert(this BlockReference blockReference, Database database)
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
@@ -59,6 +78,12 @@ namespace ICA.AutoCAD
             }
         }
 
+        /// <summary>
+        /// Adds reference to the passed <see cref="Database"/> within passed transaction.
+        /// </summary>
+        /// <param name="blockReference"></param>
+        /// <param name="database">Database to append the reference to</param>
+        /// <param name="transaction">Transaction dependency for the operation</param>
         public static void Insert(this BlockReference blockReference, Database database, Transaction transaction)
         {
             BlockTableRecord modelSpace = transaction.GetObject(database.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
