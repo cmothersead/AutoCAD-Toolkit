@@ -1,9 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using ICA.AutoCAD.Adapter.Windows.Models;
+﻿using System.Windows;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
-using ICA.Schematic;
 
 namespace ICA.AutoCAD.Adapter.Windows.Views
 {
