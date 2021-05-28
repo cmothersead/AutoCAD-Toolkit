@@ -15,6 +15,9 @@ namespace ICA.AutoCAD
 
         public static BlockTableRecord LoadExternalBlockTableRecord (this BlockTable blockTable, string filePath)
         {
+            if (filePath is null)
+                return null;
+
             string fileName = Path.GetFileNameWithoutExtension(filePath);
             BlockTableRecord record;
             using (Transaction transaction = blockTable.Database.TransactionManager.StartTransaction())

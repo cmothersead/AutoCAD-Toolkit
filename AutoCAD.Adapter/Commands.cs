@@ -2,14 +2,13 @@
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.ApplicationServices.Core;
 using ICA.Schematic;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
-using System.IO;
+using ICA.AutoCAD.IO;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -188,7 +187,7 @@ namespace ICA.AutoCAD.Adapter
             if (blockTable.Has(name))
                 record = blockTable.GetBlockTableRecord(name);
             else
-                record = blockTable.LoadExternalBlockTableRecord("C:/Users/cmotherseadicacontro/OneDrive - icacontrol.com/Electrical Library/libs/schematic/library/HCB1.dwg");
+                record = blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
 
             using(Transaction transaction = database.TransactionManager.StartTransaction())
             {

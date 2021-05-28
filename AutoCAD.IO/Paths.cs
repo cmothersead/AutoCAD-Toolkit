@@ -150,12 +150,33 @@ namespace ICA.AutoCAD.IO
 
         public static string FindSchematic(string name)
         {
-            return GetFiles(Paths.SchematicLibrary, name)[0];
+            try
+            {
+                if (!name.Contains(".dwg"))
+                    name = $"{name}.dwg";
+                return GetFiles(Paths.SchematicLibrary, name)[0];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return null;
+            }
+
+
         }
 
         public static string FindPanel(string name)
         {
-            return GetFiles(Paths.PanelLibrary, name)[0];
+            try
+            {
+                if (!name.Contains(".dwg"))
+                    name = $"{name}.dwg";
+                return GetFiles(Paths.PanelLibrary, name)[0];
+            }
+            catch(IndexOutOfRangeException)
+            {
+                return null;
+            }
+            
         }
 
         #endregion

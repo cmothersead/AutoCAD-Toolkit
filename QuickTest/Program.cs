@@ -6,9 +6,6 @@ namespace QuickTest
     {
         static void Main(string[] args)
         {
-            string test = Paths.Main;
-            string test2 = Paths.SchematicLibrary;
-            string test3 = Paths.SchematicMenu;
         }
     }
 }

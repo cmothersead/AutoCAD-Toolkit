@@ -105,6 +105,10 @@
       <Project>{88a9421b-73d7-4cf8-8916-1c9046ee0e88}</Project>
       <Name>AutoCAD.Adapter.Windows</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AutoCAD.IO\AutoCAD.IO.csproj">
+      <Project>{68D45FA7-FBB1-4754-A8A6-0B2A56084E0E}</Project>
+      <Name>AutoCAD.IO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AutoCAD\AutoCAD.csproj">
       <Project>{fbb7192a-a07f-4017-9f9c-984c7b7c6843}</Project>
       <Name>AutoCAD</Name>
