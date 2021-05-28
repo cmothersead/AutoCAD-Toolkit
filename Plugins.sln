@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCAD.Adapter.Windows", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCAD.Adapter.Windows.Tests", "AutoCAD.Adapter.Windows.Tests\AutoCAD.Adapter.Windows.Tests.csproj", "{5E9EB276-999C-4603-8F6A-8C1E247E02CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickTest", "QuickTest\QuickTest.csproj", "{BD6D2376-5EDA-4CD0-9AFE-40CAD1164DE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTest", "QuickTest\QuickTest.csproj", "{BD6D2376-5EDA-4CD0-9AFE-40CAD1164DE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCAD.Directory", "Paths\AutoCAD.Directory.csproj", "{9D9146D7-4E50-4B73-9B1D-C4E2EC3B7EF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCAD.Directories", "Paths\AutoCAD.Directories.csproj", "{9D9146D7-4E50-4B73-9B1D-C4E2EC3B7EF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
