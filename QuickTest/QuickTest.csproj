@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Paths\AutoCAD.Directories.csproj" />
+    <ProjectReference Include="..\AutoCAD.IO\AutoCAD.IO.csproj" />
   </ItemGroup>
 
 </Project>

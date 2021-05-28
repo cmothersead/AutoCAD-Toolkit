@@ -1,4 +1,4 @@
-﻿using ICA.AutoCAD.Directories;
+﻿using ICA.AutoCAD.IO;
 
 namespace QuickTest
 {
@@ -6,9 +6,9 @@ namespace QuickTest
     {
         static void Main(string[] args)
         {
-            string test = Paths.SchematicMenu;
+            string test = Paths.Main;
             string test2 = Paths.SchematicLibrary;
-            string test3 = Paths.Templates;
+            string test3 = Paths.SchematicMenu;
         }
     }
 }

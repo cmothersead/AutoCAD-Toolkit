@@ -1,11 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
-namespace ICA.AutoCAD.Directories
+namespace ICA.AutoCAD.IO
 {
     public class Paths
     {
+        #region Private Properties
+
+        private static EnumerationOptions DefaultSearch => new()
+        {
+            IgnoreInaccessible = true,
+            RecurseSubdirectories = true,
+        };
+
+        #endregion
+
         #region Public Properties
 
         private static string _main;
@@ -19,11 +28,7 @@ namespace ICA.AutoCAD.Directories
                 if (_main is not null)
                     return _main;
 
-                string[] files = System.IO.Directory.GetFiles(@"C:\", "acad.lsp", new EnumerationOptions()
-                { 
-                    IgnoreInaccessible = true,
-                    RecurseSubdirectories = true
-                });
+                string[] files = Directory.GetFiles(@"C:\", "acad.lsp", DefaultSearch);
                 foreach(string file in files)
                 {
                     string directory = Path.GetFullPath($"{Path.GetDirectoryName(file)}\\..\\");
