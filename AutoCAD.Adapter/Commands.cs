@@ -175,34 +175,20 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TESTINSERT")]
         public static void Insert()
         {
-            InsertSymbol("HCB1", new Point2d(0, 0));
-        }
-
-        public static ISymbol InsertSymbol(string name, Point2d location, float scale = 1, bool editDialog = false)
-        {
-            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-            Database database = currentDocument.Database;
-            BlockTable blockTable = database.GetBlockTable();
-            BlockTableRecord record;
-            if (blockTable.Has(name))
-                record = blockTable.GetBlockTableRecord(name);
-            else
-                record = blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
-
-            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            PromptStringOptions options = new PromptStringOptions("Enter symbol name: ")
             {
-                BlockReference insertion = new BlockReference(Point3d.Origin, record.ObjectId);
-                insertion.Insert(database, transaction);
-                var jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, insertion);
-
-                if (jig.Run() != PromptStatus.OK)
-                    return null;
-
-                transaction.Commit();
+                AllowSpaces = true
+            };
+            PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
+            try
+            {
+                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(result.StringResult);
+                record.InsertSymbol();
             }
-            
-
-            return null;
+            catch(Exception ex)
+            {
+                Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message);
+            }
         }
     }
 }

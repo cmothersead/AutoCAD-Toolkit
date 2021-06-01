@@ -96,6 +96,7 @@
     <Compile Include="BlockTableExtensions.cs" />
     <Compile Include="DatabaseExtensions.cs" />
     <Compile Include="ObjectSnap.cs" />
+    <Compile Include="Point2dExtensions.cs" />
     <Compile Include="SystemVariables.cs" />
     <Compile Include="AttributeReferenceExtensions.cs" />
     <Compile Include="BlockReferenceExtensions.cs" />
