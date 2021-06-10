@@ -173,22 +173,32 @@ namespace ICA.AutoCAD.Adapter
         }
     
         [CommandMethod("TESTINSERT")]
-        public static void Insert()
+        public static void InsertSymbol()
         {
-            PromptStringOptions options = new PromptStringOptions("Enter symbol name: ")
-            {
-                AllowSpaces = true
-            };
-            PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
+            InsertSymbol(PromptSymbolName());
+        }
+
+        public static void InsertSymbol(string symbolName)
+        {
             try
             {
-                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(result.StringResult);
+                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(symbolName);
                 record.InsertSymbol();
             }
             catch(Exception ex)
             {
                 Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message);
             }
+        }
+
+        public static string PromptSymbolName()
+        {
+            PromptStringOptions options = new PromptStringOptions("Enter symbol name: ")
+            {
+                AllowSpaces = true
+            };
+            PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
+            return result.StringResult;
         }
     }
 }

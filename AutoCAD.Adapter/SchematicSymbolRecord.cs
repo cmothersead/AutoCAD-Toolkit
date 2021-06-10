@@ -12,8 +12,15 @@ using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class SchematicSymbolRecord : BlockTableRecord
+    public class SchematicSymbolRecord
     {
+        private BlockTableRecord _blockTableRecord;
+
+        public SchematicSymbolRecord(BlockTableRecord record)
+        {
+            _blockTableRecord = record;
+        }
+
         public static SchematicSymbolRecord GetRecord(string name)
         {
             Document currentDocument = Application.DocumentManager.MdiActiveDocument;
@@ -31,7 +38,7 @@ namespace ICA.AutoCAD.Adapter
                 throw new ArgumentException($"Symbol with name: \"{name}\" not found");
             }
 
-            return record as SchematicSymbolRecord;
+            return new SchematicSymbolRecord(record);
         }
 
         public ISymbol InsertSymbol(Transaction transaction, Point2d location = new Point2d())
@@ -39,11 +46,11 @@ namespace ICA.AutoCAD.Adapter
             BlockReference blockReference;
 
             if (location != new Point2d())
-                blockReference = new BlockReference(location.ToPoint3d(), ObjectId);
+                blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
             else
-                blockReference = new BlockReference(Point3d.Origin, ObjectId);
+                blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId);
 
-            blockReference.Insert(Database, transaction);
+            blockReference.Insert(_blockTableRecord.Database, transaction);
 
             if (blockReference.Position == Point3d.Origin)
             {
@@ -57,12 +64,12 @@ namespace ICA.AutoCAD.Adapter
             return new ParentSymbol(blockReference);
         }
 
-        public ISymbol InsertSymbol()
+        public ISymbol InsertSymbol(Point2d location = new Point2d())
         {
             ISymbol symbol;
-            using (Transaction transaction = Database.TransactionManager.StartTransaction())
+            using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
             {
-                symbol = InsertSymbol(transaction);
+                symbol = InsertSymbol(transaction, location);
                 transaction.Commit();
             }
             return symbol;
