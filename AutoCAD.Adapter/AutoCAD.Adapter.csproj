@@ -96,10 +96,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="Defaults.cs" />
+    <Compile Include="Insertable.cs" />
+    <Compile Include="Ladder.cs" />
+    <Compile Include="ILadder.cs" />
+    <Compile Include="LadderConfig.cs" />
+    <Compile Include="OnePhaseLadder.cs" />
     <Compile Include="ParentSymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchematicSymbolRecord.cs" />
     <Compile Include="SymbolJig.cs" />
+    <Compile Include="ThreePhaseLadder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

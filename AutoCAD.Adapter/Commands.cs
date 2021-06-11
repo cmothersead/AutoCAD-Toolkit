@@ -200,5 +200,12 @@ namespace ICA.AutoCAD.Adapter
             PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
             return result.StringResult;
         }
+
+        [CommandMethod("TESTLADDER")]
+        public static void InsertLadder()
+        {
+            Ladder test = new OnePhaseLadder(new Point2d(2.5, 22.5), 19.5, 32.5, 0.5, 0);
+            test.Insert();
+        }
     }
 }
