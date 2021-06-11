@@ -16,6 +16,8 @@ namespace ICA.AutoCAD.Adapter
     {
         private BlockTableRecord _blockTableRecord;
 
+        public ObjectId ObjectId => _blockTableRecord.ObjectId;
+
         public SchematicSymbolRecord(BlockTableRecord record)
         {
             _blockTableRecord = record;

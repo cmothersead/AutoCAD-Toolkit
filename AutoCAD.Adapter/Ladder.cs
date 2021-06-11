@@ -1,10 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -29,13 +25,33 @@ namespace ICA.AutoCAD.Adapter
 
         private class Rail : Insertable
         {
-            public Rail(Line line) : base(line) { }
-
             public Rail(Point2d top, Point2d bottom, string layer = Defaults.WireLayer)
                 : base(new Line(top.ToPoint3d(), bottom.ToPoint3d()) { Layer = layer }) { }
 
             public Rail(Point2d top, double length, string layer = Defaults.WireLayer)
                 : base(new Line(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0)) { Layer = layer }) { }
+        }
+
+        private List<LineNumber> LineNumbers
+        {
+            get
+            {
+                List<LineNumber> list = new List<LineNumber>();
+                int reference = FirstReference;
+                for(double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
+                {
+                    list.Add(new LineNumber(reference.ToString(), new Point2d(Origin.X, y)));
+                    reference++;
+                }
+                return list;
+            }
+        }
+
+        private class LineNumber : Insertable
+        {
+            public LineNumber(string number, Point2d location) : base(null)
+            {
+            }
         }
 
         public Ladder(Point2d origin, double height, double width, double lineHeight, int firstReference, string railLayer = Defaults.WireLayer) : base(null)
@@ -52,6 +68,9 @@ namespace ICA.AutoCAD.Adapter
         {
             foreach (Rail rail in Rails)
                 rail.Insert(database, transaction);
+
+            foreach (LineNumber lineNumber in LineNumbers)
+                lineNumber.Insert(database, transaction);
         }
     }
 }
