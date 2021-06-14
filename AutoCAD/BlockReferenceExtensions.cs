@@ -78,7 +78,7 @@ namespace ICA.AutoCAD
 
         public static void Insert(this BlockReference blockReference, Database database, Transaction transaction, Dictionary<string, string> attributes)
         {
-            BlockTableRecord modelSpace = transaction.GetObject(database.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
+            BlockTableRecord modelSpace = transaction.GetObject(database.GetModelSpace().ObjectId, OpenMode.ForWrite) as BlockTableRecord;
             modelSpace.AppendEntity(blockReference);
             transaction.AddNewlyCreatedDBObject(blockReference, true);
 

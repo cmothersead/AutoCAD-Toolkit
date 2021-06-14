@@ -97,6 +97,8 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Defaults.cs" />
+    <Compile Include="DocumentExtensions.cs" />
+    <Compile Include="ElectricalDocumentProperties.cs" />
     <Compile Include="Insertable.cs" />
     <Compile Include="Ladder.cs" />
     <Compile Include="ILadder.cs" />

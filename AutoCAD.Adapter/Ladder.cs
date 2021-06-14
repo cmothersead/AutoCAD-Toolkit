@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices.Core;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System.Collections.Generic;
 
@@ -46,7 +47,7 @@ namespace ICA.AutoCAD.Adapter
                 int reference = FirstReference;
                 for(double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
-                    list.Add(new LineNumber(/*Add sheet reference here. Hard coded for now*/reference.ToString("D2"), new Point2d(Origin.X, y)));
+                    list.Add(new LineNumber(Application.DocumentManager.MdiActiveDocument.GetPageNumber() /*remove this hard coding later*/ + reference.ToString("D2"), new Point2d(Origin.X, y)));
                     reference++;
                 }
                 return list;

@@ -16,5 +16,21 @@ namespace ICA.AutoCAD
                 return transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
             }
         }
+
+        public static BlockTableRecord GetBlockTableRecord(this Database database, string name)
+        {
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                return transaction.GetObject(database.GetBlockTable()[name], OpenMode.ForRead) as BlockTableRecord;
+            }
+        }
+
+        public static BlockTableRecord GetModelSpace(this Database database)
+        {
+            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                return transaction.GetObject(database.GetBlockTable()[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+            }
+        }
     }
 }
