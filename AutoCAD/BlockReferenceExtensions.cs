@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using System.Collections.Generic;
 
 namespace ICA.AutoCAD
 {
@@ -65,26 +66,17 @@ namespace ICA.AutoCAD
         }
 
         /// <summary>
-        /// Adds reference to the passed <see cref="Database"/> within self-contained transaction.
-        /// </summary>
-        /// <param name="blockReference"></param>
-        /// <param name="database">Database to append the reference to</param>
-        public static void Insert(this BlockReference blockReference, Database database)
-        {
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
-            {
-                blockReference.Insert(database, transaction);
-                transaction.Commit();
-            }
-        }
-
-        /// <summary>
         /// Adds reference to the passed <see cref="Database"/> within passed transaction.
         /// </summary>
         /// <param name="blockReference"></param>
         /// <param name="database">Database to append the reference to</param>
         /// <param name="transaction">Transaction dependency for the operation</param>
         public static void Insert(this BlockReference blockReference, Database database, Transaction transaction)
+        {
+            Insert(blockReference, database, transaction, null);
+        }
+
+        public static void Insert(this BlockReference blockReference, Database database, Transaction transaction, Dictionary<string, string> attributes)
         {
             BlockTableRecord modelSpace = transaction.GetObject(database.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
             modelSpace.AppendEntity(blockReference);
@@ -100,7 +92,10 @@ namespace ICA.AutoCAD
                     {
                         AttributeReference attributeReference = new AttributeReference();
                         attributeReference.SetAttributeFromBlock(attributeDefinition, blockReference.BlockTransform);
-                        attributeReference.TextString = attributeDefinition.TextString;
+                        if (attributes.ContainsKey(attributeDefinition.Tag))
+                            attributeReference.TextString = attributes[attributeDefinition.Tag];
+                        else
+                            attributeReference.TextString = attributeDefinition.TextString;
                         attributeReference.AdjustAlignment(database);
                         blockReference.AttributeCollection.AppendAttribute(attributeReference);
                         transaction.AddNewlyCreatedDBObject(attributeReference, true);

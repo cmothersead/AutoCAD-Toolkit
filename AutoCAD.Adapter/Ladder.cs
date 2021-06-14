@@ -23,13 +23,19 @@ namespace ICA.AutoCAD.Adapter
             new Rail(TopRight, Height, RailLayer)
         };
 
-        private class Rail : Insertable
+        private class Rail : Line
         {
             public Rail(Point2d top, Point2d bottom, string layer = Defaults.WireLayer)
-                : base(new Line(top.ToPoint3d(), bottom.ToPoint3d()) { Layer = layer }) { }
+                : base(top.ToPoint3d(), bottom.ToPoint3d())
+            {
+                base.Layer = layer;
+            }
 
             public Rail(Point2d top, double length, string layer = Defaults.WireLayer)
-                : base(new Line(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0)) { Layer = layer }) { }
+                : base(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0))
+            {
+                base.Layer = layer;
+            }
         }
 
         private List<LineNumber> LineNumbers
@@ -40,17 +46,28 @@ namespace ICA.AutoCAD.Adapter
                 int reference = FirstReference;
                 for(double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
-                    list.Add(new LineNumber(reference.ToString(), new Point2d(Origin.X, y)));
+                    list.Add(new LineNumber(/*Add sheet reference here. Hard coded for now*/reference.ToString("D2"), new Point2d(Origin.X, y)));
                     reference++;
                 }
                 return list;
             }
         }
 
-        private class LineNumber : Insertable
+        private class LineNumber : BlockReference
         {
-            public LineNumber(string number, Point2d location) : base(null)
+            private readonly string _number;
+
+            public LineNumber(string number, Point2d location) : base(location.ToPoint3d(), SchematicSymbolRecord.GetRecord("LINENUMBER").ObjectId)
             {
+                _number = number;
+            }
+
+            public void Insert(Database database, Transaction transaction)
+            {
+                this.Insert(database, transaction, new Dictionary<string, string>
+                {
+                    { "LINENUMBER", _number }
+                });
             }
         }
 

@@ -95,6 +95,7 @@
   <ItemGroup>
     <Compile Include="BlockTableExtensions.cs" />
     <Compile Include="DatabaseExtensions.cs" />
+    <Compile Include="EntityExtenstions.cs" />
     <Compile Include="ObjectSnap.cs" />
     <Compile Include="Point2dExtensions.cs" />
     <Compile Include="SystemVariables.cs" />
