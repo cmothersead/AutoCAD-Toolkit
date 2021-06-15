@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using System;
 using System.Collections.Generic;
 
 namespace ICA.AutoCAD
@@ -26,6 +27,24 @@ namespace ICA.AutoCAD
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Gets TextString value of the <see cref="AttributeReference"/> with the given tag, if it exists. Returns null if none found.
+        /// </summary>
+        /// <param name="blockReference"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static string GetAttributeValue(this BlockReference blockReference, string tag)
+        {
+            try
+            {
+                return blockReference.GetAttributeReference(tag).TextString;
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

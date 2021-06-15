@@ -16,6 +16,19 @@ namespace ICA.AutoCAD.Adapter
 
         public int NumberOfPhases { get; }
 
+        private string _sheetNumber;
+        private string SheetNumber
+        {
+            get
+            {
+                if (_sheetNumber != null)
+                    return _sheetNumber;
+
+                _sheetNumber = Application.DocumentManager.MdiActiveDocument.GetPageNumber();
+                return _sheetNumber;
+            }
+        }
+
         private Point2d TopLeft => Origin;
         private Point2d TopRight => new Point2d(Origin.X + Width, Origin.Y);
         private List<Rail> Rails => new List<Rail>
@@ -47,7 +60,7 @@ namespace ICA.AutoCAD.Adapter
                 int reference = FirstReference;
                 for(double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
-                    list.Add(new LineNumber(Application.DocumentManager.MdiActiveDocument.GetPageNumber() /*remove this hard coding later*/ + reference.ToString("D2"), new Point2d(Origin.X, y)));
+                    list.Add(new LineNumber(SheetNumber + reference.ToString("D2"), new Point2d(Origin.X, y)));
                     reference++;
                 }
                 return list;
