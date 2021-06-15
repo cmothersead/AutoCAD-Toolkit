@@ -204,8 +204,8 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TESTLADDER")]
         public static void InsertLadder()
         {
-            Ladder test = new OnePhaseLadder(new Point2d(2.5, 22.5), 19.5, 32.5, 0.5, 0);
-            test.Insert();
+            ElectricalDocumentProperties test = Application.DocumentManager.MdiActiveDocument.ElectricalProperties();
+            Dictionary<string, string> test2 = test.ComponentProperties.ToDictionary();
         }
     }
 }

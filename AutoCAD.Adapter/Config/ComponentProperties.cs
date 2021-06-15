@@ -2,7 +2,7 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class ComponentProperties
+    public class ComponentProperties : Properties
     {
         public NumberMode TagMode { get; set; }
         public int TagStart { get; set; }
