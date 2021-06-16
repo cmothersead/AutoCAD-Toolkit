@@ -2,7 +2,7 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class WireProperties
+    public class WireProperties : Properties
     {
         public NumberMode WireMode { get; set; }
         public int WireStart { get; set; }
@@ -14,5 +14,9 @@ namespace ICA.AutoCAD.Adapter
         public WireSortMode? WireSortMode { get; set; }
         public double WireOffsetDistance { get; set; }
         public int WireFlags { get; set; }
+
+        public WireProperties () { }
+
+        public WireProperties (Dictionary<string, string> dictionary) : base(dictionary) { }
     }
 }

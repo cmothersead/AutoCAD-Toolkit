@@ -2,7 +2,7 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class LayerProperties
+    public class LayerProperties : Properties
     {
         public LayerTableRecord TagLayer { get; set; }
         public LayerTableRecord DescriptionLayer { get; set; }
