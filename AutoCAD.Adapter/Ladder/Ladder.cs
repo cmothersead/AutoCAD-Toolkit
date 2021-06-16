@@ -24,7 +24,7 @@ namespace ICA.AutoCAD.Adapter
                 if (_sheetNumber != null)
                     return _sheetNumber;
 
-                _sheetNumber = Application.DocumentManager.MdiActiveDocument.GetPageNumber();
+                _sheetNumber = Application.DocumentManager.MdiActiveDocument.Database.GetPageNumber();
                 return _sheetNumber;
             }
         }

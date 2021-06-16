@@ -4,21 +4,21 @@ namespace ICA.AutoCAD.Adapter
 {
     public class ElectricalDocumentProperties
     {
-        public SheetProperties SheetProperties { get; set; }
-        public LadderProperties LadderProperties { get; set; }
-        public ComponentProperties ComponentProperties { get; set; }
-        public WireProperties WireProperties { get; set; }
+        public SheetProperties Sheet { get; set; }
+        public LadderProperties Ladder { get; set; }
+        public ComponentProperties Component { get; set; }
+        public WireProperties Wire { get; set; }
 
         public Dictionary<string, string> ToDictionary()
         {
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            foreach (var property in SheetProperties.ToDictionary())
+            foreach (var property in Sheet.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
-            foreach (var property in LadderProperties.ToDictionary())
+            foreach (var property in Ladder.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
-            foreach (var property in ComponentProperties.ToDictionary())
+            foreach (var property in Component.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
-            foreach (var property in WireProperties.ToDictionary())
+            foreach (var property in Wire.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
             return dictionary;
         }
@@ -27,10 +27,10 @@ namespace ICA.AutoCAD.Adapter
 
         public ElectricalDocumentProperties(Dictionary<string, string>dictionary)
         {
-            SheetProperties = new SheetProperties(dictionary);
-            LadderProperties = new LadderProperties(dictionary);
-            ComponentProperties = new ComponentProperties(dictionary);
-            WireProperties = new WireProperties(dictionary);
+            Sheet = new SheetProperties(dictionary);
+            Ladder = new LadderProperties(dictionary);
+            Component = new ComponentProperties(dictionary);
+            Wire = new WireProperties(dictionary);
         } 
     }
 }

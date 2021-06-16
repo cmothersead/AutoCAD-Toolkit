@@ -104,9 +104,10 @@
     <Compile Include="Config\ComponentProperties.cs" />
     <Compile Include="Config\Enums\WireGapStyle.cs" />
     <Compile Include="Config\Properties.cs" />
+    <Compile Include="Config\WDM.cs" />
     <Compile Include="Config\WireProperties.cs" />
     <Compile Include="Defaults.cs" />
-    <Compile Include="Extensions\DocumentExtensions.cs" />
+    <Compile Include="Extensions\DatabaseExtensions.cs" />
     <Compile Include="Config\ElectricalDocumentProperties.cs" />
     <Compile Include="Insertable.cs" />
     <Compile Include="Ladder\Ladder.cs" />
