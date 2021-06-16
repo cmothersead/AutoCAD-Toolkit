@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandEndedHandler.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Config\Enums\WireSortMode.cs" />
     <Compile Include="Config\LayerProperties.cs" />

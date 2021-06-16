@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -21,6 +22,12 @@ namespace ICA.AutoCAD.Adapter
             foreach (var property in Wire.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
             return dictionary;
+        }
+
+        public static void Update()
+        {
+            // Must scan the database for active electrical components and update base on delta of properties
+            throw new NotImplementedException();
         }
 
         public ElectricalDocumentProperties() { }
