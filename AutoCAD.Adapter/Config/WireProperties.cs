@@ -4,16 +4,16 @@ namespace ICA.AutoCAD.Adapter
 {
     public class WireProperties : Properties
     {
-        public NumberMode WireMode { get; set; }
-        public int WireStart { get; set; }
-        public List<string> WireSuffixes { get; set; }
-        public string WireFormat { get; set; }
-        public int WireIncremement { get; set; }
-        public LeaderInsertMode WireLeaders { get; set; }
-        public WireGapStyle WireGapStyle { get; set; }
-        public WireSortMode? WireSortMode { get; set; }
-        public double WireOffsetDistance { get; set; }
-        public int WireFlags { get; set; }
+        public NumberMode WireMode { get; set; } = NumberMode.Referential;
+        public int WireStart { get; set; } = 100;
+        public List<string> WireSuffixes { get; set; } = new List<string>() { "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
+        public string WireFormat { get; set; } = "%S%N";
+        public int WireIncremement { get; set; } = 1;
+        public LeaderInsertMode WireLeaders { get; set; } = LeaderInsertMode.Never;
+        public WireGapStyle WireGapStyle { get; set; } = WireGapStyle.Loop;
+        public WireSortMode? WireSortMode { get; set; } = null;
+        public double WireOffsetDistance { get; set; } = 0;
+        public int WireFlags { get; set; } = 1;
 
         public WireProperties () { }
 

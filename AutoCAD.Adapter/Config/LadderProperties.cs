@@ -4,12 +4,11 @@ namespace ICA.AutoCAD.Adapter
 {
     public class LadderProperties : Properties
     {
-        public RungOrientation RungOrientation { get; set; }
-        public double RungSpacing { get; set; }
-        public double LadderWidth { get; set; }
-        public int RungIncrement { get; set; }
-        public int DrawRungs { get; set; }
-        public double ThreePhaseSpacing { get; set; }
+        public RungOrientation RungOrientation { get; set; } = RungOrientation.Horizontal;
+        public double RungSpacing { get; set; } = 0.5;
+        public int RungIncrement { get; set; } = 1;
+        public int DrawRungs { get; set; } = 0;
+        public double ThreePhaseSpacing { get; set; } = 1;
 
         public LadderProperties() { }
 

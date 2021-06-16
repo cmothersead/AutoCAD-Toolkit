@@ -23,7 +23,6 @@ namespace ICA.AutoCAD.Adapter
             //Ladder Properties
             { "RUNGHORV", nameof(ElectricalDocumentProperties.Ladder.RungOrientation) },
             { "RUNGDIST", nameof(ElectricalDocumentProperties.Ladder.RungSpacing) },
-            { "DLADW", nameof(ElectricalDocumentProperties.Ladder.LadderWidth) },
             { "RUNGINC", nameof(ElectricalDocumentProperties.Ladder.RungIncrement) },
             { "DRWRUNG", nameof(ElectricalDocumentProperties.Ladder.DrawRungs) },
             { "PH3SPACE", nameof(ElectricalDocumentProperties.Ladder.ThreePhaseSpacing) },

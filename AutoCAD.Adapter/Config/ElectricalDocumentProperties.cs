@@ -30,7 +30,13 @@ namespace ICA.AutoCAD.Adapter
             throw new NotImplementedException();
         }
 
-        public ElectricalDocumentProperties() { }
+        public ElectricalDocumentProperties() 
+        {
+            Sheet = new SheetProperties();
+            Ladder = new LadderProperties();
+            Component = new ComponentProperties();
+            Wire = new WireProperties();
+        }
 
         public ElectricalDocumentProperties(Dictionary<string, string>dictionary)
         {

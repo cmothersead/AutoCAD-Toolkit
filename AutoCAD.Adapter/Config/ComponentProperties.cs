@@ -6,8 +6,8 @@ namespace ICA.AutoCAD.Adapter
     {
         public NumberMode TagMode { get; set; } = NumberMode.Referential;
         public int TagStart { get; set; } = 1;
-        public List<string> TagSuffixes { get; set; }
-        public string TagFormat { get; set; }
+        public List<string> TagSuffixes { get; set; } = new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+        public string TagFormat { get; set; } = "%F%S%N%X";
 
         public ComponentProperties() { }
 
