@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -7,6 +6,8 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Properties
     {
+        #region Constructors
+
         public Properties() { }
 
         public Properties(Dictionary<string, string> dictionary)
@@ -148,6 +149,10 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        #endregion
+
+        #region Public Methods
+
         public Dictionary<string, string> ToDictionary()
         {
             PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -164,5 +169,7 @@ namespace ICA.AutoCAD.Adapter
             }
             return dictionary;
         }
+
+        #endregion
     }
 }

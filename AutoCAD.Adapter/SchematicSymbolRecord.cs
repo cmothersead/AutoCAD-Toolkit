@@ -21,13 +21,11 @@ namespace ICA.AutoCAD.Adapter
 
         public static SchematicSymbolRecord GetRecord(string name)
         {
-            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-            Database database = currentDocument.Database;
-            BlockTable blockTable = database.GetBlockTable();
+            BlockTable blockTable = Application.DocumentManager.MdiActiveDocument.Database.GetBlockTable();
             BlockTableRecord record;
 
             if (blockTable.Has(name))
-                record = blockTable.GetBlockTableRecord(name);
+                record = blockTable.GetRecord(name);
             else
                 record = blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
 

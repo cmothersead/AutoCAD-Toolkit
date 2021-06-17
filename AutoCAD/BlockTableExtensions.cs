@@ -5,14 +5,6 @@ namespace ICA.AutoCAD
 {
     public static class BlockTableExtensions
     {
-        public static BlockTableRecord GetBlockTableRecord (this BlockTable blockTable, string name)
-        {
-            using(Transaction transaction = blockTable.Database.TransactionManager.StartTransaction())
-            {
-                return transaction.GetObject(blockTable[name], OpenMode.ForRead) as BlockTableRecord;
-            }
-        }
-
         public static BlockTableRecord LoadExternalBlockTableRecord (this BlockTable blockTable, string filePath)
         {
             if (filePath is null)

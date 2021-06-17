@@ -44,6 +44,6 @@ namespace ICA.AutoCAD.Adapter
             Ladder = new LadderProperties(dictionary);
             Component = new ComponentProperties(dictionary);
             Wire = new WireProperties(dictionary);
-        } 
+        }
     }
 }

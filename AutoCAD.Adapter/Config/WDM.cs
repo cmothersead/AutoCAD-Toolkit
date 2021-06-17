@@ -63,7 +63,9 @@ namespace ICA.AutoCAD.Adapter
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                ObjectIdCollection references = database.GetBlockTableRecord("WD_M").GetBlockReferenceIds(true, false);
+                ObjectIdCollection references = database.GetBlockTable()
+                                                        .GetRecord("WD_M")
+                                                        .GetBlockReferenceIds(true, false);
                 if (references.Count == 0)
                     return null;
 

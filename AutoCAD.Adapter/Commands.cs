@@ -22,7 +22,7 @@ namespace ICA.AutoCAD.Adapter
                 if(_mountMode is null)
                 {
                     Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-                    LayerTableRecord mountingLayer = currentDocument.GetLayer("MOUNTING");
+                    LayerTableRecord mountingLayer = currentDocument.Database.GetLayer("MOUNTING");
                     return !mountingLayer.IsFrozen;
                 }
                 return (bool)_mountMode;
@@ -87,11 +87,11 @@ namespace ICA.AutoCAD.Adapter
             };
             foreach (string layerName in mountingLayers)
             {
-                currentDocument.GetLayer(layerName).Freeze();
+                currentDocument.Database.GetLayer(layerName).Freeze();
             }
             foreach (string layerName in viewingLayers)
             {
-                currentDocument.GetLayer(layerName).Thaw();
+                currentDocument.Database.GetLayer(layerName).Thaw();
             }
         }
 
@@ -111,11 +111,11 @@ namespace ICA.AutoCAD.Adapter
             };
             foreach (string layerName in mountingLayers)
             {
-                currentDocument.GetLayer(layerName).Thaw();
+                currentDocument.Database.GetLayer(layerName).Thaw();
             }
             foreach (string layerName in viewingLayers)
             {
-                currentDocument.GetLayer(layerName).Freeze();
+                currentDocument.Database.GetLayer(layerName).Freeze();
             }
         }
 

@@ -98,7 +98,7 @@
     <Compile Include="CommandEndedHandler.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Config\Enums\WireSortMode.cs" />
-    <Compile Include="Config\LayerProperties.cs" />
+    <Compile Include="Config\ElectricalLayers.cs" />
     <Compile Include="Config\Enums\LeaderInsertMode.cs" />
     <Compile Include="Config\Enums\RungOrientation.cs" />
     <Compile Include="Config\Enums\NumberMode.cs" />

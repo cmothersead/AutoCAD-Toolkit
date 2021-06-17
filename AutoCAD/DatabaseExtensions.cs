@@ -7,43 +7,13 @@ namespace ICA.AutoCAD
     public static class DatabaseExtensions
     {
         /// <summary>
-        /// Get the <see cref="BlockTable"/> for the database.
-        /// </summary>
-        /// <param name="database">Database instance this method is applied to.</param>
-        /// <returns>A <see cref="BlockTable"/> opened for read.</returns>
-        public static BlockTable GetBlockTable (this Database database)
-        {
-            using(Transaction transaction = database.TransactionManager.StartTransaction())
-            {
-                return transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="BlockTableRecord"/> with the given name from the database, if it exists.
-        /// </summary>
-        /// <param name="database">Instance for this method to be applied to.</param>
-        /// <param name="name">String name of the block to retrive.</param>
-        /// <returns><see cref="BlockTableRecord"/> with the given name in the database.</returns>
-        public static BlockTableRecord GetBlockTableRecord(this Database database, string name)
-        {
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
-            {
-                return transaction.GetObject(database.GetBlockTable()[name], OpenMode.ForRead) as BlockTableRecord;
-            }
-        }
-
-        /// <summary>
         /// Get the "Model Space" <see cref="BlockTableRecord"/> for the database.
         /// </summary>
         /// <param name="database">Instance for this method to be applied to.</param>
         /// <returns><see cref="BlockTableRecord"/> representing the model space of the database.</returns>
         public static BlockTableRecord GetModelSpace(this Database database)
         {
-            using(Transaction transaction = database.TransactionManager.StartTransaction())
-            {
-                return transaction.GetObject(database.GetBlockTable()[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-            }
+            return database.GetBlockTable().GetRecord(BlockTableRecord.ModelSpace);
         }
 
         /// <summary>
@@ -102,6 +72,24 @@ namespace ICA.AutoCAD
             else
                 custProps.Add(key, value);
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
+        }
+
+        /// <summary>
+        /// Gets <see cref="LayerTableRecord"/> of the layer with the given name from the database, if it exists.
+        /// </summary>
+        /// <param name="database">Instance this method applies to.</param>
+        /// <param name="layerName">Name of the desired layer.</param>
+        /// <returns><see cref="LayerTableRecord"/> of the layer if it exists. Else null</returns>
+        public static LayerTableRecord GetLayer(this Database database, string name)
+        {
+            try
+            {
+                return database.GetLayerTable().GetRecord(name);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -98,10 +98,10 @@
     <Compile Include="EntityExtenstions.cs" />
     <Compile Include="ObjectSnap.cs" />
     <Compile Include="Point2dExtensions.cs" />
+    <Compile Include="SymbolTables.cs" />
     <Compile Include="SystemVariables.cs" />
     <Compile Include="AttributeReferenceExtensions.cs" />
     <Compile Include="BlockReferenceExtensions.cs" />
-    <Compile Include="DocumentExtensions.cs" />
     <Compile Include="LayerTableRecordExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
