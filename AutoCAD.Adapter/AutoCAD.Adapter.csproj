@@ -113,15 +113,13 @@
     <Compile Include="Insertable.cs" />
     <Compile Include="Ladder\Ladder.cs" />
     <Compile Include="Ladder\ILadder.cs" />
-    <Compile Include="LadderConfig.cs" />
+    <Compile Include="Ladder\LadderTemplate.cs" />
     <Compile Include="Config\LadderProperties.cs" />
-    <Compile Include="Ladder\OnePhaseLadder.cs" />
     <Compile Include="ParentSymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchematicSymbolRecord.cs" />
     <Compile Include="Config\SheetProperties.cs" />
     <Compile Include="SymbolJig.cs" />
-    <Compile Include="Ladder\ThreePhaseLadder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

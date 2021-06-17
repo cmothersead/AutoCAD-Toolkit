@@ -202,9 +202,16 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("TESTLADDER")]
-        public static void InsertLadder()
+        public static void CommandLineInsertLadder()
         {
-            Ladder test = new OnePhaseLadder(new Point2d(2.5, 22.5), 19.5, 32.5, 0.5, 0);
+            BlockTableRecord test1 = Application.DocumentManager.MdiActiveDocument.Database.GetTitleBlock();
+            LadderTemplate test = new LadderTemplate()
+            {
+                Origin = new Point2d(2.5, 22.5),
+                Height = 19.5,
+                TotalWidth = 32.5,
+                Gap = 2.5,
+            };
             test.Insert();
         }
 

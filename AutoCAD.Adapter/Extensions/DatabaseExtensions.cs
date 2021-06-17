@@ -22,6 +22,22 @@ namespace ICA.AutoCAD.Adapter
             return database.ElectricalProperties().Sheet.SheetNumber;
         }
 
+        public static BlockTableRecord GetTitleBlock(this Database database)
+        {
+            BlockTable blockTable = database.GetBlockTable();
+            BlockTableRecord titleBlock;
+            foreach(string name in blockTable.GetRecordNames())
+            {
+                if (name.Contains("Title Block"))
+                {
+                    titleBlock = blockTable.GetRecord(name);
+                    if (titleBlock.HasAttribute("TB"))
+                        return titleBlock;
+                } 
+            }
+            return null;
+        }
+
         #endregion
     }
 }

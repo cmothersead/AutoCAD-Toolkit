@@ -6,6 +6,12 @@ namespace ICA.AutoCAD
 {
     public static class DatabaseExtensions
     {
+        public static DBObject Open(this Database database, ObjectId id)
+        {
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+                return transaction.GetObject(id, OpenMode.ForRead);
+        }
+
         /// <summary>
         /// Get the "Model Space" <see cref="BlockTableRecord"/> for the database.
         /// </summary>

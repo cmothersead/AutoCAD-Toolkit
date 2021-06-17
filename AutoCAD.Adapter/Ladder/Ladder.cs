@@ -5,16 +5,16 @@ using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public abstract class Ladder : Insertable, ILadder
+    public class Ladder : Insertable, ILadder
     {
         public Point2d Origin { get; set; }
         public double Height { get; set; }
         public double Width { get; set; }
-        public double LineHeight { get; set; }
-        public int FirstReference { get; set; }
-        public string RailLayer { get; set; }
-
-        public int NumberOfPhases { get; }
+        public double LineHeight { get; set; } = 0.5;
+        public int FirstReference { get; set; } = 0;
+        public int LastReference => FirstReference + (int)(Height / LineHeight);
+        public string RailLayer { get; set; } = Defaults.WireLayer;
+        public int PhaseCount { get; set; } = 1;
 
         private string _sheetNumber;
         private string SheetNumber
@@ -29,13 +29,28 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        private Point2d TopLeft => Origin;
-        private Point2d TopRight => new Point2d(Origin.X + Width, Origin.Y);
-        private List<Rail> Rails => new List<Rail>
+        private List<Point2d> Origins
         {
-            new Rail(TopLeft, Height, RailLayer),
-            new Rail(TopRight, Height, RailLayer)
-        };
+            get
+            {
+                List<Point2d> value = new List<Point2d>();
+                for (int i = 0; i <= PhaseCount; i++)
+                    value.Add(new Point2d(Origin.X + i * Width, Origin.Y));
+                if (PhaseCount == 3)
+                    value.RemoveAt(PhaseCount);
+                return value;
+            }
+        }
+        private List<Rail> Rails
+        {
+            get
+            {
+                List<Rail> value = new List<Rail>();
+                foreach (Point2d origin in Origins)
+                    value.Add(new Rail(origin, Height));
+                return value;
+            }
+        }
 
         private class Rail : Line
         {
@@ -85,15 +100,7 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public Ladder(Point2d origin, double height, double width, double lineHeight, int firstReference, string railLayer = Defaults.WireLayer) : base(null)
-        {
-            Origin = origin;
-            Height = height;
-            Width = width;
-            LineHeight = lineHeight;
-            FirstReference = firstReference;
-            RailLayer = railLayer;
-        }
+        public Ladder() : base(null) { }
 
         public override void Insert(Database database, Transaction transaction)
         {

@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using System.Collections.Generic;
 
 namespace ICA.AutoCAD
 {
@@ -65,6 +66,20 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = symbolTable.Database.TransactionManager.StartTransaction())
                 return transaction.GetObject(symbolTable[name], OpenMode.ForRead) as SymbolTableRecord;
+        }
+
+        public static SymbolTableRecord GetRecord(this SymbolTable symbolTable, ObjectId id)
+        {
+            using (Transaction transaction = symbolTable.Database.TransactionManager.StartTransaction())
+                return transaction.GetObject(id, OpenMode.ForRead) as SymbolTableRecord;
+        }
+
+        public static List<string> GetRecordNames(this SymbolTable symbolTable)
+        {
+            List<string> result = new List<string>();
+            foreach (ObjectId id in symbolTable)
+                result.Add(symbolTable.GetRecord(id).Name);
+            return result;
         }
 
         #endregion

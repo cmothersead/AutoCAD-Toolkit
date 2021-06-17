@@ -9,6 +9,6 @@ namespace ICA.AutoCAD.Adapter
         double Width { get; set; }
         int FirstReference { get; set; }
         double LineHeight { get; set; }
-        int NumberOfPhases { get; }
+        int PhaseCount { get; }
     }
 }
