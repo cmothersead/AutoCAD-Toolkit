@@ -105,6 +105,7 @@
     <Compile Include="Config\ComponentProperties.cs" />
     <Compile Include="Config\Enums\WireGapStyle.cs" />
     <Compile Include="Config\Properties.cs" />
+    <Compile Include="Config\TitleBlockProperties.cs" />
     <Compile Include="Config\WDM.cs" />
     <Compile Include="Config\WireProperties.cs" />
     <Compile Include="Defaults.cs" />
@@ -120,6 +121,8 @@
     <Compile Include="SchematicSymbolRecord.cs" />
     <Compile Include="Config\SheetProperties.cs" />
     <Compile Include="SymbolJig.cs" />
+    <Compile Include="TitleBlockInsertionHandler.cs" />
+    <Compile Include="TitleBlockRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

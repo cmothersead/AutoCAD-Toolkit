@@ -21,8 +21,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 if(_mountMode is null)
                 {
-                    Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-                    LayerTableRecord mountingLayer = currentDocument.Database.GetLayer("MOUNTING");
+                    LayerTableRecord mountingLayer = CurrentDocument.Database.GetLayer("MOUNTING");
                     return !mountingLayer.IsFrozen;
                 }
                 return (bool)_mountMode;
@@ -47,11 +46,13 @@ namespace ICA.AutoCAD.Adapter
                     ObjectSnap.Value = PreviousObjectSnap;
                 }
                 _mountMode = value;
-                Application.DocumentManager.MdiActiveDocument.Editor.Regen();
+                CurrentDocument.Editor.Regen();
             }
         }
         private static bool PreviousGridSnap;
         public static short PreviousObjectSnap;
+
+        public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
@@ -73,7 +74,6 @@ namespace ICA.AutoCAD.Adapter
 
         public static void HideMountingLayers()
         {
-            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
             List<string> mountingLayers = new List<string>
             {
                 "MOUNTING",
@@ -87,17 +87,16 @@ namespace ICA.AutoCAD.Adapter
             };
             foreach (string layerName in mountingLayers)
             {
-                currentDocument.Database.GetLayer(layerName).Freeze();
+                CurrentDocument.Database.GetLayer(layerName).Freeze();
             }
             foreach (string layerName in viewingLayers)
             {
-                currentDocument.Database.GetLayer(layerName).Thaw();
+                CurrentDocument.Database.GetLayer(layerName).Thaw();
             }
         }
 
         public static void ShowMountingLayers()
         {
-            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
             List<string> mountingLayers = new List<string>
             {
                 "MOUNTING",
@@ -111,11 +110,11 @@ namespace ICA.AutoCAD.Adapter
             };
             foreach (string layerName in mountingLayers)
             {
-                currentDocument.Database.GetLayer(layerName).Thaw();
+                CurrentDocument.Database.GetLayer(layerName).Thaw();
             }
             foreach (string layerName in viewingLayers)
             {
-                currentDocument.Database.GetLayer(layerName).Freeze();
+                CurrentDocument.Database.GetLayer(layerName).Freeze();
             }
         }
 
@@ -125,8 +124,7 @@ namespace ICA.AutoCAD.Adapter
         /// <returns></returns>
         public static ISymbol SelectSymbol()
         {
-            Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-            Editor currentEditor = currentDocument.Editor;
+            Editor currentEditor = CurrentDocument.Editor;
             try
             {
                 PromptSelectionResult selectionResult = currentEditor.SelectImplied();
@@ -152,7 +150,7 @@ namespace ICA.AutoCAD.Adapter
                         {
                             if (objectId.ObjectClass.Name == "AcDbBlockReference")
                             {
-                                using (Transaction transaction = currentDocument.TransactionManager.StartTransaction())
+                                using (Transaction transaction = CurrentDocument.TransactionManager.StartTransaction())
                                 {
                                     return new ParentSymbol((BlockReference)transaction.GetObject(objectId, OpenMode.ForRead));
                                 }
@@ -187,7 +185,7 @@ namespace ICA.AutoCAD.Adapter
             }
             catch(Exception ex)
             {
-                Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message);
+                CurrentDocument.Editor.WriteMessage(ex.Message);
             }
         }
 
@@ -197,14 +195,14 @@ namespace ICA.AutoCAD.Adapter
             {
                 AllowSpaces = true
             };
-            PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
+            PromptResult result = CurrentDocument.Editor.GetString(options);
             return result.StringResult;
         }
 
         [CommandMethod("TESTLADDER")]
         public static void CommandLineInsertLadder()
         {
-            BlockTableRecord test1 = Application.DocumentManager.MdiActiveDocument.Database.GetTitleBlock();
+            BlockTableRecord test1 = CurrentDocument.Database.GetTitleBlock();
             LadderTemplate test = new LadderTemplate()
             {
                 Origin = new Point2d(2.5, 22.5),
@@ -215,10 +213,24 @@ namespace ICA.AutoCAD.Adapter
             test.Insert();
         }
 
+        [CommandMethod("TITLEBLOCK")]
+        public static void TitleBlock()
+        {
+            CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler);
+            BlockTableRecord currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
+            ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
+            if (currentTitleBlock != null)
+            {
+                //Choose Title Block From List
+            }
+            //Settings, Attributes, and changeout
+            //Is TB inserted? If not, insert at origin
+        }
+
         [CommandMethod("TESTHANDLER")]
         public static void TestHandler()
         {
-            Application.DocumentManager.MdiActiveDocument.CommandEnded += new CommandEventHandler(Handlers.CommandEnded);
+            CurrentDocument.CommandEnded += new CommandEventHandler(Handlers.CommandEnded);
         }
     }
 }

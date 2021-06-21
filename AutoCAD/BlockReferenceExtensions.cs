@@ -122,5 +122,13 @@ namespace ICA.AutoCAD
                 }
             }
         }
+
+        public static BlockTableRecord GetBlockTableRecord(this BlockReference blockReference)
+        {
+            if (blockReference.Database is null)
+                return null;
+
+            return blockReference.Database.GetBlockTable().GetRecord(blockReference.BlockTableRecord) as BlockTableRecord;
+        }
     }
 }
