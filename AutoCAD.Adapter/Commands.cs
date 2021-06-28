@@ -19,7 +19,7 @@ namespace ICA.AutoCAD.Adapter
         {
             get
             {
-                if(_mountMode is null)
+                if (_mountMode is null)
                 {
                     LayerTableRecord mountingLayer = CurrentDocument.Database.GetLayer("MOUNTING");
                     return !mountingLayer.IsFrozen;
@@ -28,7 +28,7 @@ namespace ICA.AutoCAD.Adapter
             }
             set
             {
-                if(value)
+                if (value)
                 {
                     ShowMountingLayers();
                     PreviousGridSnap = SystemVariables.GridSnap;
@@ -169,7 +169,7 @@ namespace ICA.AutoCAD.Adapter
             }
             return null;
         }
-    
+
         [CommandMethod("TESTINSERT")]
         public static void InsertSymbol()
         {
@@ -183,7 +183,7 @@ namespace ICA.AutoCAD.Adapter
                 SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(symbolName);
                 record.InsertSymbol();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CurrentDocument.Editor.WriteMessage(ex.Message);
             }
@@ -202,14 +202,60 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TESTLADDER")]
         public static void CommandLineInsertLadder()
         {
-            BlockTableRecord test1 = CurrentDocument.Database.GetTitleBlock();
-            LadderTemplate test = new LadderTemplate()
+            LadderTemplate test;
+            PromptKeywordOptions typeOptions = new PromptKeywordOptions("\nChoose ladder type [1 Phase/3 Phase] <1>: ");
+            typeOptions.Keywords.Add("1");
+            typeOptions.Keywords.Add("3");
+            PromptKeywordOptions countOptions = new PromptKeywordOptions("\nChoose number of ladders [1/2] <1>: ");
+            countOptions.Keywords.Add("1");
+            switch (CurrentDocument.Database.GetTitleBlock().Name)
             {
-                Origin = new Point2d(2.5, 22.5),
-                Height = 19.5,
-                TotalWidth = 32.5,
-                Gap = 2.5,
-            };
+                case "8.5x11 Title Block":
+                    test = new LadderTemplate()
+                    {
+                        Origin = new Point2d(2.5, 22.5),
+                        Height = 19.5,
+                        TotalWidth = 15
+                    };
+                    break;
+                case "11x17 Title Block":
+                    test = new LadderTemplate()
+                    {
+                        Origin = new Point2d(2.5, 22.5),
+                        Height = 19.5,
+                        TotalWidth = 32.5,
+                        Gap = 2.5,
+                    };
+                    countOptions.Keywords.Add("2");
+                    break;
+                case "Nexteer Title Block":
+                    test = new LadderTemplate()
+                    {
+                        Origin = new Point2d(2.5, 22.5),
+                        Height = 20,
+                        TotalWidth = 25,
+                        Gap = 5,
+                    };
+                    countOptions.Keywords.Add("2");
+                    break;
+                default:
+                    return;
+            }
+            PromptResult result = CurrentDocument.Editor.GetKeywords(typeOptions);
+            if (result.Status == PromptStatus.OK)
+            {
+                test.PhaseCount = int.Parse(result.StringResult);
+            }
+
+            if (countOptions.Keywords.Count > 1)
+            {
+                result = CurrentDocument.Editor.GetKeywords(countOptions);
+                if (result.Status == PromptStatus.OK)
+                {
+                    test.LadderCount = int.Parse(result.StringResult);
+                }
+            }
+
             test.Insert();
         }
 
@@ -217,7 +263,7 @@ namespace ICA.AutoCAD.Adapter
         public static void TitleBlock()
         {
             CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler);
-            BlockTableRecord currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
+            TitleBlockRecord currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
             ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
             if (currentTitleBlock != null)
             {
@@ -225,12 +271,6 @@ namespace ICA.AutoCAD.Adapter
             }
             //Settings, Attributes, and changeout
             //Is TB inserted? If not, insert at origin
-        }
-
-        [CommandMethod("TESTHANDLER")]
-        public static void TestHandler()
-        {
-            CurrentDocument.CommandEnded += new CommandEventHandler(Handlers.CommandEnded);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace ICA.AutoCAD.Adapter
         private BlockTableRecord _blockTableRecord;
 
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
+        public string Name => _blockTableRecord.Name;
 
         public TitleBlockRecord(BlockTableRecord record)
         {

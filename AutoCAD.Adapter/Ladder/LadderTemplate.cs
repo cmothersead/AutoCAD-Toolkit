@@ -2,7 +2,7 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    class LadderTemplate
+    public class LadderTemplate
     {
         public Point2d Origin { get; set; }
         public double Height { get; set; }
