@@ -7,6 +7,7 @@ namespace ICA.AutoCAD.Adapter
     public class TitleBlockInsertion
     {
         private static List<ObjectId> _forDelete = new List<ObjectId>();
+        private static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
 
         public static void Handler(object sender, ObjectEventArgs args)
         {
@@ -16,8 +17,8 @@ namespace ICA.AutoCAD.Adapter
                     if (reference.GetBlockTableRecord().GetBlockReferenceIds(true, false).Count > 1)
                     {
                         _forDelete.Add(reference.ObjectId);
-                        Application.DocumentManager.MdiActiveDocument.CommandEnded += new CommandEventHandler(Delete);
-                        Application.DocumentManager.MdiActiveDocument.CommandCancelled += new CommandEventHandler(Delete);
+                        CurrentDocument.CommandEnded += new CommandEventHandler(Delete);
+                        CurrentDocument.CommandCancelled += new CommandEventHandler(Delete);
                     } 
                 }
                      
@@ -25,7 +26,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static void Delete(object sender, CommandEventArgs args)
         {
-            using(Transaction transaction = Application.DocumentManager.MdiActiveDocument.TransactionManager.StartTransaction())
+            using(Transaction transaction = CurrentDocument.TransactionManager.StartTransaction())
             {
                 foreach (ObjectId id in _forDelete)
                 {
@@ -35,8 +36,9 @@ namespace ICA.AutoCAD.Adapter
                 transaction.Commit();
             }
             _forDelete = new List<ObjectId>();
-            Application.DocumentManager.MdiActiveDocument.CommandEnded -= new CommandEventHandler(Delete);
-            Application.DocumentManager.MdiActiveDocument.CommandCancelled -= new CommandEventHandler(Delete);
+            CurrentDocument.CommandEnded -= new CommandEventHandler(Delete);
+            CurrentDocument.CommandCancelled -= new CommandEventHandler(Delete);
+            CurrentDocument.Editor.WriteMessage("\nTitle Block already present on drawing.");
         }
     }
 }
