@@ -291,7 +291,8 @@ namespace ICA.AutoCAD.Adapter
             ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
             if (currentTitleBlock != null)
             {
-                //Choose Title Block From List
+                var titleBlockWindow = new TitleBlockView();
+                Application.ShowModalWindow(titleBlockWindow);
             }
             //Settings, Attributes, and changeout
             //Is TB inserted? If not, insert at origin
@@ -330,7 +331,7 @@ namespace ICA.AutoCAD.Adapter
                     switch (reference.Layer)
                     {
                         case "LADDER":
-                            CommandLineInsertLadder();
+                            //Ladder();
                             break;
                         case "TITLE BLOCK":
                             TitleBlock();

@@ -11,9 +11,6 @@
         Background="#FFE4E4E4"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize">
-    <Window.DataContext>
-        <vm:EditViewModel/>
-    </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
