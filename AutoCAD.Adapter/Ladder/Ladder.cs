@@ -13,7 +13,6 @@ namespace ICA.AutoCAD.Adapter
         public double LineHeight { get; set; } = 0.5;
         public int FirstReference { get; set; } = 0;
         public int LastReference => FirstReference + (int)(Height / LineHeight);
-        public string RailLayer { get; set; } = Defaults.WireLayer;
         public int PhaseCount { get; set; } = 1;
 
         private string _sheetNumber;
@@ -25,6 +24,13 @@ namespace ICA.AutoCAD.Adapter
                     return _sheetNumber;
 
                 _sheetNumber = Application.DocumentManager.MdiActiveDocument.Database.GetPageNumber();
+
+                if (_sheetNumber is null)
+                {
+                    Application.ShowAlertDialog("Sheet number not set."); //Have a set dialog instead of just an alert here
+                    _sheetNumber = "1";
+                }
+                    
                 return _sheetNumber;
             }
         }
@@ -54,16 +60,16 @@ namespace ICA.AutoCAD.Adapter
 
         private class Rail : Line
         {
-            public Rail(Point2d top, Point2d bottom, string layer = Defaults.WireLayer)
+            public Rail(Point2d top, Point2d bottom)
                 : base(top.ToPoint3d(), bottom.ToPoint3d())
             {
-                base.Layer = layer;
+                Layer = ElectricalLayers.LadderLayer.Name;
             }
 
-            public Rail(Point2d top, double length, string layer = Defaults.WireLayer)
+            public Rail(Point2d top, double length)
                 : base(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0))
             {
-                base.Layer = layer;
+                Layer = ElectricalLayers.LadderLayer.Name;
             }
         }
 
@@ -73,7 +79,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 List<LineNumber> list = new List<LineNumber>();
                 int reference = FirstReference;
-                for(double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
+                for (double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
                     list.Add(new LineNumber(SheetNumber + reference.ToString("D2"), new Point2d(Origin.X, y)));
                     reference++;
@@ -89,6 +95,7 @@ namespace ICA.AutoCAD.Adapter
             public LineNumber(string number, Point2d location) : base(location.ToPoint3d(), SchematicSymbolRecord.GetRecord("LINENUMBER").ObjectId)
             {
                 _number = number;
+                Layer = "LADDER";
             }
 
             public void Insert(Database database, Transaction transaction)

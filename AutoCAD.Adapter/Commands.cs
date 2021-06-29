@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.IO;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -157,13 +158,13 @@ namespace ICA.AutoCAD.Adapter
                             }
                         }
                     }
-                    catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                    catch (Exception ex)
                     {
                         currentEditor.WriteMessage(ex.Message);
                     }
                 }
             }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            catch (Exception ex)
             {
                 currentEditor.WriteMessage(ex.Message);
             }
@@ -180,8 +181,8 @@ namespace ICA.AutoCAD.Adapter
         {
             try
             {
-                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(symbolName);
-                record.InsertSymbol();
+                SchematicSymbolRecord.GetRecord(symbolName)
+                                     .InsertSymbol();
             }
             catch (Exception ex)
             {
@@ -199,19 +200,27 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
-        [CommandMethod("TESTLADDER")]
+        [CommandMethod("LADDER")]
         public static void CommandLineInsertLadder()
         {
-            LadderTemplate test;
+            PromptLadder().Insert();
+        }
+
+        public static LadderTemplate PromptLadder()
+        {
+            LadderTemplate template;
+
             PromptKeywordOptions typeOptions = new PromptKeywordOptions("\nChoose ladder type [1 Phase/3 Phase] <1>: ");
             typeOptions.Keywords.Add("1");
             typeOptions.Keywords.Add("3");
+
             PromptKeywordOptions countOptions = new PromptKeywordOptions("\nChoose number of ladders [1/2] <1>: ");
             countOptions.Keywords.Add("1");
+
             switch (CurrentDocument.Database.GetTitleBlock().Name)
             {
                 case "8.5x11 Title Block":
-                    test = new LadderTemplate()
+                    template = new LadderTemplate()
                     {
                         Origin = new Point2d(2.5, 22.5),
                         Height = 19.5,
@@ -219,7 +228,7 @@ namespace ICA.AutoCAD.Adapter
                     };
                     break;
                 case "11x17 Title Block":
-                    test = new LadderTemplate()
+                    template = new LadderTemplate()
                     {
                         Origin = new Point2d(2.5, 22.5),
                         Height = 19.5,
@@ -229,7 +238,7 @@ namespace ICA.AutoCAD.Adapter
                     countOptions.Keywords.Add("2");
                     break;
                 case "Nexteer Title Block":
-                    test = new LadderTemplate()
+                    template = new LadderTemplate()
                     {
                         Origin = new Point2d(2.5, 22.5),
                         Height = 20,
@@ -239,12 +248,12 @@ namespace ICA.AutoCAD.Adapter
                     countOptions.Keywords.Add("2");
                     break;
                 default:
-                    return;
+                    return null;
             }
             PromptResult result = CurrentDocument.Editor.GetKeywords(typeOptions);
             if (result.Status == PromptStatus.OK)
             {
-                test.PhaseCount = int.Parse(result.StringResult);
+                template.PhaseCount = int.Parse(result.StringResult);
             }
 
             if (countOptions.Keywords.Count > 1)
@@ -252,11 +261,36 @@ namespace ICA.AutoCAD.Adapter
                 result = CurrentDocument.Editor.GetKeywords(countOptions);
                 if (result.Status == PromptStatus.OK)
                 {
-                    test.LadderCount = int.Parse(result.StringResult);
+                    template.LadderCount = int.Parse(result.StringResult);
                 }
             }
 
-            test.Insert();
+            return template;
+        }
+
+        [CommandMethod("TESTVALUES")]
+        public static void RemoveLadder()
+        {
+            LayerTableRecord ladderLayer = Application.DocumentManager.MdiActiveDocument.Database.GetLayer("LADDER");
+            ladderLayer.Unlock();
+            LayerFilter layers = new LayerFilter()
+            {
+                ladderLayer.Name
+            };
+            PromptSelectionResult result = Application.DocumentManager.MdiActiveDocument.Editor.SelectAll(layers.Filter);
+            if (result.Status == PromptStatus.OK)
+            {
+                using (Transaction transaction = Application.DocumentManager.MdiActiveDocument.TransactionManager.StartTransaction())
+                {
+                    foreach (ObjectId id in result.Value.GetObjectIds())
+                    {
+                        Entity entity = transaction.GetObject(id, OpenMode.ForWrite) as Entity;
+                        entity.Erase();
+                    }
+                    transaction.Commit();
+                }
+            }
+            ladderLayer.Lock();
         }
 
         [CommandMethod("TITLEBLOCK")]

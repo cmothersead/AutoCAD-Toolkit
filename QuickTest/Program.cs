@@ -1,6 +1,4 @@
-﻿using ICA.AutoCAD.IO;
-
-namespace QuickTest
+﻿namespace QuickTest
 {
     class Program
     {
