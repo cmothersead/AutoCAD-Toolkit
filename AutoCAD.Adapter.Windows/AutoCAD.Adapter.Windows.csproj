@@ -143,6 +143,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\TitleBlock.cs" />
     <Compile Include="ViewModels\TitleBlockViewModel.cs" />
     <Compile Include="Views\TitleBlockView.xaml.cs">
       <DependentUpon>TitleBlockView.xaml</DependentUpon>

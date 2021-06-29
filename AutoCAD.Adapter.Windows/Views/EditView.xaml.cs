@@ -8,15 +8,13 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
     /// </summary>
     public partial class EditView : Window
     {
-        public EditView()
-        {
-            InitializeComponent();
-        }
+        private readonly EditViewModel _editViewModel;
 
         public EditView(EditViewModel editViewModel)
         {
             InitializeComponent();
-            DataContext = editViewModel;
+            _editViewModel = editViewModel;
+            DataContext = _editViewModel;
         }
 
         private void OK_Button_Click(object sender, RoutedEventArgs e)

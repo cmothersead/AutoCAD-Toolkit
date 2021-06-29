@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Controls;assembly=AutoCAD.Adapter.Controls"
-        xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels"
+        xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:EditViewModel}"
         mc:Ignorable="d"
         Title="Edit Component"
         MinWidth="620"

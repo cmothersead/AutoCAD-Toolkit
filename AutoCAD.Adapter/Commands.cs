@@ -10,6 +10,8 @@ using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.IO;
 using System.Linq;
+using ICA.AutoCAD.Adapter.Windows.Models;
+using System.Collections.ObjectModel;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -291,7 +293,12 @@ namespace ICA.AutoCAD.Adapter
             ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
             if (currentTitleBlock != null)
             {
-                var titleBlockWindow = new TitleBlockView();
+                var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel() { TitleBlocks = new ObservableCollection<TitleBlock>() 
+                { 
+                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\ICA 8.5x11 Title Block.png"),
+                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\ICA 11x17 Title Block.png"),
+                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\Nexteer 11x17 Title Block.png")
+                } });
                 Application.ShowModalWindow(titleBlockWindow);
             }
             //Settings, Attributes, and changeout

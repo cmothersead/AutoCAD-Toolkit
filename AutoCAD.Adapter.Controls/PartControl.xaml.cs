@@ -11,7 +11,7 @@ namespace ICA.AutoCAD.Adapter.Controls
     {
         public static readonly DependencyProperty FamilyProperty =
             DependencyProperty.Register(
-                "Family",
+                nameof(Family),
                 typeof(object),
                 typeof(PartControl));
 
@@ -23,7 +23,7 @@ namespace ICA.AutoCAD.Adapter.Controls
 
         public static readonly DependencyProperty SelectedManufacturerProperty =
             DependencyProperty.Register(
-                "SelectedManufacturer",
+                nameof(SelectedManufacturer),
                 typeof(object),
                 typeof(PartControl));
 
@@ -35,7 +35,7 @@ namespace ICA.AutoCAD.Adapter.Controls
 
         public static readonly DependencyProperty SelectedPartProperty =
             DependencyProperty.Register(
-                "SelectedPart",
+                nameof(SelectedPart),
                 typeof(object),
                 typeof(PartControl));
 
