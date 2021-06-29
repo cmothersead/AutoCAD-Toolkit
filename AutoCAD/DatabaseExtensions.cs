@@ -80,6 +80,16 @@ namespace ICA.AutoCAD
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
+        public static bool HasLayer(this Database database, string name)
+        {
+            return database.GetLayerTable().Contains(name);
+        }
+
+        public static bool HasLayer(this Database database, LayerTableRecord layer)
+        {
+            return database.HasLayer(layer.Name);
+        }
+
         /// <summary>
         /// Gets <see cref="LayerTableRecord"/> of the layer with the given name from the database, if it exists.
         /// </summary>
@@ -88,14 +98,24 @@ namespace ICA.AutoCAD
         /// <returns><see cref="LayerTableRecord"/> of the layer if it exists. Else null</returns>
         public static LayerTableRecord GetLayer(this Database database, string name)
         {
-            try
-            {
+            if (database.HasLayer(name))
                 return database.GetLayerTable().GetRecord(name);
-            }
-            catch
-            {
-                return null;
-            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets <see cref="LayerTableRecord"/> of the layer with the given name from the database, if it exists.
+        /// </summary>
+        /// <param name="database">Instance this method applies to.</param>
+        /// <param name="layerName">Name of the desired layer.</param>
+        /// <returns><see cref="LayerTableRecord"/> of the layer if it exists. Else null</returns>
+        public static LayerTableRecord GetLayer(this Database database, LayerTableRecord layer)
+        {
+            if (database.HasLayer(layer.Name))
+                return database.GetLayer(layer.Name);
+
+            return null;
         }
     }
 }

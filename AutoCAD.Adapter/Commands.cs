@@ -265,30 +265,20 @@ namespace ICA.AutoCAD.Adapter
                 }
             }
 
+            RemoveLadder();
             return template;
         }
 
-        [CommandMethod("TESTVALUES")]
+        [CommandMethod("REMOVELADDER")]
         public static void RemoveLadder()
         {
             LayerTableRecord ladderLayer = Application.DocumentManager.MdiActiveDocument.Database.GetLayer("LADDER");
             ladderLayer.Unlock();
-            LayerFilter layers = new LayerFilter()
+            using (Transaction transaction = ladderLayer.Database.TransactionManager.StartTransaction())
             {
-                ladderLayer.Name
-            };
-            PromptSelectionResult result = Application.DocumentManager.MdiActiveDocument.Editor.SelectAll(layers.Filter);
-            if (result.Status == PromptStatus.OK)
-            {
-                using (Transaction transaction = Application.DocumentManager.MdiActiveDocument.TransactionManager.StartTransaction())
-                {
-                    foreach (ObjectId id in result.Value.GetObjectIds())
-                    {
-                        Entity entity = transaction.GetObject(id, OpenMode.ForWrite) as Entity;
-                        entity.Erase();
-                    }
-                    transaction.Commit();
-                }
+                foreach (ObjectId id in ladderLayer.GetEntities())
+                    ((Entity)transaction.GetObject(id, OpenMode.ForWrite)).Erase();
+                transaction.Commit();
             }
             ladderLayer.Lock();
         }
@@ -305,6 +295,56 @@ namespace ICA.AutoCAD.Adapter
             }
             //Settings, Attributes, and changeout
             //Is TB inserted? If not, insert at origin
+        }
+
+        [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet)]
+        public static void AttributeBlockEdit()
+        {
+            Editor currentEditor = CurrentDocument.Editor;
+            try
+            {
+                PromptSelectionResult selectionResult = currentEditor.SelectImplied();
+                if (selectionResult.Status == PromptStatus.Error)
+                {
+                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions
+                    {
+                        SingleOnly = true
+                    };
+                    selectionResult = currentEditor.GetSelection(selectionOptions);
+                }
+                else
+                {
+                    currentEditor.SetImpliedSelection(new ObjectId[0]);
+                }
+
+                if (selectionResult.Status == PromptStatus.OK)
+                {
+                    if (selectionResult.Value.Count > 1)
+                        return;
+
+                    if (selectionResult.Value[0].ObjectId.ObjectClass.Name != "AcDbBlockReference")
+                        return;
+
+                    BlockReference reference = selectionResult.Value[0].ObjectId.Open() as BlockReference;
+
+                    switch (reference.Layer)
+                    {
+                        case "LADDER":
+                            CommandLineInsertLadder();
+                            break;
+                        case "TITLE BLOCK":
+                            TitleBlock();
+                            break;
+                        default:
+                            return;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                currentEditor.WriteMessage(ex.Message);
+            }
         }
     }
 }

@@ -98,6 +98,7 @@
     <Compile Include="DatabaseExtensions.cs" />
     <Compile Include="EntityExtenstions.cs" />
     <Compile Include="LayerFilter.cs" />
+    <Compile Include="ObjectIdExtensions.cs" />
     <Compile Include="ObjectSnap.cs" />
     <Compile Include="Point2dExtensions.cs" />
     <Compile Include="SymbolTables.cs" />

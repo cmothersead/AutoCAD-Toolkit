@@ -40,6 +40,22 @@ namespace ICA.AutoCAD.Adapter
             return null;
         }
 
+        public static bool HasLadder(this Database database)
+        {
+            if (database.GetLadder().Count > 0)
+                return true;
+
+            return false;
+        }
+
+        public static ObjectIdCollection GetLadder(this Database database)
+        {
+            if (!database.HasLayer(ElectricalLayers.LadderLayer))
+                return null;
+
+            return database.GetLayer(ElectricalLayers.LadderLayer).GetEntities();
+        }
+
         #endregion
     }
 }

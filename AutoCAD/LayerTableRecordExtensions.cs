@@ -1,4 +1,6 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 
 namespace ICA.AutoCAD
 {
@@ -84,6 +86,24 @@ namespace ICA.AutoCAD
             {
                 return false;
             }
+        }
+
+        public static ObjectIdCollection GetEntities(this LayerTableRecord layer)
+        {
+            ObjectIdCollection collection = new ObjectIdCollection();
+
+            using(Transaction transaction = layer.Database.TransactionManager.StartTransaction())
+            {
+                foreach(ObjectId id in layer.Database.GetModelSpace())
+                {
+                    if(((Entity)layer.Database.Open(id)).Layer == layer.Name)
+                    {
+                        collection.Add(id);
+                    }
+                }
+            }
+
+            return collection;
         }
     }
 }

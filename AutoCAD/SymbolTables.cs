@@ -62,6 +62,11 @@ namespace ICA.AutoCAD
                 return transaction.GetObject(symbolTableId, OpenMode.ForRead) as SymbolTable;
         }
 
+        public static bool Contains(this SymbolTable symbolTable, string name)
+        {
+            return symbolTable[name] != null;
+        }
+
         public static SymbolTableRecord GetRecord(this SymbolTable symbolTable, string name)
         {
             using (Transaction transaction = symbolTable.Database.TransactionManager.StartTransaction())
