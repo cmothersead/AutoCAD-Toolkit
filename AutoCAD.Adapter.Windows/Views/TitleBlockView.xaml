@@ -22,10 +22,10 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"  Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
             <Button Name="New_Button" Content="New" Width="100" Margin="0,0,5,0"/>
             <Button Name="Settings_Button" Content="Settings" Width="100"/>
-            <Label Content="{Binding SelectedTitleBlock.Name}"/>
+            <Label Content="{Binding SelectedTitleBlock.Preview.Source}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"  Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
-            <Button Name="Ok_Button" Content="OK" Width="100" Margin="0,0,5,0"/>
+            <Button Name="Ok_Button" Content="OK" Width="100" Margin="0,0,5,0" IsDefault="True" Click="Ok_Button_Click"/>
             <Button Name="Cancel_Button" Content="Cancel" Width="100" IsCancel="True"/>
         </StackPanel>
     </Grid>

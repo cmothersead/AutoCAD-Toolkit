@@ -72,5 +72,12 @@ namespace ICA.AutoCAD.Adapter
             Description = "Ladder markings",
             IsLocked = true
         };
+        public static LayerTableRecord TitleBlockLayer { get; set; } = new LayerTableRecord()
+        {
+            Name = "TITLE BLOCK",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
+            Description = "Title Blocks",
+            IsLocked = true
+        };
     }
 }

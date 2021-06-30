@@ -8,6 +8,8 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
     /// </summary>
     public partial class TitleBlockView : Window
     {
+        public TitleBlockViewModel ViewModel { get; }
+
         public TitleBlockView()
         {
             InitializeComponent();
@@ -16,7 +18,14 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
         public TitleBlockView(TitleBlockViewModel titleBlockViewModel)
         {
             InitializeComponent();
-            DataContext = titleBlockViewModel;
+            ViewModel = titleBlockViewModel;
+            DataContext = ViewModel;
+        }
+
+        private void Ok_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            Close();
         }
     }
 }

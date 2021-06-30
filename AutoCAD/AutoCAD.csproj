@@ -93,14 +93,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bitcode.cs" />
     <Compile Include="BlockTableExtensions.cs" />
     <Compile Include="BlockTableRecordExtensions.cs" />
     <Compile Include="DatabaseExtensions.cs" />
+    <Compile Include="DBObjectExtensions.cs" />
     <Compile Include="EntityExtenstions.cs" />
+    <Compile Include="GridDisplay.cs" />
     <Compile Include="LayerFilter.cs" />
     <Compile Include="ObjectIdExtensions.cs" />
     <Compile Include="ObjectSnap.cs" />
     <Compile Include="Point2dExtensions.cs" />
+    <Compile Include="Point3dExtensions.cs" />
     <Compile Include="SymbolTables.cs" />
     <Compile Include="SystemVariables.cs" />
     <Compile Include="AttributeReferenceExtensions.cs" />

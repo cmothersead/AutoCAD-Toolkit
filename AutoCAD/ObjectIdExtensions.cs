@@ -8,5 +8,10 @@ namespace ICA.AutoCAD
         {
             return id.Database.Open(id);
         }
+
+        public static void Erase(this ObjectId id, Transaction transaction)
+        {
+            transaction.GetObject(id, OpenMode.ForWrite).Erase();
+        }
     }
 }

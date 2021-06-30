@@ -6,7 +6,7 @@ namespace ICA.AutoCAD
     public static class EntityExtenstions
     {
         /// <summary>
-        /// Adds entity to the current document's database within sel-contained transaction.
+        /// Adds entity to the current document's database within self-contained transaction.
         /// </summary>
         /// <param name="entity"></param>
         public static void Insert(this Entity entity)
@@ -23,7 +23,10 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                entity.Insert(database, transaction);
+                if (entity is BlockReference reference)
+                    reference.Insert(database, transaction);
+                else
+                    entity.Insert(database, transaction);
                 transaction.Commit();
             }
         }

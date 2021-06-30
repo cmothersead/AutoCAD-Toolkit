@@ -111,7 +111,7 @@ namespace ICA.AutoCAD
                     {
                         AttributeReference attributeReference = new AttributeReference();
                         attributeReference.SetAttributeFromBlock(attributeDefinition, blockReference.BlockTransform);
-                        if (attributes.ContainsKey(attributeDefinition.Tag))
+                        if (attributes != null && attributes.ContainsKey(attributeDefinition.Tag))
                             attributeReference.TextString = attributes[attributeDefinition.Tag];
                         else
                             attributeReference.TextString = attributeDefinition.TextString;

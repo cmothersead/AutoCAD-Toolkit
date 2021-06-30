@@ -12,6 +12,7 @@ using ICA.AutoCAD.IO;
 using System.Linq;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using System.Collections.ObjectModel;
+using System.Windows.Forms;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -288,21 +289,57 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TITLEBLOCK")]
         public static void TitleBlock()
         {
-            CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler);
+            //CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler); //Doesn't belong here.
             TitleBlockRecord currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
             ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
             if (currentTitleBlock != null)
             {
-                var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel() { TitleBlocks = new ObservableCollection<TitleBlock>() 
-                { 
-                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\ICA 8.5x11 Title Block.png"),
-                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\ICA 11x17 Title Block.png"),
-                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\Nexteer 11x17 Title Block.png")
+                var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel() { TitleBlocks = new ObservableCollection<TitleBlock>()
+                {
+                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
+                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
+                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
                 } });
                 Application.ShowModalWindow(titleBlockWindow);
+                if((bool)titleBlockWindow.DialogResult)
+                {
+                    TitleBlock SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
+
+                    if (currentTitleBlock.Name == SelectedTitleBlock.Name)
+                        return;
+
+                    currentTitleBlock.Purge();
+
+                    TitleBlockRecord newTitleBlock = new TitleBlockRecord(CurrentDocument.Database.GetBlockTable().LoadExternalBlockTableRecord(SelectedTitleBlock.FilePath.LocalPath));
+                    newTitleBlock.Insert();
+                    ZoomExtents(newTitleBlock.Reference.GeometricExtents);
+                }
             }
             //Settings, Attributes, and changeout
             //Is TB inserted? If not, insert at origin
+        }
+
+        public static void ZoomExtents(Extents3d extents)
+        {
+            using (ViewTableRecord view = CurrentDocument.Editor.GetCurrentView())
+            {
+                view.Width = extents.MaxPoint.X - extents.MinPoint.X;
+                view.Height = extents.MaxPoint.Y - extents.MinPoint.Y;
+                view.CenterPoint = new Point2d(
+                    (extents.MaxPoint.X + extents.MinPoint.X) / 2.0,
+                    (extents.MaxPoint.Y + extents.MinPoint.Y) / 2.0);
+                CurrentDocument.Editor.SetCurrentView(view);
+            }
+        }
+
+        [CommandMethod("REMOVETITLEBLOCK")]
+        public static void RemoveTitleBlock()
+        {
+            try
+            {
+                CurrentDocument.Database.GetTitleBlock().Remove();
+            }
+            catch { }
         }
 
         [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet)]

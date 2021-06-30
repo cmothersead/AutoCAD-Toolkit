@@ -1,4 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.ApplicationServices.Core;
 using System;
 using System.Collections;
 
@@ -107,10 +107,7 @@ namespace ICA.AutoCAD
             set => Set(value);
         }
 
-        private static short Get()
-        {
-            return (short)Application.GetSystemVariable("OSMODE");
-        }
+        private static short Get() => (short)Application.GetSystemVariable("OSMODE");
 
         private static bool Get(Type type)
         {
@@ -120,25 +117,23 @@ namespace ICA.AutoCAD
             })[(int)type];
         }
 
-        private static void Set(short value)
-        {
-            Application.SetSystemVariable("OSMODE", value);
-        }
+        private static void Set(short value) => Application.SetSystemVariable("OSMODE", value);
 
         private static void Set(Type type, bool value)
         {
             if (Get(type) != value)
+            {
                 if (value)
+                {
                     Set((short)(Get() + Math.Pow(2,(int)type)));
+                }
                 else
                 {
                     Set((short)(Get() - Math.Pow(2, (int)type)));
                 }
+            }
         }
 
-        public static void None()
-        {
-            Set(0);
-        }
+        public static void None() => Set(0);
     }
 }
