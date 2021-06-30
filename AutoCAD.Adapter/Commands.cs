@@ -8,11 +8,9 @@ using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
-using ICA.AutoCAD.IO;
 using System.Linq;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using System.Collections.ObjectModel;
-using System.Windows.Forms;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -222,7 +220,7 @@ namespace ICA.AutoCAD.Adapter
 
             switch (CurrentDocument.Database.GetTitleBlock().Name)
             {
-                case "8.5x11 Title Block":
+                case "ICA 8.5x11 Title Block":
                     template = new LadderTemplate()
                     {
                         Origin = new Point2d(2.5, 22.5),
@@ -230,7 +228,7 @@ namespace ICA.AutoCAD.Adapter
                         TotalWidth = 15
                     };
                     break;
-                case "11x17 Title Block":
+                case "ICA 11x17 Title Block":
                     template = new LadderTemplate()
                     {
                         Origin = new Point2d(2.5, 22.5),
@@ -240,7 +238,7 @@ namespace ICA.AutoCAD.Adapter
                     };
                     countOptions.Keywords.Add("2");
                     break;
-                case "Nexteer Title Block":
+                case "Nexteer 11x17 Title Block":
                     template = new LadderTemplate()
                     {
                         Origin = new Point2d(2.5, 22.5),
@@ -294,12 +292,16 @@ namespace ICA.AutoCAD.Adapter
             ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
             if (currentTitleBlock != null)
             {
-                var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel() { TitleBlocks = new ObservableCollection<TitleBlock>()
-                {
-                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
-                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
-                    new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
-                } });
+                var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel()
+                { 
+                    TitleBlocks = new ObservableCollection<TitleBlock>()
+                    {
+                        new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
+                        new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
+                        new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
+                    }
+                });
+                titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.Where(titleBlock => titleBlock.Name == currentTitleBlock.Name).FirstOrDefault();
                 Application.ShowModalWindow(titleBlockWindow);
                 if((bool)titleBlockWindow.DialogResult)
                 {
@@ -308,6 +310,7 @@ namespace ICA.AutoCAD.Adapter
                     if (currentTitleBlock.Name == SelectedTitleBlock.Name)
                         return;
 
+                    RemoveLadder();
                     currentTitleBlock.Purge();
 
                     TitleBlockRecord newTitleBlock = new TitleBlockRecord(CurrentDocument.Database.GetBlockTable().LoadExternalBlockTableRecord(SelectedTitleBlock.FilePath.LocalPath));
@@ -315,8 +318,6 @@ namespace ICA.AutoCAD.Adapter
                     ZoomExtents(newTitleBlock.Reference.GeometricExtents);
                 }
             }
-            //Settings, Attributes, and changeout
-            //Is TB inserted? If not, insert at origin
         }
 
         public static void ZoomExtents(Extents3d extents)
