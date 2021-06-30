@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 using System.Collections.Generic;
 
 namespace ICA.AutoCAD
@@ -60,11 +61,6 @@ namespace ICA.AutoCAD
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
                 return transaction.GetObject(symbolTableId, OpenMode.ForRead) as SymbolTable;
-        }
-
-        public static bool Contains(this SymbolTable symbolTable, string name)
-        {
-            return symbolTable[name] != null;
         }
 
         public static SymbolTableRecord GetRecord(this SymbolTable symbolTable, string name)
@@ -167,7 +163,7 @@ namespace ICA.AutoCAD
         /// <param name="blockTable">Instance this method applies to.</param>
         /// <param name="name">Name of the record to find.</param>
         /// <returns><see cref="BlockTableRecord"/> if it exists.</returns>
-        public static BlockTableRecord GetRecord (this BlockTable blockTable, string name)
+        public static BlockTableRecord GetRecord(this BlockTable blockTable, string name)
         {
             return GetRecord((SymbolTable)blockTable, name) as BlockTableRecord;
         }

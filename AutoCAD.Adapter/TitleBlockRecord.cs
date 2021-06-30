@@ -10,8 +10,7 @@ namespace ICA.AutoCAD.Adapter
 
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
         public string Name => _blockTableRecord.Name;
-        private BlockReference _blockReference;
-        public BlockReference Reference => _blockReference;
+        public BlockReference Reference => _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference;
 
         public TitleBlockRecord(BlockTableRecord record)
         {
@@ -29,11 +28,10 @@ namespace ICA.AutoCAD.Adapter
             if (_blockTableRecord.GetBlockReferenceIds(true, false).Count > 0)
                 return;
 
-            _blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId) { Layer = ElectricalLayers.TitleBlockLayer.Name };
-            _blockTableRecord.Database.Limmax = _blockReference.GeometricExtents.MaxPoint.ToPoint2D();
-            _blockTableRecord.Database.Limmin = _blockReference.GeometricExtents.MinPoint.ToPoint2D();
+            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId) { Layer = _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer).Name }.Insert();
+            _blockTableRecord.Database.Limmax = Reference.GeometricExtents.MaxPoint.ToPoint2D();
+            _blockTableRecord.Database.Limmin = Reference.GeometricExtents.MinPoint.ToPoint2D();
             GridDisplay.Limits = true;
-            _blockReference.Insert();
         }
 
         public void Remove()

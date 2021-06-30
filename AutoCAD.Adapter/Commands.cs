@@ -69,10 +69,7 @@ namespace ICA.AutoCAD.Adapter
         /// Toggles between layer states to help with manual mounting of panel components
         /// </summary>
         [CommandMethod("MOUNT")]
-        public static void ToggleMountingLayers()
-        {
-            MountMode = !MountMode;
-        }
+        public static void ToggleMountingLayers() => MountMode = !MountMode;
 
         public static void HideMountingLayers()
         {
@@ -273,7 +270,14 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("REMOVELADDER")]
         public static void RemoveLadder()
         {
-            LayerTableRecord ladderLayer = Application.DocumentManager.MdiActiveDocument.Database.GetLayer("LADDER");
+            if (!CurrentDocument.Database.GetLayerTable().Has(ElectricalLayers.LadderLayer.Name))
+                return;
+
+            LayerTableRecord ladderLayer = CurrentDocument.Database.GetLayer(ElectricalLayers.LadderLayer.Name);
+
+            if (ladderLayer is null)
+                return;
+            
             ladderLayer.Unlock();
             using (Transaction transaction = ladderLayer.Database.TransactionManager.StartTransaction())
             {
@@ -289,34 +293,33 @@ namespace ICA.AutoCAD.Adapter
         {
             //CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler); //Doesn't belong here.
             TitleBlockRecord currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
-            ElectricalDocumentProperties properties = CurrentDocument.Database.ElectricalProperties();
-            if (currentTitleBlock != null)
+            var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel()
             {
-                var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel()
-                { 
-                    TitleBlocks = new ObservableCollection<TitleBlock>()
+                TitleBlocks = new ObservableCollection<TitleBlock>()
                     {
                         new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
                         new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
                         new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
                     }
-                });
+            });
+
+            if (currentTitleBlock != null)
                 titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.Where(titleBlock => titleBlock.Name == currentTitleBlock.Name).FirstOrDefault();
-                Application.ShowModalWindow(titleBlockWindow);
-                if((bool)titleBlockWindow.DialogResult)
-                {
-                    TitleBlock SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
 
-                    if (currentTitleBlock.Name == SelectedTitleBlock.Name)
-                        return;
+            Application.ShowModalWindow(titleBlockWindow);
+            if ((bool)titleBlockWindow.DialogResult)
+            {
+                TitleBlock SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
 
-                    RemoveLadder();
-                    currentTitleBlock.Purge();
+                if (currentTitleBlock != null && currentTitleBlock.Name == SelectedTitleBlock.Name)
+                    return;
 
-                    TitleBlockRecord newTitleBlock = new TitleBlockRecord(CurrentDocument.Database.GetBlockTable().LoadExternalBlockTableRecord(SelectedTitleBlock.FilePath.LocalPath));
-                    newTitleBlock.Insert();
-                    ZoomExtents(newTitleBlock.Reference.GeometricExtents);
-                }
+                RemoveLadder();
+                PurgeTitleBlock();
+
+                TitleBlockRecord newTitleBlock = new TitleBlockRecord(CurrentDocument.Database.GetBlockTable().LoadExternalBlockTableRecord(SelectedTitleBlock.FilePath.LocalPath));
+                newTitleBlock.Insert();
+                ZoomExtents(newTitleBlock.Reference.GeometricExtents);
             }
         }
 
@@ -333,12 +336,12 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        [CommandMethod("REMOVETITLEBLOCK")]
-        public static void RemoveTitleBlock()
+        [CommandMethod("PURGETITLEBLOCK")]
+        public static void PurgeTitleBlock()
         {
             try
             {
-                CurrentDocument.Database.GetTitleBlock().Remove();
+                CurrentDocument.Database.GetTitleBlock().Purge();
             }
             catch { }
         }

@@ -82,7 +82,7 @@ namespace ICA.AutoCAD
 
         public static bool HasLayer(this Database database, string name)
         {
-            return database.GetLayerTable().Contains(name);
+            return database.GetLayerTable().Has(name);
         }
 
         public static bool HasLayer(this Database database, LayerTableRecord layer)
@@ -115,7 +115,15 @@ namespace ICA.AutoCAD
             if (database.HasLayer(layer.Name))
                 return database.GetLayer(layer.Name);
 
-            return null;
+            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                LayerTable layerTable = transaction.GetObject(database.LayerTableId, OpenMode.ForWrite) as LayerTable;
+                LayerTableRecord layerClone = layer.Clone() as LayerTableRecord;
+                layerTable.Add(layerClone);
+                transaction.AddNewlyCreatedDBObject(layerClone, true);
+                transaction.Commit();
+            }
+            return database.GetLayer(layer);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
         public TitleBlockView(TitleBlockViewModel titleBlockViewModel)
         {
             InitializeComponent();
+            TitleBlock_ComboBox.Text = "Please select a Title Block...";
             ViewModel = titleBlockViewModel;
             DataContext = ViewModel;
         }
