@@ -33,7 +33,7 @@ namespace ICA.AutoCAD
         }
 
         /// <summary>
-        /// Creates transaction to freeze this layer. Returns true if successful
+        /// Creates transaction to thaw this layer. Returns true if successful
         /// </summary>
         /// <param name="layer"></param>
         /// <returns></returns>

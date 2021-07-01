@@ -40,6 +40,10 @@
     <Reference Include="AcMgd">
       <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcMgd.dll</HintPath>
     </Reference>
+    <Reference Include="Autodesk.AutoCAD.Interop">
+      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc-x64\Autodesk.AutoCAD.Interop.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -55,6 +59,8 @@
     <Compile Include="DocumentExtensions.cs" />
     <Compile Include="LayerTableRecordExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingsInitializer.cs" />
+    <Compile Include="SupportPath.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
