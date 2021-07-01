@@ -218,10 +218,9 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TITLEBLOCK")]
         public static void TitleBlockCommand()
         {
-            //CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler); //Doesn't belong here.
-            TitleBlock currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
             try
             {
+                CurrentDocument.Database.ObjectAppended -= new ObjectEventHandler(TitleBlockInsertion.Handler);
                 TitleBlockView titleBlockWindow = new TitleBlockView(new TitleBlockViewModel(Paths.TitleBlocks));
                 ObservableCollection<TitleBlockFile> validFiles = new ObservableCollection<TitleBlockFile>();
                 Dictionary<string, string> errorList = new Dictionary<string, string>();
@@ -251,10 +250,13 @@ namespace ICA.AutoCAD.Adapter
                     Application.ShowAlertDialog(errorMessage);
                 }
 
+                TitleBlock currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
+
                 if (currentTitleBlock != null)
                     titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.Where(titleBlock => titleBlock.Name == currentTitleBlock.Name).FirstOrDefault();
 
                 Application.ShowModalWindow(titleBlockWindow);
+
                 if ((bool)titleBlockWindow.DialogResult)
                 {
                     TitleBlockFile SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
@@ -273,6 +275,10 @@ namespace ICA.AutoCAD.Adapter
             catch (ArgumentException ex)
             {
                 Application.ShowAlertDialog(ex.Message);
+            }
+            finally
+            {
+                CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler);
             }
         }
 
