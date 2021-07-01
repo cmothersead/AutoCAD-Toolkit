@@ -1,10 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Runtime;
 using System.Collections.Generic;
 
 namespace ICA.AutoCAD
 {
-    public static class SymbolTables
+    public static class SymbolTableExtensions
     {
         #region Public Enums
 
@@ -82,6 +81,8 @@ namespace ICA.AutoCAD
                 result.Add(symbolTable.GetRecord(id).Name);
             return result;
         }
+
+        public static bool Has(this SymbolTable symbolTable, SymbolTableRecord record) => symbolTable.Has(record.Name);
 
         #endregion
 

@@ -97,29 +97,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bitcode.cs" />
-    <Compile Include="BlockTableExtensions.cs" />
-    <Compile Include="BlockTableRecordExtensions.cs" />
-    <Compile Include="DatabaseExtensions.cs" />
-    <Compile Include="DBObjectExtensions.cs" />
-    <Compile Include="EntityExtenstions.cs" />
-    <Compile Include="GridDisplay.cs" />
+    <Compile Include="System Variables\Bitcode.cs" />
+    <Compile Include="Extensions\BlockTableExtensions.cs" />
+    <Compile Include="Extensions\BlockTableRecordExtensions.cs" />
+    <Compile Include="Extensions\DatabaseExtensions.cs" />
+    <Compile Include="Extensions\DBObjectExtensions.cs" />
+    <Compile Include="Extensions\EntityExtenstions.cs" />
+    <Compile Include="System Variables\GridDisplay.cs" />
     <Compile Include="LayerFilter.cs" />
-    <Compile Include="ObjectIdExtensions.cs" />
-    <Compile Include="ObjectSnap.cs" />
-    <Compile Include="Point2dExtensions.cs" />
-    <Compile Include="Point3dExtensions.cs" />
-    <Compile Include="SymbolTables.cs" />
-    <Compile Include="SystemVariables.cs" />
-    <Compile Include="AttributeReferenceExtensions.cs" />
-    <Compile Include="BlockReferenceExtensions.cs" />
-    <Compile Include="LayerTableRecordExtensions.cs" />
+    <Compile Include="Extensions\ObjectIdExtensions.cs" />
+    <Compile Include="System Variables\ObjectSnap.cs" />
+    <Compile Include="Extensions\Point2dExtensions.cs" />
+    <Compile Include="Extensions\Point3dExtensions.cs" />
+    <Compile Include="Extensions\SymbolTableExtensions.cs" />
+    <Compile Include="System Variables\SystemVariables.cs" />
+    <Compile Include="Extensions\AttributeReferenceExtensions.cs" />
+    <Compile Include="Extensions\BlockReferenceExtensions.cs" />
+    <Compile Include="Extensions\LayerTableRecordExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsInitializer.cs" />
-    <Compile Include="SupportPath.cs" />
+    <Compile Include="System Variables\SupportPath.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

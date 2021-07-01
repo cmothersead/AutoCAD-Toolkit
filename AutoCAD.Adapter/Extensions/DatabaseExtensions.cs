@@ -7,6 +7,8 @@ namespace ICA.AutoCAD.Adapter
     {
         #region Public Extension Methods
 
+        #region Document Properties
+
         public static ElectricalDocumentProperties ElectricalProperties(this Database database)
         {
             Dictionary<string, string> properties = database.GetCustomProperties();
@@ -21,6 +23,10 @@ namespace ICA.AutoCAD.Adapter
         {
             return database.ElectricalProperties().Sheet.SheetNumber;
         }
+
+        #endregion
+
+        #region Title Block
 
         public static TitleBlockRecord GetTitleBlock(this Database database)
         {
@@ -40,6 +46,10 @@ namespace ICA.AutoCAD.Adapter
             return null;
         }
 
+        #endregion
+
+        #region Ladder
+
         public static bool HasLadder(this Database database)
         {
             if (database.GetLadder().Count > 0)
@@ -51,10 +61,12 @@ namespace ICA.AutoCAD.Adapter
         public static ObjectIdCollection GetLadder(this Database database)
         {
             if (!database.HasLayer(ElectricalLayers.LadderLayer))
-                return null;
+                return new ObjectIdCollection();
 
             return database.GetLayer(ElectricalLayers.LadderLayer).GetEntities();
         }
+
+        #endregion
 
         #endregion
     }

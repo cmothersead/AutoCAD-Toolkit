@@ -1,12 +1,5 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Interop;
-using Autodesk.AutoCAD.Runtime;
+﻿using Autodesk.AutoCAD.Runtime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD
 {
@@ -14,7 +7,7 @@ namespace ICA.AutoCAD
     {
         public void Initialize()
         {
-            List<string> test = Settings.GetSupportPaths();
+            //List<string> test = Settings.GetSupportPaths();
         }
 
         public void Terminate()
@@ -27,9 +20,8 @@ namespace ICA.AutoCAD
 
     public class Settings
     {
-        public static List<string> GetSupportPaths()
-        {
-            return ((AcadApplication)Application.AcadApplication).Preferences.Files.SupportPath.Split(';').ToList();
-        }
+        //public static List<string> GetSupportPaths()
+        //{
+        //}
     }
 }
