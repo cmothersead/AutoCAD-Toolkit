@@ -1,83 +1,130 @@
-﻿using Autodesk.AutoCAD.Colors;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class ElectricalLayers
+    public static class ElectricalLayers
     {
-        public static LayerTableRecord SymbolLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord SymbolLayer => new LayerTableRecord()
         {
             Name = "SYMS",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Schematic symbol blocks"
         };
-        public static LayerTableRecord TagLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord TagLayer => new LayerTableRecord()
         {
             Name = "TAGS",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 51),
             Description = "Tag attributes",
         };
-        public static LayerTableRecord DescriptionLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord DescriptionLayer => new LayerTableRecord()
         {
             Name = "DESC",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 1),
             Description = "Description attributes"
         };
-        public static LayerTableRecord TerminalLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord TerminalLayer => new LayerTableRecord()
         {
             Name = "TERMS",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 130),
             Description = "Terminal number attributes"
         };
-        public static LayerTableRecord XrefLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord XrefLayer => new LayerTableRecord()
         {
             Name = "XREF",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Cross reference attributes"
         };
-        public static LayerTableRecord LinkLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord LinkLayer => new LayerTableRecord()
         {
             Name = "LINK",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 9),
             Description = "Link lines"
         };
-        public static LayerTableRecord WireLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord WireLayer => new LayerTableRecord()
         {
             Name = "WIRES",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Default wires layer"
         };
-        public static LayerTableRecord WireNumberLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord WireNumberLayer => new LayerTableRecord()
         {
             Name = "WIRENO",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 3),
             Description = "Wire numbers"
         };
-        public static LayerTableRecord ManufacturerLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord ManufacturerLayer => new LayerTableRecord()
         {
             Name = "MFG",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 150),
             Description = "Manufacturer name attributes"
         };
-        public static LayerTableRecord PartNumberLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord PartNumberLayer => new LayerTableRecord()
         {
             Name = "CAT",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 141),
             Description = "Part number attributes"
         };
-        public static LayerTableRecord LadderLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord LadderLayer => new LayerTableRecord()
         {
             Name = "LADDER",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Ladder markings",
             IsLocked = true
         };
-        public static LayerTableRecord TitleBlockLayer { get; set; } = new LayerTableRecord()
+        public static LayerTableRecord TitleBlockLayer => new LayerTableRecord()
         {
             Name = "TITLE BLOCK",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Title Blocks",
             IsLocked = true
         };
+
+        private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
+                                                                                              .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
+
+        public static void HandleLocks(Database database)
+        {
+            List<LayerTableRecord> test = Layers.Select(l => l.Value).Where(l => l.IsLocked == true).ToList();
+            //if (args.Document.Database.HasLayer(ElectricalLayers.TitleBlockLayer))
+            //    using (Transaction transaction = args.Document.Database.TransactionManager.StartTransaction())
+            //    {
+            //        DBObject layer = transaction.GetObject(args.Document.Database.GetLayer(ElectricalLayers.TitleBlockLayer).ObjectId, OpenMode.ForWrite);
+            //        layer.Modified += new EventHandler(ElectricalLayers.UnlockHandler);
+            //    }
+        }
+
+        private static void Unlock(object sender, EventArgs e)
+        {
+            LayerTableRecord layer = sender as LayerTableRecord;
+            if (layer.IsLocked == false)
+            {
+                MessageBoxResult result = MessageBox.Show("Manual modification of this layer and its contents can cause unexpected errors. Continue?",
+                                                          "Unlock Layer",
+                                                          MessageBoxButton.OKCancel,
+                                                          MessageBoxImage.Warning);
+                if (result != MessageBoxResult.OK)
+                {
+                    forRelock = layer;
+                    Application.Idle += Relock;
+                }
+            }
+        }
+
+        private static LayerTableRecord forRelock;
+
+        private static void Relock(object sender, EventArgs e)
+        {
+            Application.Idle -= Relock;
+            using (DocumentLock lockDoc = Application.DocumentManager.GetDocument(forRelock.Database).LockDocument())
+                forRelock.Lock();
+        }
     }
 }
