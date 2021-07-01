@@ -31,14 +31,57 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AcCoreMgd">
-      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2022_Win_64bit_dlm\inc\AcCoreMgd.dll</HintPath>
+    <Reference Include="AcCoreMgd, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.Core.24.1.51000\lib\net47\AcCoreMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="AcDbMgd">
-      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2022_Win_64bit_dlm\inc\AcDbMgd.dll</HintPath>
+    <Reference Include="AcCui, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcCui.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="AcMgd">
-      <HintPath>..\..\..\..\..\..\..\Autodesk\ObjectARX_for_AutoCAD_2022_Win_64bit_dlm\inc\AcMgd.dll</HintPath>
+    <Reference Include="AcDbMgd, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.Model.24.1.51000\lib\net47\AcDbMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acdbmgdbrep, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.Model.24.1.51000\lib\net47\acdbmgdbrep.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcDx, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcDx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcMgd, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcMr, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcMr.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcSeamless, Version=24.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcSeamless.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcTcMgd, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcTcMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcWindows, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcWindows.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AdUIMgd, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AdUIMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AdUiPalettes, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AdUiPalettes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AdWindows, Version=3.1.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AdWindows.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -52,14 +95,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandEndedHandler.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="Config\Enums\WireSortMode.cs" />
+    <Compile Include="Config\ElectricalLayers.cs" />
+    <Compile Include="Config\Enums\LeaderInsertMode.cs" />
+    <Compile Include="Config\Enums\RungOrientation.cs" />
+    <Compile Include="Config\Enums\NumberMode.cs" />
+    <Compile Include="Config\ComponentProperties.cs" />
+    <Compile Include="Config\Enums\WireGapStyle.cs" />
+    <Compile Include="Config\Properties.cs" />
+    <Compile Include="Config\TitleBlockProperties.cs" />
+    <Compile Include="Config\WDM.cs" />
+    <Compile Include="Config\WireProperties.cs" />
+    <Compile Include="Defaults.cs" />
+    <Compile Include="Extensions\DatabaseExtensions.cs" />
+    <Compile Include="Config\ElectricalDocumentProperties.cs" />
+    <Compile Include="Insertable.cs" />
+    <Compile Include="Ladder\Ladder.cs" />
+    <Compile Include="Ladder\ILadder.cs" />
+    <Compile Include="Ladder\LadderTemplate.cs" />
+    <Compile Include="Config\LadderProperties.cs" />
     <Compile Include="ParentSymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchematicSymbolRecord.cs" />
+    <Compile Include="Config\SheetProperties.cs" />
+    <Compile Include="SymbolJig.cs" />
+    <Compile Include="TitleBlockInsertionHandler.cs" />
+    <Compile Include="TitleBlockRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">
       <Project>{88a9421b-73d7-4cf8-8916-1c9046ee0e88}</Project>
       <Name>AutoCAD.Adapter.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoCAD.IO\AutoCAD.IO.csproj">
+      <Project>{68D45FA7-FBB1-4754-A8A6-0B2A56084E0E}</Project>
+      <Name>AutoCAD.IO</Name>
     </ProjectReference>
     <ProjectReference Include="..\AutoCAD\AutoCAD.csproj">
       <Project>{fbb7192a-a07f-4017-9f9c-984c7b7c6843}</Project>
@@ -72,6 +144,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
