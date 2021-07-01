@@ -11,6 +11,7 @@ using Autodesk.AutoCAD.Geometry;
 using System.Linq;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using System.Collections.ObjectModel;
+using System;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -156,13 +157,13 @@ namespace ICA.AutoCAD.Adapter
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (Autodesk.AutoCAD.Runtime.Exception ex)
                     {
                         currentEditor.WriteMessage(ex.Message);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
                 currentEditor.WriteMessage(ex.Message);
             }
@@ -182,7 +183,7 @@ namespace ICA.AutoCAD.Adapter
                 SchematicSymbolRecord.GetRecord(symbolName)
                                      .InsertSymbol();
             }
-            catch (Exception ex)
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
                 CurrentDocument.Editor.WriteMessage(ex.Message);
             }
@@ -297,9 +298,9 @@ namespace ICA.AutoCAD.Adapter
             {
                 TitleBlocks = new ObservableCollection<TitleBlock>()
                     {
-                        new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
-                        new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
-                        new TitleBlock("C:\\Users\\cmotherseadicacontro\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
+                        new TitleBlock($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
+                        new TitleBlock($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
+                        new TitleBlock($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
                     }
             });
 
@@ -390,7 +391,7 @@ namespace ICA.AutoCAD.Adapter
 
                 }
             }
-            catch (Exception ex)
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
                 currentEditor.WriteMessage(ex.Message);
             }
