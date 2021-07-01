@@ -75,6 +75,11 @@ namespace ICA.AutoCAD.IO
         /// </summary>
         public static string Templates => Path.GetFullPath($"{Main}\\templates");
 
+        /// <summary>
+        /// ICA title block directory. Contains title block definition files.
+        /// </summary>
+        public static string TitleBlocks => Path.GetFullPath($"{Templates}\\title blocks");
+
         #endregion
 
         #region Private Methods

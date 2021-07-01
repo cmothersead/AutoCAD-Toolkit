@@ -12,6 +12,8 @@ using System.Linq;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using System.Collections.ObjectModel;
 using System;
+using ICA.AutoCAD.IO;
+using System.IO;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -214,37 +216,63 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("TITLEBLOCK")]
-        public static void TitleBlock()
+        public static void TitleBlockCommand()
         {
             //CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler); //Doesn't belong here.
-            TitleBlockRecord currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
-            var titleBlockWindow = new TitleBlockView(new TitleBlockViewModel()
+            TitleBlock currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
+            try
             {
-                TitleBlocks = new ObservableCollection<TitleBlock>()
+                TitleBlockView titleBlockWindow = new TitleBlockView(new TitleBlockViewModel(Paths.TitleBlocks));
+                ObservableCollection<TitleBlockFile> validFiles = new ObservableCollection<TitleBlockFile>();
+                Dictionary<string, string> errorList = new Dictionary<string, string>();
+                foreach (TitleBlockFile file in titleBlockWindow.ViewModel.TitleBlocks)
+                {
+                    string path = file.Uri.LocalPath;
+                    if (!TitleBlock.IsDefinitionFile(path))
+                        errorList.Add(Path.GetFileName(path), TitleBlock.DefinitionFileException(path));
+                    else
+                        validFiles.Add(file);
+                }
+
+                titleBlockWindow.ViewModel.TitleBlocks = validFiles;
+
+                if (errorList.Count > 0)
+                {
+                    string errorMessage = "The following files were not loaded:\n";
+
+                    if (errorList.Count == 1)
+                        errorMessage = "The following file was not loaded:\n";
+
+                    foreach (var entry in errorList)
                     {
-                        new TitleBlock($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 8.5x11 Title Block.dwg"),
-                        new TitleBlock($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\ICA 11x17 Title Block.dwg"),
-                        new TitleBlock($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\OneDrive - icacontrol.com\\Electrical Library\\templates\\title blocks\\Nexteer 11x17 Title Block.dwg")
+                        errorMessage += "\n\u2022 \"" + entry.Key + "\" : " + entry.Value;
                     }
-            });
 
-            if (currentTitleBlock != null)
-                titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.Where(titleBlock => titleBlock.Name == currentTitleBlock.Name).FirstOrDefault();
+                    Application.ShowAlertDialog(errorMessage);
+                }
 
-            Application.ShowModalWindow(titleBlockWindow);
-            if ((bool)titleBlockWindow.DialogResult)
+                if (currentTitleBlock != null)
+                    titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.Where(titleBlock => titleBlock.Name == currentTitleBlock.Name).FirstOrDefault();
+
+                Application.ShowModalWindow(titleBlockWindow);
+                if ((bool)titleBlockWindow.DialogResult)
+                {
+                    TitleBlockFile SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
+
+                    if (currentTitleBlock != null && currentTitleBlock.Name == SelectedTitleBlock.Name)
+                        return;
+
+                    RemoveLadder();
+                    PurgeTitleBlock();
+
+                    TitleBlock newTitleBlock = new TitleBlock(CurrentDocument.Database, SelectedTitleBlock.Uri);
+                    newTitleBlock.Insert();
+                    ZoomExtents(newTitleBlock.Reference.GeometricExtents);
+                }
+            }
+            catch (ArgumentException ex)
             {
-                TitleBlock SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
-
-                if (currentTitleBlock != null && currentTitleBlock.Name == SelectedTitleBlock.Name)
-                    return;
-
-                RemoveLadder();
-                PurgeTitleBlock();
-
-                TitleBlockRecord newTitleBlock = new TitleBlockRecord(CurrentDocument.Database.GetBlockTable().LoadExternalBlockTableRecord(SelectedTitleBlock.FilePath.LocalPath));
-                newTitleBlock.Insert();
-                ZoomExtents(newTitleBlock.Reference.GeometricExtents);
+                Application.ShowAlertDialog(ex.Message);
             }
         }
 
@@ -307,7 +335,7 @@ namespace ICA.AutoCAD.Adapter
                             //Ladder();
                             break;
                         case "TITLE BLOCK":
-                            TitleBlock();
+                            TitleBlockCommand();
                             break;
                         default:
                             return;

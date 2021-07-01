@@ -17,8 +17,8 @@ namespace ICA.AutoCAD
             foreach(ObjectId id in record)
             {
                 DBObject obj = record.Database.Open(id);
-                if (obj is AttributeDefinition)
-                    result.Add(obj as AttributeDefinition);
+                if (obj is AttributeDefinition attributeDefinition)
+                    result.Add(attributeDefinition);
             }
             return result;
         }

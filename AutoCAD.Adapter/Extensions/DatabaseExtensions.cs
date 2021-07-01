@@ -28,7 +28,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Title Block
 
-        public static TitleBlockRecord GetTitleBlock(this Database database)
+        public static TitleBlock GetTitleBlock(this Database database)
         {
             BlockTable blockTable = database.GetBlockTable();
             BlockTableRecord titleBlock;
@@ -41,9 +41,19 @@ namespace ICA.AutoCAD.Adapter
                 if (!titleBlock.HasAttribute("TB"))
                     continue;
 
-                return new TitleBlockRecord(titleBlock);
+                return new TitleBlock(titleBlock);
             }
             return null;
+        }
+
+        public static bool ContainsTBAtrribute(this Database database)
+        {
+            foreach (ObjectId id in database.GetModelSpace())
+                if (id.Open() is AttributeDefinition definition)
+                    if (definition.Tag == "TB")
+                        return true;
+
+            return false;
         }
 
         #endregion

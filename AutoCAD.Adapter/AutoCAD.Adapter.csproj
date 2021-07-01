@@ -121,7 +121,7 @@
     <Compile Include="Config\SheetProperties.cs" />
     <Compile Include="SymbolJig.cs" />
     <Compile Include="Title Block\TitleBlockInsertionHandler.cs" />
-    <Compile Include="Title Block\TitleBlockRecord.cs" />
+    <Compile Include="Title Block\TitleBlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

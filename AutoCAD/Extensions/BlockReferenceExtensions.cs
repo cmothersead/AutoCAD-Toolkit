@@ -17,16 +17,30 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
             {
-                foreach (ObjectId attRefID in blockReference.AttributeCollection)
+                return blockReference.GetAttributeReference(tag, transaction);
+            }
+        }
+
+        public static AttributeReference GetAttributeReference(this BlockReference blockReference, string tag, Transaction transaction)
+        {
+            foreach (ObjectId attRefID in blockReference.AttributeCollection)
+            {
+                AttributeReference attRef = transaction.GetObject(attRefID, OpenMode.ForRead) as AttributeReference;
+                if (attRef.Tag == tag)
                 {
-                    AttributeReference attRef = transaction.GetObject(attRefID, OpenMode.ForRead) as AttributeReference;
-                    if (attRef.Tag == tag)
-                    {
-                        return attRef;
-                    }
+                    return attRef;
                 }
             }
+
             return null;
+        }
+
+        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction)
+        {
+            List<AttributeReference> list = new List<AttributeReference>();
+            foreach (ObjectId attRefID in blockReference.AttributeCollection)
+                list.Add(attRefID.Open() as AttributeReference);
+            return list;
         }
 
         /// <summary>
@@ -45,6 +59,48 @@ namespace ICA.AutoCAD
             {
                 return null;
             }
+        }
+
+        public static bool SetAttributeValue(this BlockReference blockReference, string tag, string value)
+        {
+            try
+            {
+                using(Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+                {
+                    blockReference.SetAttributeValue(tag, value, transaction);
+                    transaction.Commit();
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static void SetAttributeValue(this BlockReference blockReference, string tag, string value, Transaction transaction)
+        {
+            AttributeReference attributeReference = blockReference.GetAttributeReference(tag, transaction);
+            if(attributeReference != null)
+            {
+                attributeReference.UpgradeOpen();
+                attributeReference.TextString = value;
+                attributeReference.DowngradeOpen();
+            }
+        }
+
+        public static void SetAttributeValues(this BlockReference blockReference, Dictionary<string, string> values)
+        {
+            using(Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+            {
+                blockReference.SetAttributeValues(values, transaction);
+            }
+        }
+
+        public static void SetAttributeValues(this BlockReference blockReference, Dictionary<string, string> values, Transaction transaction)
+        {
+            foreach (KeyValuePair<string, string> pair in values)
+                blockReference.SetAttributeValue(pair.Key, pair.Value, transaction);
         }
 
         /// <summary>
