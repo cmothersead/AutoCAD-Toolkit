@@ -1,100 +1,47 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using System;
+using System.Collections.Generic;
 
 namespace ICA.AutoCAD
 {
     public static class LayerTableRecordExtensions
     {
-        public static bool Lock(this LayerTableRecord layer)
+        public static void Transact(this LayerTableRecord layer, Action<LayerTableRecord, Transaction> action)
         {
-            try
+            using (Transaction transaction = layer.Database.TransactionManager.StartTransaction())
             {
-                using(Transaction transaction = layer.Database.TransactionManager.StartTransaction())
-                {
-                    LayerTableRecord layerForWrite = transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
-                    layerForWrite.IsLocked = true;
-                    transaction.Commit();
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
+                action(layer, transaction);
+                transaction.Commit();
             }
         }
 
-        public static bool Unlock(this LayerTableRecord layer)
-        {
-            try
-            {
-                using (Transaction transaction = layer.Database.TransactionManager.StartTransaction())
-                {
-                    LayerTableRecord layerForWrite = transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
-                    layerForWrite.IsLocked = false;
-                    transaction.Commit();
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        public static LayerTableRecord GetForWrite(this LayerTableRecord layer, Transaction transaction) => transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
 
-        /// <summary>
-        /// Creates transaction to freeze this layer. Returns true if successful
-        /// </summary>
-        /// <param name="layer"></param>
-        /// <returns></returns>
-        public static bool Freeze(this LayerTableRecord layer)
-        {
-            try
-            {
-                using (Transaction transaction = layer.Database.TransactionManager.StartTransaction())
-                {
-                    LayerTableRecord layerForWrite = transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
-                    layerForWrite.IsFrozen = true;
-                    transaction.Commit();
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        public static void Lock(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsLocked = true;
 
-        /// <summary>
-        /// Creates transaction to thaw this layer. Returns true if successful
-        /// </summary>
-        /// <param name="layer"></param>
-        /// <returns></returns>
-        public static bool Thaw(this LayerTableRecord layer)
-        {
-            try
-            {
-                using (Transaction transaction = layer.Database.TransactionManager.StartTransaction())
-                {
-                    LayerTableRecord layerForWrite = transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
-                    layerForWrite.IsFrozen = false;
-                    transaction.Commit();
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        public static void Unlock(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsLocked = false;
+
+        public static void Freeze(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsFrozen = true;
+
+        public static void Thaw(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsFrozen = false;
+
+        public static void Lock(this LayerTableRecord layer) => layer.Transact(Lock);
+
+        public static void Unlock(this LayerTableRecord layer) => layer.Transact(Unlock);
+
+        public static void Freeze(this LayerTableRecord layer) => layer.Transact(Freeze);
+
+        public static void Thaw(this LayerTableRecord layer) => layer.Transact(Thaw);
 
         public static ObjectIdCollection GetEntities(this LayerTableRecord layer)
         {
             ObjectIdCollection collection = new ObjectIdCollection();
 
-            using(Transaction transaction = layer.Database.TransactionManager.StartTransaction())
+            using (Transaction transaction = layer.Database.TransactionManager.StartTransaction())
             {
-                foreach(ObjectId id in layer.Database.GetModelSpace())
+                foreach (ObjectId id in layer.Database.GetModelSpace())
                 {
-                    if(((Entity)layer.Database.Open(id)).Layer == layer.Name)
+                    if (((Entity)layer.Database.Open(id)).Layer == layer.Name)
                     {
                         collection.Add(id);
                     }

@@ -92,16 +92,21 @@ namespace ICA.AutoCAD.Adapter
 
         public static void HandleLocks(Database database)
         {
-            List<LayerTableRecord> test = Layers.Select(l => l.Value).Where(l => l.IsLocked == true).ToList();
-            //if (args.Document.Database.HasLayer(ElectricalLayers.TitleBlockLayer))
-            //    using (Transaction transaction = args.Document.Database.TransactionManager.StartTransaction())
-            //    {
-            //        DBObject layer = transaction.GetObject(args.Document.Database.GetLayer(ElectricalLayers.TitleBlockLayer).ObjectId, OpenMode.ForWrite);
-            //        layer.Modified += new EventHandler(ElectricalLayers.UnlockHandler);
-            //    }
+            List<LayerTableRecord> lockedLayers = Layers.Select(l => l.Value).Where(l => l.IsLocked == true).ToList();
+            foreach(LayerTableRecord lockedLayer in lockedLayers)
+            {
+                if (database.HasLayer(lockedLayer))
+                {
+                    using (Transaction transaction = database.TransactionManager.StartTransaction())
+                    {
+                        DBObject layer = transaction.GetObject(database.GetLayer(lockedLayer).ObjectId, OpenMode.ForWrite);
+                        layer.Modified += UnlockWarning;
+                    }
+                }
+            }
         }
 
-        private static void Unlock(object sender, EventArgs e)
+        public static void UnlockWarning(object sender, EventArgs e)
         {
             LayerTableRecord layer = sender as LayerTableRecord;
             if (layer.IsLocked == false)

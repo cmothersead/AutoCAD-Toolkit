@@ -110,6 +110,7 @@
     <Compile Include="Config\WireProperties.cs" />
     <Compile Include="Extensions\DatabaseExtensions.cs" />
     <Compile Include="Config\ElectricalDocumentProperties.cs" />
+    <Compile Include="Extensions\LayerTableRecordExtensions.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="Insertable.cs" />
     <Compile Include="Ladder\Ladder.cs" />

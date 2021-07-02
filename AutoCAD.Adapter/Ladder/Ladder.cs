@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using System;
 using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter
@@ -213,14 +214,14 @@ namespace ICA.AutoCAD.Adapter
 
             LayerTableRecord ladderLayer = database.GetLayer(ElectricalLayers.LadderLayer);
 
-            ladderLayer.Unlock();
+            ladderLayer.UnlockWithoutWarning();
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 foreach (ObjectId id in database.GetLadder())
                     ((Entity)transaction.GetObject(id, OpenMode.ForWrite)).Erase();
                 transaction.Commit();
             }
-            ladderLayer.Lock();
+            ladderLayer.LockWithWarning();
         }
 
         #endregion

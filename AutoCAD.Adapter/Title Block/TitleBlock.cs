@@ -88,10 +88,11 @@ namespace ICA.AutoCAD.Adapter
 
             using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
             {
-                _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer).Unlock();
+                LayerTableRecord titleBlockLayer = _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer);
+                titleBlockLayer.UnlockWithoutWarning();
                 foreach (ObjectId id in _blockTableRecord.GetBlockReferenceIds(true, false))
                     id.Erase(transaction);
-                _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer).Lock();
+                titleBlockLayer.LockWithWarning();
                 GridDisplay.Limits = false;
                 transaction.Commit();
             }
