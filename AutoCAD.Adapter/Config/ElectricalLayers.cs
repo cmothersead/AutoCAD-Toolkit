@@ -108,6 +108,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static void UnlockWarning(object sender, EventArgs e)
         {
+            if (!((string)Application.GetSystemVariable("CMDNAMES")).Contains("LAYER"))
+                return;
+
             LayerTableRecord layer = sender as LayerTableRecord;
             if (layer.IsLocked == false)
             {

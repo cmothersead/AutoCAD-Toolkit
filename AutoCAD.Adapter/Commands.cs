@@ -205,8 +205,11 @@ namespace ICA.AutoCAD.Adapter
         public static void CommandLineInsertLadder()
         {
             LadderTemplate template = Ladder.Prompt();
-            RemoveLadder();
-            template.Insert();
+            if(template != null)
+            {
+                RemoveLadder();
+                template.Insert();
+            }
         }
 
         [CommandMethod("REMOVELADDER")]

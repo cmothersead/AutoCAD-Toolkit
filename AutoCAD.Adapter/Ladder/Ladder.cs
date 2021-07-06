@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using System;
 using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter

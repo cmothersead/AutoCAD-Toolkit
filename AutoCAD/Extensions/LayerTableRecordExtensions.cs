@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using System.Collections.Generic;
 
 namespace ICA.AutoCAD
 {
@@ -17,6 +16,10 @@ namespace ICA.AutoCAD
 
         public static LayerTableRecord GetForWrite(this LayerTableRecord layer, Transaction transaction) => transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
 
+        #region Setters
+
+        #region Methods
+
         public static void Lock(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsLocked = true;
 
         public static void Unlock(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsLocked = false;
@@ -25,6 +28,10 @@ namespace ICA.AutoCAD
 
         public static void Thaw(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsFrozen = false;
 
+        #endregion
+
+        #region Transacted Overloads
+
         public static void Lock(this LayerTableRecord layer) => layer.Transact(Lock);
 
         public static void Unlock(this LayerTableRecord layer) => layer.Transact(Unlock);
@@ -32,6 +39,10 @@ namespace ICA.AutoCAD
         public static void Freeze(this LayerTableRecord layer) => layer.Transact(Freeze);
 
         public static void Thaw(this LayerTableRecord layer) => layer.Transact(Thaw);
+
+        #endregion
+
+        #endregion
 
         public static ObjectIdCollection GetEntities(this LayerTableRecord layer)
         {
