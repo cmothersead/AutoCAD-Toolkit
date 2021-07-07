@@ -205,7 +205,7 @@ namespace ICA.AutoCAD.Adapter
         public static void CommandLineInsertLadder()
         {
             LadderTemplate template = Ladder.Prompt();
-            if(template != null)
+            if (template != null)
             {
                 RemoveLadder();
                 template.Insert();
@@ -223,7 +223,7 @@ namespace ICA.AutoCAD.Adapter
         {
             try
             {
-                CurrentDocument.Database.ObjectAppended -= new ObjectEventHandler(TitleBlockInsertion.Handler);
+                CurrentDocument.Database.ObjectAppended -= TitleBlock.RemoveDuplicates;
                 TitleBlockView titleBlockWindow = new TitleBlockView(new TitleBlockViewModel(Paths.TitleBlocks));
                 ObservableCollection<TitleBlockFile> validFiles = new ObservableCollection<TitleBlockFile>();
                 Dictionary<string, string> errorList = new Dictionary<string, string>();
@@ -281,7 +281,7 @@ namespace ICA.AutoCAD.Adapter
             }
             finally
             {
-                CurrentDocument.Database.ObjectAppended += new ObjectEventHandler(TitleBlockInsertion.Handler);
+                CurrentDocument.Database.ObjectAppended += TitleBlock.RemoveDuplicates;
             }
         }
 
@@ -308,7 +308,7 @@ namespace ICA.AutoCAD.Adapter
             catch { }
         }
 
-        [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet)]
+        [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet | CommandFlags.Redraw)]
         public static void AttributeBlockEdit()
         {
             Editor currentEditor = CurrentDocument.Editor;
@@ -347,6 +347,8 @@ namespace ICA.AutoCAD.Adapter
                             TitleBlockCommand();
                             break;
                         default:
+                            CurrentDocument.Editor.SetImpliedSelection(selectionResult.Value);
+                            CurrentDocument.SendStringToExecute("_EATTEDIT ", false, false, false);
                             return;
                     }
 

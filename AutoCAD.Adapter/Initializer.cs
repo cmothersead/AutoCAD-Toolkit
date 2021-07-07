@@ -11,6 +11,9 @@ namespace ICA.AutoCAD.Adapter
 
         public void Initialize()
         {
+            if (Environment.UserName.Contains("cmoth"))
+                ConfigureDefaults();
+
             DocumentCollection.DocumentCreated += new DocumentCollectionEventHandler(DocumentCreated);
         }
 
@@ -23,5 +26,9 @@ namespace ICA.AutoCAD.Adapter
             ElectricalLayers.HandleLocks(args.Document.Database);
         }
 
+        private void ConfigureDefaults()
+        {
+
+        }
     }
 }

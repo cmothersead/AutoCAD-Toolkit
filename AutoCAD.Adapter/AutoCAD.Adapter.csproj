@@ -122,7 +122,6 @@
     <Compile Include="Schematic\SchematicSymbolRecord.cs" />
     <Compile Include="Config\SheetProperties.cs" />
     <Compile Include="SymbolJig.cs" />
-    <Compile Include="Title Block\TitleBlockInsertionHandler.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
   </ItemGroup>
   <ItemGroup>

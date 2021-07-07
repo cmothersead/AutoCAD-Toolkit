@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
@@ -142,6 +143,45 @@ namespace ICA.AutoCAD.Adapter
             return "No error.";
         }
 
+        #endregion
+
+        #region Public Static Methods
+
+        private static List<ObjectId> _forDelete = new List<ObjectId>();
+        private static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
+
+        public static void RemoveDuplicates(object sender, ObjectEventArgs args)
+        {
+            if (args.DBObject is BlockReference reference)
+                if (reference.Name.Contains("Title Block"))
+                {
+                    if (reference.GetBlockTableRecord().GetBlockReferenceIds(true, false).Count > 1)
+                    {
+                        _forDelete.Add(reference.ObjectId);
+                    }
+                }
+        }
+
+        public static void Delete(object sender, EventArgs args)
+        {
+            Application.Idle -= Delete;
+            if(_forDelete.Count > 0)
+            {
+                using (DocumentLock lockDoc = Application.DocumentManager.GetDocument(_forDelete[0].Database).LockDocument())
+                {
+                    using (Transaction transaction = CurrentDocument.TransactionManager.StartTransaction())
+                    {
+                        foreach (ObjectId id in _forDelete)
+                        {
+                            id.Erase(transaction);
+                        }
+                        transaction.Commit();
+                    }
+                }
+                _forDelete = new List<ObjectId>();
+            }
+            CurrentDocument.Editor.WriteMessage("\nTitle Block already present on drawing.");
+        }
         #endregion
     }
 }
