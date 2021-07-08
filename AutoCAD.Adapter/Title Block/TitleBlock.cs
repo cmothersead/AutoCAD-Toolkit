@@ -1,10 +1,16 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using ICA.AutoCAD.Adapter.Windows.Models;
+using ICA.AutoCAD.Adapter.Windows.ViewModels;
+using ICA.AutoCAD.Adapter.Windows.Views;
+using ICA.AutoCAD.IO;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -147,6 +153,8 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Static Methods
 
+        #region Handlers
+
         private static List<ObjectId> _forDelete = new List<ObjectId>();
         private static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
 
@@ -182,6 +190,75 @@ namespace ICA.AutoCAD.Adapter
             }
             CurrentDocument.Editor.WriteMessage("\nTitle Block already present on drawing.");
         }
+
+        #endregion
+
+        #region Commands
+
+        public static TitleBlock Select()
+        {
+            try
+            {
+                CurrentDocument.Database.ObjectAppended -= RemoveDuplicates;
+                TitleBlockView titleBlockWindow = new TitleBlockView(new TitleBlockViewModel(Paths.TitleBlocks));
+                ObservableCollection<TitleBlockFile> validFiles = new ObservableCollection<TitleBlockFile>();
+                Dictionary<string, string> errorList = new Dictionary<string, string>();
+                foreach (TitleBlockFile file in titleBlockWindow.ViewModel.TitleBlocks)
+                {
+                    string path = file.Uri.LocalPath;
+                    if (!IsDefinitionFile(path))
+                        errorList.Add(Path.GetFileName(path), DefinitionFileException(path));
+                    else
+                        validFiles.Add(file);
+                }
+
+                titleBlockWindow.ViewModel.TitleBlocks = validFiles;
+
+                if (errorList.Count > 0)
+                {
+                    string errorMessage = "The following files were not loaded:\n";
+
+                    if (errorList.Count == 1)
+                        errorMessage = "The following file was not loaded:\n";
+
+                    foreach (var entry in errorList)
+                    {
+                        errorMessage += "\n\u2022 \"" + entry.Key + "\" : " + entry.Value;
+                    }
+
+                    Application.ShowAlertDialog(errorMessage);
+                }
+
+                TitleBlock currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
+
+                if (currentTitleBlock != null)
+                    titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.FirstOrDefault(titleBlock => titleBlock.Name == currentTitleBlock.Name);
+
+                Application.ShowModalWindow(titleBlockWindow);
+
+                if ((bool)titleBlockWindow.DialogResult)
+                {
+                    TitleBlockFile SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
+
+                    if (currentTitleBlock != null && currentTitleBlock.Name == SelectedTitleBlock.Name)
+                        return null;
+
+                    return new TitleBlock(CurrentDocument.Database, SelectedTitleBlock.Uri);
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                Application.ShowAlertDialog(ex.Message);
+            }
+            finally
+            {
+                CurrentDocument.Database.ObjectAppended += RemoveDuplicates;
+            }
+            return null;
+        }
+
+        #endregion
+
         #endregion
     }
 }

@@ -8,12 +8,6 @@ using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
-using System.Linq;
-using ICA.AutoCAD.Adapter.Windows.Models;
-using System.Collections.ObjectModel;
-using System;
-using ICA.AutoCAD.IO;
-using System.IO;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -201,6 +195,8 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
+        #region Ladder
+
         [CommandMethod("LADDER")]
         public static void CommandLineInsertLadder()
         {
@@ -218,87 +214,31 @@ namespace ICA.AutoCAD.Adapter
             Ladder.RemoveFrom(CurrentDocument.Database);
         }
 
+        [CommandMethod("LADDERCONFIG")]
+        public static void ConfigureLadder()
+        {
+
+        }
+
+        #endregion
+
+        #region Title Block
+
         [CommandMethod("TITLEBLOCK")]
         public static void TitleBlockCommand()
         {
-            try
+            TitleBlock newTitleBlock = TitleBlock.Select();
+
+            if(newTitleBlock != null)
             {
-                CurrentDocument.Database.ObjectAppended -= TitleBlock.RemoveDuplicates;
-                TitleBlockView titleBlockWindow = new TitleBlockView(new TitleBlockViewModel(Paths.TitleBlocks));
-                ObservableCollection<TitleBlockFile> validFiles = new ObservableCollection<TitleBlockFile>();
-                Dictionary<string, string> errorList = new Dictionary<string, string>();
-                foreach (TitleBlockFile file in titleBlockWindow.ViewModel.TitleBlocks)
-                {
-                    string path = file.Uri.LocalPath;
-                    if (!TitleBlock.IsDefinitionFile(path))
-                        errorList.Add(Path.GetFileName(path), TitleBlock.DefinitionFileException(path));
-                    else
-                        validFiles.Add(file);
-                }
-
-                titleBlockWindow.ViewModel.TitleBlocks = validFiles;
-
-                if (errorList.Count > 0)
-                {
-                    string errorMessage = "The following files were not loaded:\n";
-
-                    if (errorList.Count == 1)
-                        errorMessage = "The following file was not loaded:\n";
-
-                    foreach (var entry in errorList)
-                    {
-                        errorMessage += "\n\u2022 \"" + entry.Key + "\" : " + entry.Value;
-                    }
-
-                    Application.ShowAlertDialog(errorMessage);
-                }
-
-                TitleBlock currentTitleBlock = CurrentDocument.Database.GetTitleBlock();
-
-                if (currentTitleBlock != null)
-                    titleBlockWindow.ViewModel.SelectedTitleBlock = titleBlockWindow.ViewModel.TitleBlocks.Where(titleBlock => titleBlock.Name == currentTitleBlock.Name).FirstOrDefault();
-
-                Application.ShowModalWindow(titleBlockWindow);
-
-                if ((bool)titleBlockWindow.DialogResult)
-                {
-                    TitleBlockFile SelectedTitleBlock = titleBlockWindow.ViewModel.SelectedTitleBlock;
-
-                    if (currentTitleBlock != null && currentTitleBlock.Name == SelectedTitleBlock.Name)
-                        return;
-
-                    RemoveLadder();
-                    PurgeTitleBlock();
-
-                    TitleBlock newTitleBlock = new TitleBlock(CurrentDocument.Database, SelectedTitleBlock.Uri);
-                    newTitleBlock.Insert();
-                    ZoomExtents(newTitleBlock.Reference.GeometricExtents);
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                Application.ShowAlertDialog(ex.Message);
-            }
-            finally
-            {
-                CurrentDocument.Database.ObjectAppended += TitleBlock.RemoveDuplicates;
+                RemoveLadder();
+                PurgeTitleBlock();
+                newTitleBlock.Insert();
+                ZoomExtents(newTitleBlock.Reference.GeometricExtents);
             }
         }
 
-        public static void ZoomExtents(Extents3d extents)
-        {
-            using (ViewTableRecord view = CurrentDocument.Editor.GetCurrentView())
-            {
-                view.Width = extents.MaxPoint.X - extents.MinPoint.X;
-                view.Height = extents.MaxPoint.Y - extents.MinPoint.Y;
-                view.CenterPoint = new Point2d(
-                    (extents.MaxPoint.X + extents.MinPoint.X) / 2.0,
-                    (extents.MaxPoint.Y + extents.MinPoint.Y) / 2.0);
-                CurrentDocument.Editor.SetCurrentView(view);
-            }
-        }
-
-        [CommandMethod("PURGETITLEBLOCK")]
+        [CommandMethod("REMOVETITLEBLOCK")]
         public static void PurgeTitleBlock()
         {
             try
@@ -307,6 +247,13 @@ namespace ICA.AutoCAD.Adapter
             }
             catch { }
         }
+
+        [CommandMethod("TITLEBLOCKCONFIG")]
+        public static void ConfigureTitleBlock() { }
+
+        #endregion
+
+        #region Multiplexers
 
         [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet | CommandFlags.Redraw)]
         public static void AttributeBlockEdit()
@@ -357,6 +304,21 @@ namespace ICA.AutoCAD.Adapter
             catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
                 currentEditor.WriteMessage(ex.Message);
+            }
+        }
+
+        #endregion
+
+        public static void ZoomExtents(Extents3d extents)
+        {
+            using (ViewTableRecord view = CurrentDocument.Editor.GetCurrentView())
+            {
+                view.Width = extents.MaxPoint.X - extents.MinPoint.X;
+                view.Height = extents.MaxPoint.Y - extents.MinPoint.Y;
+                view.CenterPoint = new Point2d(
+                    (extents.MaxPoint.X + extents.MinPoint.X) / 2.0,
+                    (extents.MaxPoint.Y + extents.MinPoint.Y) / 2.0);
+                CurrentDocument.Editor.SetCurrentView(view);
             }
         }
     }
