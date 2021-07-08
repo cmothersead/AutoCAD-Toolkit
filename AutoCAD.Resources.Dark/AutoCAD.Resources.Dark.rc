@@ -1,0 +1,6 @@
+ICA_LADDER_ADD	RCDATA	"icons/ladder/add.ico"
+ICA_LADDER_EDIT	RCDATA	"icons/ladder/edit.ico"
+ICA_LADDER_REMOVE	RCDATA	"icons/ladder/remove.ico"
+ICA_TITLEBLOCK_ADD	RCDATA	"icons/titleblock/add.ico"
+ICA_TITLEBLOCK_EDIT	RCDATA	"icons/titleblock/edit.ico"
+ICA_TITLEBLOCK_REMOVE	RCDATA	"icons/titleblock/remove.ico"

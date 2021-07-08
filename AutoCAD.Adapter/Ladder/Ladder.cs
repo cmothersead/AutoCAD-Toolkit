@@ -37,7 +37,7 @@ namespace ICA.AutoCAD.Adapter
                     Application.ShowAlertDialog("Sheet number not set."); //Have a set dialog instead of just an alert here
                     _sheetNumber = "1";
                 }
-                    
+
                 return _sheetNumber;
             }
         }
@@ -189,18 +189,19 @@ namespace ICA.AutoCAD.Adapter
             }
 
             PromptResult result = CurrentDocument.Editor.GetKeywords(typeOptions);
-            if (result.Status == PromptStatus.OK)
-            {
-                template.PhaseCount = int.Parse(result.StringResult);
-            }
+            if (result.Status != PromptStatus.OK)
+                return null;
+
+            template.PhaseCount = int.Parse(result.StringResult);
 
             if (countOptions.Keywords.Count > 1)
             {
                 result = CurrentDocument.Editor.GetKeywords(countOptions);
-                if (result.Status == PromptStatus.OK)
-                {
-                    template.LadderCount = int.Parse(result.StringResult);
-                }
+
+                if (result.Status != PromptStatus.OK)
+                    return null;
+
+                template.LadderCount = int.Parse(result.StringResult);
             }
 
             return template;
