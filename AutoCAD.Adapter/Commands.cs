@@ -178,8 +178,7 @@ namespace ICA.AutoCAD.Adapter
         {
             try
             {
-                SchematicSymbolRecord.GetRecord(symbolName)
-                                     .InsertSymbol();
+                ISymbol symbol = SchematicSymbolRecord.GetRecord(symbolName).InsertSymbol();
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {

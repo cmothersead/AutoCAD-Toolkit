@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -93,7 +94,7 @@ namespace ICA.AutoCAD.Adapter
         public static void HandleLocks(Database database)
         {
             List<LayerTableRecord> lockedLayers = Layers.Select(l => l.Value).Where(l => l.IsLocked == true).ToList();
-            foreach(LayerTableRecord lockedLayer in lockedLayers)
+            foreach (LayerTableRecord lockedLayer in lockedLayers)
             {
                 if (database.HasLayer(lockedLayer))
                 {
@@ -133,6 +134,35 @@ namespace ICA.AutoCAD.Adapter
             Application.Idle -= Relock;
             using (DocumentLock lockDoc = Application.DocumentManager.GetDocument(forRelock.Database).LockDocument())
                 forRelock.Lock();
+        }
+
+        private static Dictionary<string, LayerTableRecord> Attributes => new Dictionary<string, LayerTableRecord>()
+        {
+            { "TAG1", TagLayer },
+            { "MFG", ManufacturerLayer },
+            { "CAT", PartNumberLayer },
+            { "DESC", DescriptionLayer },
+            { "TERM", TerminalLayer },
+            { "XREF", XrefLayer }
+        };
+
+        public static void Assign(BlockReference blockReference)
+        {
+            using(Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+            {
+                Assign(blockReference, transaction);
+                transaction.Commit();
+            }
+        }
+
+        public static void Assign(BlockReference blockReference, Transaction transaction)
+        {
+                foreach (AttributeReference reference in blockReference.GetAttributeReferences(transaction))
+                {
+                    var match = Attributes.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
+                    if (match.Key != null)
+                        reference.GetForWrite(transaction).Layer = reference.Database.GetLayer(match.Value).Name;
+                }
         }
     }
 }

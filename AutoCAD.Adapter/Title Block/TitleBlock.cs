@@ -252,7 +252,7 @@ namespace ICA.AutoCAD.Adapter
             }
             finally
             {
-                CurrentDocument.Database.ObjectAppended += RemoveDuplicates;
+                //CurrentDocument.Database.ObjectAppended += RemoveDuplicates;
             }
             return null;
         }
