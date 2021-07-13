@@ -27,25 +27,20 @@ namespace ICA.AutoCAD.Adapter
                 if (PhaseCount != 3)
                     width = (TotalWidth - Gap) / 2;
                 
-                Ladder firstLadder = new Ladder()
-                {
-                    Origin = Origin,
-                    Height = Height,
-                    Width = width,
-                    FirstReference = FirstReference,
-                    LineHeight = LineHeight,
-                    PhaseCount = PhaseCount
-                };
-                Ladder secondLadder = new Ladder()
-                {
-                    Origin = new Point2d(Origin.X + separation, Origin.Y),
-                    Height = Height,
-                    Width = width,
-                    FirstReference = firstLadder.LastReference + 1,
-                    LineHeight = LineHeight,
-                    PhaseCount = PhaseCount
-                };
+                Ladder firstLadder = new Ladder(Origin,
+                                                Height,
+                                                width,
+                                                LineHeight,
+                                                FirstReference,
+                                                PhaseCount);
                 firstLadder.Insert();
+
+                Ladder secondLadder = new Ladder(new Point2d(Origin.X + separation, Origin.Y),
+                                                 Height,
+                                                 width,
+                                                 LineHeight,
+                                                 firstLadder.LastReference + 1,
+                                                 PhaseCount);
                 secondLadder.Insert();
             }
             else
@@ -53,15 +48,12 @@ namespace ICA.AutoCAD.Adapter
                 if (PhaseCount != 3)
                     width = TotalWidth;
 
-                new Ladder()
-                {
-                    Origin = Origin,
-                    Height = Height,
-                    Width = width,
-                    FirstReference = FirstReference,
-                    LineHeight = LineHeight,
-                    PhaseCount = PhaseCount
-                }
+                new Ladder(Origin,
+                           Height,
+                           width,
+                           LineHeight,
+                           FirstReference,
+                           PhaseCount)
                 .Insert();
             }
         }

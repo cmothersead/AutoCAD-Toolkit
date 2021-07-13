@@ -2,7 +2,9 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -10,13 +12,48 @@ namespace ICA.AutoCAD.Adapter
     {
         #region Public Properties
 
-        public Point2d Origin { get; set; }
-        public double Height { get; set; }
-        public double Width { get; set; }
-        public double LineHeight { get; set; } = 0.5;
-        public int FirstReference { get; set; } = 0;
+        public Point2d Origin { get; }
+        public double Height { get; }
+        public double Width { get; }
+        public double LineHeight { get; } = 0.5;
+        public int FirstReference { get; } = 0;
         public int LastReference => FirstReference + (int)(Height / LineHeight);
-        public int PhaseCount { get; set; } = 1;
+        public int PhaseCount { get; } = 1;
+        public Database Database { get; }
+
+        private List<Line> _rails;
+        public List<Line> Rails
+        {
+            get
+            {
+                if (_rails != null)
+                    return _rails;
+
+                _rails = new List<Line>();
+                foreach (Point2d origin in Origins)
+                    _rails.Add(new Rail(origin, Height));
+                return _rails;
+            }
+        }
+
+        private List<BlockReference> _lineNumbers;
+        public List<BlockReference> LineNumbers
+        {
+            get
+            {
+                if (_lineNumbers != null)
+                    return _lineNumbers;
+
+                _lineNumbers = new List<BlockReference>();
+                int reference = FirstReference;
+                for (double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
+                {
+                    _lineNumbers.Add(new LineNumber(SheetNumber + reference.ToString("D2"), new Point2d(Origin.X, y)));
+                    reference++;
+                }
+                return _lineNumbers;
+            }
+        }
 
         #endregion
 
@@ -34,8 +71,10 @@ namespace ICA.AutoCAD.Adapter
 
                 if (_sheetNumber is null)
                 {
-                    Application.ShowAlertDialog("Sheet number not set."); //Have a set dialog instead of just an alert here
-                    _sheetNumber = "1";
+                    PromptStringOptions options = new PromptStringOptions("Sheet Number");
+                    PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
+                    _sheetNumber = result.StringResult;
+                    Application.DocumentManager.MdiActiveDocument.Database.SetPageNumber(result.StringResult);
                 }
 
                 return _sheetNumber;
@@ -59,17 +98,6 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        private List<Rail> Rails
-        {
-            get
-            {
-                List<Rail> value = new List<Rail>();
-                foreach (Point2d origin in Origins)
-                    value.Add(new Rail(origin, Height));
-                return value;
-            }
-        }
-
         private class Rail : Line
         {
             public Rail(Point2d top, Point2d bottom)
@@ -82,21 +110,6 @@ namespace ICA.AutoCAD.Adapter
                 : base(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0))
             {
                 Layer = Application.DocumentManager.MdiActiveDocument.Database.GetLayer(ElectricalLayers.LadderLayer).Name;
-            }
-        }
-
-        private List<LineNumber> LineNumbers
-        {
-            get
-            {
-                List<LineNumber> list = new List<LineNumber>();
-                int reference = FirstReference;
-                for (double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
-                {
-                    list.Add(new LineNumber(SheetNumber + reference.ToString("D2"), new Point2d(Origin.X, y)));
-                    reference++;
-                }
-                return list;
             }
         }
 
@@ -123,7 +136,54 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public Ladder() : base(null) { }
+        public Ladder(Point2d origin, double height, double width) : base(null)
+        {
+            Origin = origin;
+            Height = height;
+            Width = width;
+        }
+
+        public Ladder(Point2d origin, double height, double width, double lineHeight, int firstReference, int phaseCount) : base(null)
+        {
+            Origin = origin;
+            Height = height;
+            Width = width;
+            LineHeight = lineHeight;
+            FirstReference = firstReference;
+            PhaseCount = phaseCount;
+        }
+
+        public Ladder(ObjectIdCollection objects) : base(null)
+        {
+            _rails = new List<Line>();
+            _lineNumbers = new List<BlockReference>();
+            Database = objects[0].Database;
+            foreach (ObjectId id in objects)
+            {
+                DBObject obj = id.Open();
+
+                if (obj is Line line)
+                {
+                    _rails.Add(line);
+                }
+                else if (obj is BlockReference lineNumber)
+                {
+                    _lineNumbers.Add(lineNumber);
+                }
+            }
+            _rails = _rails.OrderBy(rail => rail.StartPoint.X).ToList();
+            _lineNumbers = _lineNumbers.OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER")).ToList();
+
+            Origin = _rails[0].StartPoint.ToPoint2D();
+            Height = _rails[0].StartPoint.Y - _rails[0].EndPoint.Y;
+            Width = _rails[1].StartPoint.X - _rails[0].StartPoint.X;
+            FirstReference = int.Parse(_lineNumbers[0].GetAttributeValue("LINENUMBER").Substring(SheetNumber.Length));
+            LineHeight = _lineNumbers[0].Position.Y - _lineNumbers[1].Position.Y;
+            PhaseCount = _rails.Count - 1;
+
+            if (_rails.Count == 3)
+                PhaseCount = 3;
+        }
 
         #endregion
 
@@ -137,6 +197,12 @@ namespace ICA.AutoCAD.Adapter
             foreach (LineNumber lineNumber in LineNumbers)
                 lineNumber.Insert(database, transaction);
         }
+
+        public string ClosestLineNumber(double yValue) => LineNumbers.Aggregate((closest, next) => Math.Abs(next.Position.Y - yValue) < Math.Abs(closest.Position.Y - yValue) ? next : closest).GetAttributeValue("LINENUMBER");
+
+        public string ClosestLineNumber(Point2d position) => ClosestLineNumber(position.Y);
+
+        public string ClosestLineNumber(Point3d position) => ClosestLineNumber(position.Y);
 
         #endregion
 
@@ -217,7 +283,7 @@ namespace ICA.AutoCAD.Adapter
             ladderLayer.UnlockWithoutWarning();
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                foreach (ObjectId id in database.GetLadder())
+                foreach (ObjectId id in ladderLayer.GetEntities())
                     ((Entity)transaction.GetObject(id, OpenMode.ForWrite)).Erase();
                 transaction.Commit();
             }

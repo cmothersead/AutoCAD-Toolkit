@@ -19,9 +19,13 @@ namespace ICA.AutoCAD.Adapter
             return new ElectricalDocumentProperties(database.GetCustomProperties());
         }
 
-        public static string GetPageNumber(this Database database)
+        public static string GetPageNumber(this Database database) => database.ElectricalProperties().Sheet.SheetNumber;
+
+        public static void SetPageNumber(this Database database, string value)
         {
-            return database.ElectricalProperties().Sheet.SheetNumber;
+            ElectricalDocumentProperties properties = database.ElectricalProperties();
+            properties.Sheet.SheetNumber = value;
+            database.SetCustomProperties(properties.ToDictionary());
         }
 
         #endregion
@@ -62,18 +66,18 @@ namespace ICA.AutoCAD.Adapter
 
         public static bool HasLadder(this Database database)
         {
-            if (database.GetLadder().Count > 0)
+            if (database.GetLadder() != null) // Refactor this to reduce the workload/redundancy
                 return true;
 
             return false;
         }
 
-        public static ObjectIdCollection GetLadder(this Database database)
+        public static Ladder GetLadder(this Database database)
         {
             if (!database.HasLayer(ElectricalLayers.LadderLayer))
-                return new ObjectIdCollection();
+                return null;
 
-            return database.GetLayer(ElectricalLayers.LadderLayer).GetEntities();
+            return new Ladder(database.GetLayer(ElectricalLayers.LadderLayer).GetEntities());
         }
 
         #endregion

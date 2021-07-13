@@ -8,6 +8,8 @@ using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
+using System.Linq;
+using System;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -195,9 +197,24 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
+        [CommandMethod("WHATLINE")]
+        public static void WhatLine()
+        {
+            if (!CurrentDocument.Database.HasLadder())
+            {
+                CurrentDocument.Editor.WriteMessage("No ladder.");
+                return;
+            }
+                
+            PromptPointOptions options = new PromptPointOptions("Where?");
+            PromptPointResult result = CurrentDocument.Editor.GetPoint(options);
+
+            CurrentDocument.Editor.WriteMessage(CurrentDocument.Database.GetLadder().ClosestLineNumber(result.Value));
+        }
+
         #region Ladder
 
-        [CommandMethod("LADDER")]
+        [CommandMethod("NEWLADDER")]
         public static void CommandLineInsertLadder()
         {
             LadderTemplate template = Ladder.Prompt();
@@ -227,12 +244,14 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TITLEBLOCK")]
         public static void TitleBlockCommand()
         {
+            TitleBlock oldTitleBlock = Application.DocumentManager.MdiActiveDocument.Database.GetTitleBlock();
             TitleBlock newTitleBlock = TitleBlock.Select();
 
             if(newTitleBlock != null)
             {
                 RemoveLadder();
-                PurgeTitleBlock();
+                if(oldTitleBlock != null)
+                    oldTitleBlock.Purge();
                 newTitleBlock.Insert();
                 ZoomExtents(newTitleBlock.Reference.GeometricExtents);
             }
