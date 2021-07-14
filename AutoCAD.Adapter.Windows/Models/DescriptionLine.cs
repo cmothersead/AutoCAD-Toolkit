@@ -40,11 +40,6 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
         /// </summary>
         public event EventHandler Filled;
 
-        public override bool Equals(object compare)
-        {
-            return Value == ((DescriptionLine)compare).Value;
-        }
-
         public override int GetHashCode()
         {
             int hashCode = 1571931217;

@@ -60,7 +60,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         public void UpdateSymbol()
         {
             _symbol.Tag = Tag;
-            //_symbol.Description = Description.Select(d => d.Value).ToList();
+            _symbol.Description = Description.Select(d => d.Value).Where(v => v != null).ToList();
             _symbol.DescriptionHidden = DescriptionHidden;
             _symbol.Enclosure = Installation;
             _symbol.Location = Location;

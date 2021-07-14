@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using ICA.Schematic;
@@ -118,7 +119,21 @@ namespace ICA.AutoCAD.Adapter
             }
             set
             {
-                throw new NotImplementedException();
+                if(value.Count == 0)
+                    value.Add("");
+
+                while(DescAttributes.Count != value.Count)
+                {
+                    if (DescAttributes.Count > value.Count)
+                        RemoveDescription();
+                    else
+                        AddDescription();
+                }
+                int position = 0;
+                foreach(string val in value)
+                {
+                    DescAttributes[position++].SetValue(val);
+                }
             }
         }
 
@@ -217,6 +232,26 @@ namespace ICA.AutoCAD.Adapter
                     position = new Point3d(position.X, position.Y + 0.15625, position.Z);
                 }
             }
+        }
+
+        public void AddDescription()
+        {
+            AttributeReference ref1 = new AttributeReference()
+            {
+                Tag = $"DESC{DescAttributes.Count + 1}",
+                Position = TagAttribute.Position,
+                TextString = "",
+                Justify = AttachmentPoint.BaseCenter,
+                LockPositionInBlock = true,
+                Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
+                Invisible = DescriptionHidden
+            };
+            BlockReference.AddAttributeReference(ref1);
+        }
+
+        public void RemoveDescription()
+        {
+            BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
         }
 
         #endregion

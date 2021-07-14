@@ -7,6 +7,33 @@ namespace ICA.AutoCAD
 {
     public static class BlockReferenceExtensions
     {
+        public static void Transact(this BlockReference blockReference, Action<BlockReference, Transaction> action)
+        {
+            using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+            {
+                action(blockReference, transaction);
+                transaction.Commit();
+            }
+        }
+
+        public static void Transact(this BlockReference blockReference, Action<BlockReference, Transaction, string> action, string value)
+        {
+            using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+            {
+                action(blockReference, transaction, value);
+                transaction.Commit();
+            }
+        }
+
+        public static void Transact(this BlockReference blockReference, Action<BlockReference, Transaction, AttributeReference> action, AttributeReference value)
+        {
+            using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+            {
+                action(blockReference, transaction, value);
+                transaction.Commit();
+            }
+        }
+
         /// <summary>
         /// Gets readonly <see cref="AttributeReference"/> with the given tag, if it exists. Returns null if none found.
         /// </summary>
@@ -42,6 +69,26 @@ namespace ICA.AutoCAD
                 list.Add(attRefID.Open() as AttributeReference);
             return list;
         }
+
+        public static void RemoveAttributeReference(this BlockReference blockReference, Transaction transaction, string tag)
+        {
+            AttributeReference attributeReference = blockReference.GetAttributeReference(tag, transaction);
+            if (attributeReference == null)
+                return;
+            attributeReference.UpgradeOpen();
+            attributeReference.Erase();
+        }
+
+        public static void RemoveAttributeReference(this BlockReference blockReference, string tag) => blockReference.Transact(RemoveAttributeReference, tag);
+
+        public static void AddAttributeReference(this BlockReference blockReference, Transaction transaction, AttributeReference attributeReference)
+        {
+            BlockReference blockReferenceForWrite = transaction.GetObject(blockReference.Id, OpenMode.ForWrite) as BlockReference;
+            blockReferenceForWrite.AttributeCollection.AppendAttribute(attributeReference);
+            transaction.AddNewlyCreatedDBObject(attributeReference, true);
+        }
+
+        public static void AddAttributeReference(this BlockReference blockReference, AttributeReference attributeReference) => blockReference.Transact(AddAttributeReference, attributeReference);
 
         /// <summary>
         /// Gets TextString value of the <see cref="AttributeReference"/> with the given tag, if it exists. Returns null if none found.
