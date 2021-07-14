@@ -144,7 +144,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\TitleBlockFile.cs" />
+    <Compile Include="ViewModels\TitleBlockSettingsViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockViewModel.cs" />
+    <Compile Include="Views\TitleBlockSettingsView.xaml.cs">
+      <DependentUpon>TitleBlockSettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TitleBlockView.xaml.cs">
       <DependentUpon>TitleBlockView.xaml</DependentUpon>
     </Compile>
@@ -152,7 +156,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\EditView.xaml">
+    <Page Include="Views\ParentSymbolEditView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -168,10 +172,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\DescriptionLine.cs" />
-    <Compile Include="ViewModels\EditViewModel.cs" />
-    <Compile Include="Views\EditView.xaml.cs">
-      <DependentUpon>EditView.xaml</DependentUpon>
+    <Compile Include="ViewModels\ParentSymbolEditViewModel.cs" />
+    <Compile Include="Views\ParentSymbolEditView.xaml.cs">
+      <DependentUpon>ParentSymbolEditView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\TitleBlockSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\TitleBlockView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

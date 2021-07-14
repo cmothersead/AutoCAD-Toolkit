@@ -9,6 +9,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
         public Uri Uri { get; set; }
         public string Name => Path.GetFileNameWithoutExtension(Uri.LocalPath);
         public BitmapImage Preview => new BitmapImage(new Uri(Uri, $"images/{Path.GetFileNameWithoutExtension(Uri.LocalPath)}.png"));
+        //public BlockLibraryList<>
 
         public TitleBlockFile(string path)
         {

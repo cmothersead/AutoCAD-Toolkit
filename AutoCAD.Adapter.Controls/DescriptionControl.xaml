@@ -16,7 +16,7 @@
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Description"/>
-                <CheckBox Name="Description_Checkbox" VerticalContentAlignment="Center" Content="Hide" Checked="Description_Checkbox_Checked" Unchecked="Description_Checkbox_Unchecked">
+                <CheckBox Name="Description_Checkbox" VerticalContentAlignment="Center" Content="Hide" Checked="Description_Checkbox_Checked" Unchecked="Description_Checkbox_Unchecked" IsChecked="{Binding IsChecked}">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
                     </CheckBox.LayoutTransform>

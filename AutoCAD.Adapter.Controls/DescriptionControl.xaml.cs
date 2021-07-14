@@ -12,7 +12,7 @@ namespace ICA.AutoCAD.Adapter.Controls
     {
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(
-                "ItemsSource",
+                nameof(ItemsSource),
                 typeof(IEnumerable),
                 typeof(DescriptionControl));
         public IEnumerable ItemsSource
@@ -21,10 +21,15 @@ namespace ICA.AutoCAD.Adapter.Controls
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        public static readonly DependencyProperty IsCheckedProperty =
+            DependencyProperty.Register(
+                nameof(IsChecked),
+                typeof(bool),
+                typeof(DescriptionControl));
         public bool? IsChecked
         {
-            get => Description_Checkbox.IsChecked;
-            set => Description_Checkbox.IsChecked = value;
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
 
         public event EventHandler Checked;

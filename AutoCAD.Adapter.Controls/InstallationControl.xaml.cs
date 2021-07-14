@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ICA.AutoCAD.Adapter.Controls
 {
@@ -20,30 +10,35 @@ namespace ICA.AutoCAD.Adapter.Controls
     {
         public static readonly DependencyProperty InstallationProperty =
             DependencyProperty.Register(
-                "Installation",
-                typeof(object),
+                nameof(Installation),
+                typeof(string),
                 typeof(InstallationControl));
-        public object Installation
+        public string Installation
         {
-            get => (object)GetValue(InstallationProperty);
+            get => (string)GetValue(InstallationProperty);
             set => SetValue(InstallationProperty, value);
         }
 
         public static readonly DependencyProperty LocationProperty =
             DependencyProperty.Register(
-                "Location",
-                typeof(object),
+                nameof(Location),
+                typeof(string),
                 typeof(InstallationControl));
-        public object Location
+        public string Location
         {
-            get => GetValue(LocationProperty);
+            get => (string)GetValue(LocationProperty);
             set => SetValue(LocationProperty, value);
         }
 
+        public static readonly DependencyProperty IsCheckedProperty =
+            DependencyProperty.Register(
+                nameof(IsChecked),
+                typeof(bool),
+                typeof(InstallationControl));
         public bool? IsChecked
         {
-            get => Installation_Checkbox.IsChecked;
-            set => Installation_Checkbox.IsChecked = value;
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
 
         public InstallationControl()

@@ -51,10 +51,15 @@ namespace ICA.AutoCAD.Adapter.Controls
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
+        public static readonly DependencyProperty IsCheckedProperty =
+            DependencyProperty.Register(
+                nameof(IsChecked),
+                typeof(bool),
+                typeof(PartControl));
         public bool? IsChecked
         {
-            get => PartNumber_Checkbox.IsChecked;
-            set => PartNumber_Checkbox.IsChecked = value;
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
 
         public PartControl()

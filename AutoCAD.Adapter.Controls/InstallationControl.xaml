@@ -16,7 +16,7 @@
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Install Info"/>
-                <CheckBox Name="Installation_Checkbox" Content="Hide" VerticalAlignment="Center">
+                <CheckBox Name="Installation_Checkbox" Content="Hide" VerticalAlignment="Center" IsChecked="{Binding IsChecked}">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
                     </CheckBox.LayoutTransform>

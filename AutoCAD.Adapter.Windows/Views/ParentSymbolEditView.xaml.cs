@@ -6,11 +6,11 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
     /// <summary>
     /// Interaction logic for EditView.xaml
     /// </summary>
-    public partial class EditView : Window
+    public partial class ParentSymbolEditView : Window
     {
-        private readonly EditViewModel _editViewModel;
+        private readonly ParentSymbolEditViewModel _editViewModel;
 
-        public EditView(EditViewModel editViewModel)
+        public ParentSymbolEditView(ParentSymbolEditViewModel editViewModel)
         {
             InitializeComponent();
             _editViewModel = editViewModel;
@@ -19,11 +19,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
 
         private void OK_Button_Click(object sender, RoutedEventArgs e)
         {
-            Close();
-        }
-
-        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
-        {
+            _editViewModel.UpdateSymbol();
             Close();
         }
     }

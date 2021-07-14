@@ -28,7 +28,7 @@ namespace ICA.AutoCAD.Adapter
 
         private void ConfigureDefaults()
         {
-
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("netload ", true, false, false);
         }
     }
 }

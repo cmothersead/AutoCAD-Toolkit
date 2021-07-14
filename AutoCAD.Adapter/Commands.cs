@@ -10,6 +10,7 @@ using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -58,9 +59,9 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
         {
-            var editViewModel = new EditViewModel(SelectSymbol());
-            await editViewModel.LoadFamilyDataAsync();
-            var editWindow = new EditView(editViewModel);
+            var editViewModel = new ParentSymbolEditViewModel(SelectSymbol());
+            //await editViewModel.LoadFamilyDataAsync();
+            var editWindow = new ParentSymbolEditView(editViewModel);
             Application.ShowModalWindow(editWindow);
         }
 
@@ -120,7 +121,7 @@ namespace ICA.AutoCAD.Adapter
         /// Prompts for selection of a schematic symbol from the current drawing, or selects the implied symbol
         /// </summary>
         /// <returns></returns>
-        public static ISymbol SelectSymbol()
+        public static IParentSymbol SelectSymbol()
         {
             Editor currentEditor = CurrentDocument.Editor;
             try
@@ -310,6 +311,9 @@ namespace ICA.AutoCAD.Adapter
                             break;
                         case "TITLE BLOCK":
                             TitleBlockCommand();
+                            break;
+                        case "SYMS":
+                            EditAsync();
                             break;
                         default:
                             CurrentDocument.Editor.SetImpliedSelection(selectionResult.Value);

@@ -10,7 +10,7 @@
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Part Data"/>
-                <CheckBox Name="PartNumber_Checkbox" Content="Hide" VerticalAlignment="Center" VerticalContentAlignment="Center">
+                <CheckBox Name="PartNumber_Checkbox" Content="Hide" VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding IsChecked}">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
                     </CheckBox.LayoutTransform>
