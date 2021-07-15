@@ -125,7 +125,7 @@ namespace ICA.AutoCAD.Adapter
 
             public void Insert(Database database, Transaction transaction)
             {
-                this.Insert(database, transaction, new Dictionary<string, string>
+                this.Insert(transaction, database, new Dictionary<string, string>
                 {
                     { "LINENUMBER", _number }
                 });
@@ -192,7 +192,7 @@ namespace ICA.AutoCAD.Adapter
         public override void Insert(Database database, Transaction transaction)
         {
             foreach (Rail rail in Rails)
-                rail.Insert(database, transaction);
+                rail.Insert(transaction, database);
 
             foreach (LineNumber lineNumber in LineNumbers)
                 lineNumber.Insert(database, transaction);

@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -36,7 +37,7 @@ namespace ICA.AutoCAD.Adapter
         {
             BlockTable blockTable = database.GetBlockTable();
             BlockTableRecord titleBlock;
-            foreach (string name in blockTable.GetRecordNames())
+            foreach (string name in blockTable.GetRecords().Select(r => r.Name))
             {
                 if (!name.Contains("Title Block"))
                     continue;

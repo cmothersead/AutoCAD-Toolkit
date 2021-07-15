@@ -6,21 +6,30 @@ namespace ICA.AutoCAD
 {
     public static class BlockTableRecordExtensions
     {
-        public static bool HasAttribute(this BlockTableRecord record, string name)
-        {
-            return record.AttributeDefinitions().Select(definition => definition.Tag).ToList().Contains(name);
-        }
+        #region Public Extension Methods
 
-        public static List<AttributeDefinition> AttributeDefinitions(this BlockTableRecord record)
+        public static bool HasAttribute(this BlockTableRecord record, Transaction transaction, string name) => record.AttributeDefinitions(transaction).Select(definition => definition.Tag).ToList().Contains(name);
+
+        public static List<AttributeDefinition> AttributeDefinitions(this BlockTableRecord record, Transaction transaction)
         {
             List<AttributeDefinition> result = new List<AttributeDefinition>();
             foreach(ObjectId id in record)
             {
-                DBObject obj = record.Database.Open(id);
+                DBObject obj = transaction.GetObject(id, OpenMode.ForRead);
                 if (obj is AttributeDefinition attributeDefinition)
                     result.Add(attributeDefinition);
             }
             return result;
         }
+
+        #endregion
+
+        #region Transacted Overloads
+
+        public static bool HasAttribute(this BlockTableRecord record, string name) => record.Transact(HasAttribute, name);
+
+        public static List<AttributeDefinition> AttributeDefinitions(this BlockTableRecord record) => record.Transact(AttributeDefinitions);
+
+        #endregion
     }
 }

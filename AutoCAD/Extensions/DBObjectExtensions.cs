@@ -5,12 +5,17 @@ namespace ICA.AutoCAD
 {
     public static class DBObjectExtensions
     {
-        public static void Erase(this DBObject obj, Transaction transaction)
-        {
-            transaction.GetObject(obj.ObjectId, OpenMode.ForWrite).Erase();
-        }
+        #region Public Extension Methods
 
-        public static void Transact(this DBObject obj, Action<DBObject, Transaction> action)
+        public static TDBObject GetForWrite<TDBObject>(this TDBObject attributeReference, Transaction transaction) where TDBObject : DBObject => transaction.GetObject(attributeReference.ObjectId, OpenMode.ForWrite) as TDBObject;
+
+        public static void Erase(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
+
+        #endregion
+
+        #region Transaction Handlers
+
+        public static void Transact<TDBObject>(this TDBObject obj, Action<TDBObject, Transaction> action) where TDBObject: DBObject
         {
             using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
             {
@@ -18,5 +23,49 @@ namespace ICA.AutoCAD
                 transaction.Commit();
             }
         }
+
+        public static TResult Transact<TDBObject, TResult>(this TDBObject obj, Func<TDBObject, Transaction, TResult> function) where TDBObject : DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                return function(obj, transaction);
+            }
+        }
+
+        public static void Transact<TDBObject, TArgument>(this TDBObject obj, Action<TDBObject, Transaction, TArgument> action, TArgument value) where TDBObject: DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                action(obj, transaction, value);
+                transaction.Commit();
+            }
+        }
+
+        public static TResult Transact<TDBObject, TArgument, TResult>(this TDBObject obj, Func<TDBObject, Transaction, TArgument, TResult> function, TArgument value) where TDBObject : DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                return function(obj, transaction, value);
+            }
+        }
+
+        public static void Transact<TDBObject, TArgument1, TArgument2>(this TDBObject obj, Action<TDBObject, Transaction, TArgument1, TArgument2> action, TArgument1 value1, TArgument2 value2) where TDBObject : DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                action(obj, transaction, value1, value2);
+                transaction.Commit();
+            }
+        }
+
+        public static TResult Transact<TDBObject, TArgument1, TArgument2, TResult>(this TDBObject obj, Func<TDBObject, Transaction, TArgument1, TArgument2, TResult> function, TArgument1 value1, TArgument2 value2) where TDBObject : DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                return function(obj, transaction, value1, value2);
+            }
+        }
+
+        #endregion
     }
 }

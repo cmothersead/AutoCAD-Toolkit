@@ -44,9 +44,9 @@ namespace ICA.AutoCAD.Adapter
             else
                 blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId);
 
-            blockReference.Insert(_blockTableRecord.Database, transaction, TestAttributes);
+            blockReference.Insert(transaction, _blockTableRecord.Database, TestAttributes);
 
-            ElectricalLayers.Assign(blockReference, transaction);
+            ElectricalLayers.Assign(transaction, blockReference);
 
             if (blockReference.Position == Point3d.Origin)
             {

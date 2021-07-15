@@ -1,21 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
 
 namespace ICA.AutoCAD
 {
     public static class LayerTableRecordExtensions
     {
-        public static void Transact(this LayerTableRecord layer, Action<LayerTableRecord, Transaction> action)
-        {
-            using (Transaction transaction = layer.Database.TransactionManager.StartTransaction())
-            {
-                action(layer, transaction);
-                transaction.Commit();
-            }
-        }
-
-        public static LayerTableRecord GetForWrite(this LayerTableRecord layer, Transaction transaction) => transaction.GetObject(layer.ObjectId, OpenMode.ForWrite) as LayerTableRecord;
-
         #region Setters
 
         #region Methods
@@ -52,7 +40,7 @@ namespace ICA.AutoCAD
             {
                 foreach (ObjectId id in layer.Database.GetModelSpace())
                 {
-                    if (((Entity)layer.Database.Open(id)).Layer == layer.Name)
+                    if (((Entity)id.Open()).Layer == layer.Name)
                     {
                         collection.Add(id);
                     }

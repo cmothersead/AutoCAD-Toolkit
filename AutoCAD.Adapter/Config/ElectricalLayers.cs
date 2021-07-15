@@ -150,12 +150,12 @@ namespace ICA.AutoCAD.Adapter
         {
             using(Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
             {
-                Assign(blockReference, transaction);
+                Assign(transaction, blockReference);
                 transaction.Commit();
             }
         }
 
-        public static void Assign(BlockReference blockReference, Transaction transaction)
+        public static void Assign(Transaction transaction, BlockReference blockReference)
         {
                 foreach (AttributeReference reference in blockReference.GetAttributeReferences(transaction))
                 {
