@@ -107,13 +107,19 @@ namespace ICA.AutoCAD
             if (database.HasLayer(transaction, layer.Name))
                 return database.GetLayer(transaction, layer.Name);
 
-            LayerTable layerTable = transaction.GetObject(database.LayerTableId, OpenMode.ForWrite) as LayerTable;
-            LayerTableRecord layerClone = layer.Clone() as LayerTableRecord;
-            layerTable.Add(layerClone);
-            transaction.AddNewlyCreatedDBObject(layerClone, true);
-            transaction.Commit();
+            database.AddLayer(layer);
 
-            return database.GetLayer(transaction, layer);
+            var test = database.GetLayer(layer.Name);
+
+            return database.GetLayer(layer.Name);
+        }
+
+        public static void AddLayer(this Database database, Transaction transaction, LayerTableRecord layer)
+        {
+            LayerTableRecord layerClone = layer.Clone() as LayerTableRecord;
+            LayerTable table = database.GetLayerTable(transaction).GetForWrite(transaction);
+            table.Add(layerClone);
+            transaction.AddNewlyCreatedDBObject(layerClone, true);
         }
 
         #endregion
@@ -129,6 +135,8 @@ namespace ICA.AutoCAD
         public static LayerTableRecord GetLayer(this Database database, string name) => database.Transact(GetLayer, name);
 
         public static LayerTableRecord GetLayer(this Database database, LayerTableRecord layer) => database.Transact(GetLayer, layer);
+
+        public static void AddLayer(this Database database, LayerTableRecord layer) => database.Transact(AddLayer, layer);
 
         #endregion
 

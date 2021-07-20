@@ -8,9 +8,6 @@ using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
-using System.Linq;
-using System;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -59,7 +56,11 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
         {
-            var editViewModel = new ParentSymbolEditViewModel(SelectSymbol());
+            IParentSymbol symbol = SelectSymbol();
+            if (symbol is null)
+                return;
+
+            var editViewModel = new ParentSymbolEditViewModel(symbol);
             //await editViewModel.LoadFamilyDataAsync();
             var editWindow = new ParentSymbolEditView(editViewModel);
             Application.ShowModalWindow(editWindow);

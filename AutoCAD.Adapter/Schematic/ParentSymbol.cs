@@ -50,58 +50,61 @@ namespace ICA.AutoCAD.Adapter
 
         public string Tag
         {
-            get => TagAttribute.TextString;
+            get => TagAttribute?.TextString;
             set
             {
-                TagAttribute.SetValue(value);
+                if (TagAttribute != null)
+                    TagAttribute.SetValue(value);
             }
         }
 
         public string Family
         {
-            get
-            {
-                return FamilyAttribute.TextString;
-            }
+            get => FamilyAttribute?.TextString;
             set
             {
-                FamilyAttribute.SetValue(value);
+                if(FamilyAttribute != null)
+                    FamilyAttribute.SetValue(value);
             }
         }
 
         public string ManufacturerName
         {
-            get => MfgAttribute.TextString;
+            get => MfgAttribute?.TextString;
             set
             {
-                MfgAttribute.SetValue(value);
+                if (MfgAttribute != null)
+                    MfgAttribute.SetValue(value);
             }
         }
 
         public string PartNumber
         {
-            get => CatAttribute.TextString;
+            get => CatAttribute?.TextString;
             set
             {
-                CatAttribute.SetValue(value);
+                if (CatAttribute != null)
+                    CatAttribute.SetValue(value);
             }
         }
 
         public string Enclosure
         {
-            get => InstAttribute.TextString;
+            get => InstAttribute?.TextString;
             set
             {
-                InstAttribute.SetValue(value);
+                if (InstAttribute != null)
+                    InstAttribute.SetValue(value);
             }
         }
 
         public string Location
         {
-            get => LocAttribute.TextString;
+            get => LocAttribute?.TextString;
             set
             {
-                LocAttribute.SetValue(value);
+                if (LocAttribute != null)
+                    LocAttribute.SetValue(value);
             }
         }
 
@@ -170,12 +173,12 @@ namespace ICA.AutoCAD.Adapter
                 if (value)
                 {
                     InstAttribute.Hide();
-                    LocAttribute.Hide();
+                    LocAttribute?.Hide();
                 }
                 else
                 {
                     InstAttribute.Unhide();
-                    LocAttribute.Unhide();
+                    LocAttribute?.Unhide();
                 }
             }
         }
@@ -213,7 +216,7 @@ namespace ICA.AutoCAD.Adapter
 
         public void CollapseAttributeStack()
         {
-            CollapseAttributeStack(TagAttribute.AlignmentPoint);
+            CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
         }
 
         public void CollapseAttributeStack(Point3d position)
@@ -238,9 +241,9 @@ namespace ICA.AutoCAD.Adapter
             AttributeReference ref1 = new AttributeReference()
             {
                 Tag = $"DESC{DescAttributes.Count + 1}",
-                Position = TagAttribute.Position,
+                Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
                 TextString = "",
-                Justify = AttachmentPoint.BaseCenter,
+                Justify = TagAttribute.Justify,
                 LockPositionInBlock = true,
                 Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
                 Invisible = DescriptionHidden

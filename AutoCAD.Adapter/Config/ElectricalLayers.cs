@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Windows;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -146,15 +145,6 @@ namespace ICA.AutoCAD.Adapter
             { "XREF", XrefLayer }
         };
 
-        public static void Assign(BlockReference blockReference)
-        {
-            using(Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
-            {
-                Assign(transaction, blockReference);
-                transaction.Commit();
-            }
-        }
-
         public static void Assign(Transaction transaction, BlockReference blockReference)
         {
                 foreach (AttributeReference reference in blockReference.GetAttributeReferences(transaction))
@@ -163,6 +153,15 @@ namespace ICA.AutoCAD.Adapter
                     if (match.Key != null)
                         reference.GetForWrite(transaction).Layer = reference.Database.GetLayer(match.Value).Name;
                 }
+        }
+
+        public static void Assign(BlockReference blockReference)
+        {
+            using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
+            {
+                Assign(transaction, blockReference);
+                transaction.Commit();
+            }
         }
     }
 }

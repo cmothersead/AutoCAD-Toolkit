@@ -7,9 +7,14 @@ namespace ICA.AutoCAD
     {
         #region Public Extension Methods
 
-        public static TDBObject GetForWrite<TDBObject>(this TDBObject attributeReference, Transaction transaction) where TDBObject : DBObject => transaction.GetObject(attributeReference.ObjectId, OpenMode.ForWrite) as TDBObject;
+        public static TDBObject GetForWrite<TDBObject>(this TDBObject obj, Transaction transaction) where TDBObject : DBObject => transaction.GetObject(obj.ObjectId, OpenMode.ForWrite) as TDBObject;
 
         public static void Erase(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
+
+        public static void SetLayer(this DBObject obj, Transaction transaction)
+        {
+
+        }
 
         #endregion
 

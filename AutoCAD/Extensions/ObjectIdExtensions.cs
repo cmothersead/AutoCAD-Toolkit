@@ -23,20 +23,20 @@ namespace ICA.AutoCAD
 
         #region Transaction Handlers
 
-        public static void Transact(this ObjectId id, Action<ObjectId> action)
+        public static void Transact(this ObjectId id, Action<ObjectId, Transaction> action)
         {
             using (Transaction transaction = id.Database.TransactionManager.StartTransaction())
             {
-                action(id);
+                action(id, transaction);
                 transaction.Commit();
             }
         }
 
-        public static TResult Transact<TResult>(this ObjectId id, Func<ObjectId, TResult> function)
+        public static TResult Transact<TResult>(this ObjectId id, Func<ObjectId, Transaction, TResult> function)
         {
             using (Transaction transaction = id.Database.TransactionManager.StartTransaction())
             {
-                return function(id);
+                return function(id, transaction);
             }
         }
 

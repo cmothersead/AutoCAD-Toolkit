@@ -28,7 +28,8 @@ namespace ICA.AutoCAD.Adapter
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
         public string Name => _blockTableRecord.Name;
         public List<string> Attributes => _blockTableRecord.AttributeDefinitions().Select(definition => definition.Tag).ToList();
-        public BlockReference Reference => _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference;
+        public bool IsInserted => _blockTableRecord.GetBlockReferenceIds(true, false).Count != 0;
+        public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
 
         #endregion
 
@@ -79,10 +80,11 @@ namespace ICA.AutoCAD.Adapter
 
         public void Insert()
         {
-            if (_blockTableRecord.GetBlockReferenceIds(true, false).Count > 0)
+            if (IsInserted)
                 return;
 
-            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId) { Layer = _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer).Name }.Insert();
+            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId).Insert();
+            Reference.SetLayer(ElectricalLayers.TitleBlockLayer);
             _blockTableRecord.Database.Limmax = Reference.GeometricExtents.MaxPoint.ToPoint2D();
             _blockTableRecord.Database.Limmin = Reference.GeometricExtents.MinPoint.ToPoint2D();
             GridDisplay.Limits = true;
@@ -90,7 +92,7 @@ namespace ICA.AutoCAD.Adapter
 
         public void Remove()
         {
-            if (_blockTableRecord.GetBlockReferenceIds(true, false).Count == 0)
+            if (!IsInserted)
                 return;
 
             using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())

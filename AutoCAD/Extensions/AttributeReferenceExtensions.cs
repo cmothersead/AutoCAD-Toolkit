@@ -13,7 +13,13 @@ namespace ICA.AutoCAD
 
         public static void SetValue(this AttributeReference attributeReference, Transaction transaction, string value) => attributeReference.GetForWrite(transaction).TextString = value;
 
-        public static void SetPosition(this AttributeReference attributeReference, Transaction transaction, Point3d position) => attributeReference.GetForWrite(transaction).AlignmentPoint = position;
+        public static void SetPosition(this AttributeReference attributeReference, Transaction transaction, Point3d position)
+        {
+            if (attributeReference.Justify == AttachmentPoint.BaseLeft)
+                attributeReference.GetForWrite(transaction).Position = position;
+            else
+                attributeReference.GetForWrite(transaction).AlignmentPoint = position;
+        }
 
         #endregion
 
