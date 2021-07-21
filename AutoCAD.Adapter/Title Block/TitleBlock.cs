@@ -119,38 +119,6 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public static bool IsDefinitionFile(string path)
-        {
-            if (Path.GetExtension(path) != ".dwg")
-                return false;
-
-            if (!Path.GetFileNameWithoutExtension(path).ToUpper().Contains("TITLE BLOCK"))
-                return false;
-
-            Database tempDatabase = new Database();
-            tempDatabase.ReadDwgFile(path, FileShare.Read, true, null);
-            if (!tempDatabase.ContainsTBAtrribute())
-                return false;
-
-            return true;
-        }
-
-        public static string DefinitionFileException(string path)
-        {
-            if (Path.GetExtension(path) != ".dwg")
-                return $"File must be of type \".dwg\"";
-
-            if (!Path.GetFileNameWithoutExtension(path).ToUpper().Contains("TITLE BLOCK"))
-                return $"File name must contain \"Title Block\"";
-
-            Database tempDatabase = new Database();
-            tempDatabase.ReadDwgFile(path, FileShare.Read, true, null);
-            if (!tempDatabase.ContainsTBAtrribute())
-                return $"File must contain attribute \"TB\"";
-
-            return "No error.";
-        }
-
         #endregion
 
         #region Public Static Methods
@@ -260,6 +228,38 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        public static bool IsDefinitionFile(string path)
+        {
+            if (Path.GetExtension(path) != ".dwg")
+                return false;
+
+            if (!Path.GetFileNameWithoutExtension(path).ToUpper().Contains("TITLE BLOCK"))
+                return false;
+
+            Database tempDatabase = new Database();
+            tempDatabase.ReadDwgFile(path, FileShare.Read, true, null);
+            if (!tempDatabase.ContainsTBAtrribute())
+                return false;
+
+            return true;
+        }
+
+        public static string DefinitionFileException(string path)
+        {
+            if (Path.GetExtension(path) != ".dwg")
+                return $"File must be of type \".dwg\"";
+
+            if (!Path.GetFileNameWithoutExtension(path).ToUpper().Contains("TITLE BLOCK"))
+                return $"File name must contain \"Title Block\"";
+
+            Database tempDatabase = new Database();
+            tempDatabase.ReadDwgFile(path, FileShare.Read, true, null);
+            if (!tempDatabase.ContainsTBAtrribute())
+                return $"File must contain attribute \"TB\"";
+
+            return "No error.";
+        }
 
         #endregion
     }

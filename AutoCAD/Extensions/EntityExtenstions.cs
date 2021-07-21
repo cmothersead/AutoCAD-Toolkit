@@ -16,11 +16,19 @@ namespace ICA.AutoCAD
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="database">Database to append the entity to</param>
-        public static void Insert<TEntity>(this TEntity entity, Database database) where TEntity : Entity
+        public static void Insert(this Entity entity, Database database)
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                entity.Insert(transaction, database);
+                switch(entity)
+                {
+                    case BlockReference reference:
+                        reference.Insert(transaction, database);
+                        break;
+                    default:
+                        entity.Insert(transaction, database);
+                        break;
+                }
                 transaction.Commit();
             }
         }
