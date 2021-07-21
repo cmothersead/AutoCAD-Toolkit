@@ -8,6 +8,7 @@ using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
+using System.IO;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -198,19 +199,16 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
-        [CommandMethod("WHATLINE")]
-        public static void WhatLine()
+        [CommandMethod("CURRENTPROJECT")]
+        public static void GetCurrentProject()
         {
-            if (!CurrentDocument.Database.HasLadder())
+            if(!CurrentDocument.IsNamedDrawing)
             {
-                CurrentDocument.Editor.WriteMessage("No ladder.");
+                CurrentDocument.Editor.WriteMessage("File does not belong to a project");
                 return;
             }
-                
-            PromptPointOptions options = new PromptPointOptions("Where?");
-            PromptPointResult result = CurrentDocument.Editor.GetPoint(options);
-
-            CurrentDocument.Editor.WriteMessage(CurrentDocument.Database.GetLadder().ClosestLineNumber(result.Value));
+            var test = new Project(Directory.GetFiles(Path.GetDirectoryName(CurrentDocument.Name), "*.wdp")[0]);
+            CurrentDocument.Editor.WriteMessage(test.Name);
         }
 
         #region Ladder

@@ -9,6 +9,12 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
     /// </summary>
     public class DescriptionCollection : ObservableCollection<DescriptionLine>
     {
+        #region Public Properties
+
+        public DescriptionLine CurrentLine { get; set; }
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
