@@ -223,12 +223,14 @@ namespace ICA.AutoCAD.Adapter
             Document CurrentDocument = Application.DocumentManager.MdiActiveDocument;
             LadderTemplate template;
 
-            PromptKeywordOptions typeOptions = new PromptKeywordOptions("\nChoose ladder type [1 Phase/3 Phase] <1>: ");
-            typeOptions.Keywords.Add("1");
-            typeOptions.Keywords.Add("3");
+            PromptKeywordOptions typeOptions = new PromptKeywordOptions("\nChoose ladder type: ");
+            typeOptions.Keywords.Add("1 Phase");
+            typeOptions.Keywords.Add("3 Phase");
+            typeOptions.Keywords.Default = "1 Phase";
 
-            PromptKeywordOptions countOptions = new PromptKeywordOptions("\nChoose number of ladders [1/2] <1>: ");
+            PromptKeywordOptions countOptions = new PromptKeywordOptions("\nChoose number of ladders: ");
             countOptions.Keywords.Add("1");
+            countOptions.Keywords.Default = "1";
 
             switch (CurrentDocument.Database.GetTitleBlock()?.Name)
             {
