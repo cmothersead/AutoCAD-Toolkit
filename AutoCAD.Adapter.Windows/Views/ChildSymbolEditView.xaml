@@ -1,0 +1,34 @@
+﻿<Window x:Class="ICA.AutoCAD.Adapter.Windows.Views.ChildSymbolEditView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Controls;assembly=AutoCAD.Adapter.Controls"
+        xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:ChildSymbolEditViewModel}"
+        mc:Ignorable="d"
+        Title="Edit Component"
+        MinWidth="620"
+        Background="#FFE4E4E4"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Margin="10" Grid.Column="0">
+            <controls:ChildTagControl Name="TagControl" Text="{Binding Tag}"/>
+            <controls:InstallationControl Name="InstallationControl" Installation="{Binding Path=Installation, Mode=TwoWay}" Location="{Binding Path=Location, Mode=TwoWay}" IsChecked="{Binding Path=InstallationHidden, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <StackPanel Margin="10" Grid.Column="1">
+            <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
+            <controls:PartControl Name="PartControl" Family="{Binding Family}" SelectedManufacturer="{Binding Family.CurrentManufacturer}" SelectedPart="{Binding Family.CurrentPart}" IsEnabled="{Binding Family.IsLoaded}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>
+            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
+                <Button Name="OK_Button" Content="OK" Click="OK_Button_Click" HorizontalAlignment="Right" Height="28" Width="65" Margin="2"/>
+                <Button Name="Cancel_Button" Content="Cancel" IsCancel="True" Height="28" Width="65" Margin="2"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

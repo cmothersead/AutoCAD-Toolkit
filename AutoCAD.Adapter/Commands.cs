@@ -57,14 +57,21 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static async void EditAsync()
         {
-            IParentSymbol symbol = SelectSymbol();
-            if (symbol is null)
-                return;
+            ISymbol symbol = SelectSymbol();
 
-            var editViewModel = new ParentSymbolEditViewModel(symbol);
-            //await editViewModel.LoadFamilyDataAsync();
-            var editWindow = new ParentSymbolEditView(editViewModel);
-            Application.ShowModalWindow(editWindow);
+            switch (symbol)
+            {
+                case ParentSymbol parent:
+                    var editView = new ParentSymbolEditView(parent);
+                    Application.ShowModalWindow(editView);
+                    break;
+                case ChildSymbol child:
+                    var childEditView = new ChildSymbolEditView(child);
+                    Application.ShowModalWindow(childEditView);
+                    break;
+                default:
+                    return;
+            }
         }
 
         /// <summary>
@@ -123,7 +130,7 @@ namespace ICA.AutoCAD.Adapter
         /// Prompts for selection of a schematic symbol from the current drawing, or selects the implied symbol
         /// </summary>
         /// <returns></returns>
-        public static IParentSymbol SelectSymbol()
+        public static ISymbol SelectSymbol()
         {
             Editor currentEditor = CurrentDocument.Editor;
             try
@@ -151,10 +158,11 @@ namespace ICA.AutoCAD.Adapter
                         {
                             if (objectId.ObjectClass.Name == "AcDbBlockReference")
                             {
-                                using (Transaction transaction = CurrentDocument.TransactionManager.StartTransaction())
-                                {
-                                    return new ParentSymbol((BlockReference)transaction.GetObject(objectId, OpenMode.ForRead));
-                                }
+                                BlockReference reference = objectId.Open() as BlockReference;
+                                if (reference.HasAttributeReference("TAG1"))
+                                    return new ParentSymbol(reference);
+                                else if (reference.HasAttributeReference("TAG2"))
+                                    return new ChildSymbol(reference);
                             }
                         }
                     }

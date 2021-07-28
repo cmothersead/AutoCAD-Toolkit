@@ -144,8 +144,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\TitleBlockFile.cs" />
+    <Compile Include="ViewModels\ChildSymbolEditViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockSettingsViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockViewModel.cs" />
+    <Compile Include="Views\ChildSymbolEditView.xaml.cs">
+      <DependentUpon>ChildSymbolEditView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TitleBlockSettingsView.xaml.cs">
       <DependentUpon>TitleBlockSettingsView.xaml</DependentUpon>
     </Compile>
@@ -155,6 +159,10 @@
     <Page Include="Views\AddPartWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ChildSymbolEditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ParentSymbolEditView.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -1,24 +1,24 @@
-﻿using System.Windows;
-using ICA.AutoCAD.Adapter.Windows.ViewModels;
+﻿using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.Schematic;
+using System.Windows;
 
 namespace ICA.AutoCAD.Adapter.Windows.Views
 {
     /// <summary>
-    /// Interaction logic for EditView.xaml
+    /// Interaction logic for ChildSymbolEditView.xaml
     /// </summary>
-    public partial class ParentSymbolEditView : Window
+    public partial class ChildSymbolEditView : Window
     {
-        private readonly ParentSymbolEditViewModel _viewModel;
+        private readonly ChildSymbolEditViewModel _viewModel;
 
-        public ParentSymbolEditView(IParentSymbol symbol)
+        public ChildSymbolEditView(IChildSymbol symbol)
         {
             InitializeComponent();
-            _viewModel = new ParentSymbolEditViewModel(symbol);
+            _viewModel = new ChildSymbolEditViewModel(symbol);
             DataContext = _viewModel;
         }
 
-        public ParentSymbolEditView(ParentSymbolEditViewModel viewModel)
+        public ChildSymbolEditView(ChildSymbolEditViewModel viewModel)
         {
             InitializeComponent();
             _viewModel = viewModel;

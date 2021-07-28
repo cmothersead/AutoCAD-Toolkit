@@ -103,6 +103,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChildTagControl.xaml.cs">
+      <DependentUpon>ChildTagControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TagControl.xaml.cs">
       <DependentUpon>TagControl.xaml</DependentUpon>
     </Compile>
@@ -128,6 +131,10 @@
     <Page Include="Style\TextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChildTagControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="TagControl.xaml">
       <SubType>Designer</SubType>

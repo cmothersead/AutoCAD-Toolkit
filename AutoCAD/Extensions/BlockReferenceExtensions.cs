@@ -20,6 +20,11 @@ namespace ICA.AutoCAD
 
         #region Public Extension Methods
 
+        public static bool HasAttributeReference(this BlockReference blockReference, Transaction transaction, string tag)
+        {
+            return blockReference.GetAttributeReference(transaction, tag) != null;
+        }
+
         /// <summary>
         /// Gets readonly <see cref="AttributeReference"/> with the given tag, if it exists. Returns null if none found.
         /// </summary>
@@ -159,6 +164,8 @@ namespace ICA.AutoCAD
         #endregion
 
         #region Transacted Overloads
+
+        public static bool HasAttributeReference(this BlockReference blockReference, string tag) => blockReference.Transact(HasAttributeReference, tag);
 
         public static AttributeReference GetAttributeReference(this BlockReference blockReference, string tag) => blockReference.Transact(GetAttributeReference, tag);
 
