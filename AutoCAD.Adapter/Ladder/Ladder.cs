@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class Ladder : Insertable, ILadder
+    public class Ladder : ILadder
     {
         #region Public Properties
 
@@ -48,7 +48,7 @@ namespace ICA.AutoCAD.Adapter
                 int reference = FirstReference;
                 for (double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
-                    _lineNumbers.Add(new LineNumber(SheetNumber + reference.ToString("D2"), new Point2d(Origin.X, y)));
+                    _lineNumbers.Add(new LineNumber(Database, SheetNumber + reference.ToString("D2"), new Point2d(Origin.X, y)));
                     reference++;
                 }
                 return _lineNumbers;
@@ -101,29 +101,22 @@ namespace ICA.AutoCAD.Adapter
         private class Rail : Line
         {
             public Rail(Point2d top, Point2d bottom)
-                : base(top.ToPoint3d(), bottom.ToPoint3d())
-            {
-                Layer = Application.DocumentManager.MdiActiveDocument.Database.GetLayer(ElectricalLayers.LadderLayer).Name;
-            }
+                : base(top.ToPoint3d(), bottom.ToPoint3d()) { }
 
             public Rail(Point2d top, double length)
-                : base(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0))
-            {
-                Layer = Application.DocumentManager.MdiActiveDocument.Database.GetLayer(ElectricalLayers.LadderLayer).Name;
-            }
+                : base(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0)) { }
         }
 
         private class LineNumber : BlockReference
         {
             private readonly string _number;
 
-            public LineNumber(string number, Point2d location) : base(location.ToPoint3d(), SchematicSymbolRecord.GetRecord("LINENUMBER").ObjectId)
+            public LineNumber(Database database, string number, Point2d location) : base(location.ToPoint3d(), SchematicSymbolRecord.GetRecord(database, "LINENUMBER").ObjectId)
             {
                 _number = number;
-                Layer = "LADDER";
             }
 
-            public void Insert(Database database, Transaction transaction)
+            public void Insert(Transaction transaction, Database database)
             {
                 this.Insert(transaction, database, new Dictionary<string, string>
                 {
@@ -136,15 +129,17 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public Ladder(Point2d origin, double height, double width) : base(null)
+        public Ladder(Database database, Point2d origin, double height, double width)
         {
+            Database = database;
             Origin = origin;
             Height = height;
             Width = width;
         }
 
-        public Ladder(Point2d origin, double height, double width, double lineHeight, int firstReference, int phaseCount) : base(null)
+        public Ladder(Database database, Point2d origin, double height, double width, double lineHeight, int firstReference, int phaseCount)
         {
+            Database = database;
             Origin = origin;
             Height = height;
             Width = width;
@@ -153,7 +148,7 @@ namespace ICA.AutoCAD.Adapter
             PhaseCount = phaseCount;
         }
 
-        public Ladder(ObjectIdCollection objects) : base(null)
+        public Ladder(ObjectIdCollection objects)
         {
             _rails = new List<Line>();
             _lineNumbers = new List<BlockReference>();
@@ -189,13 +184,28 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public override void Insert(Database database, Transaction transaction)
+        public void Insert()
+        {
+            using(Transaction transaction = Database.TransactionManager.StartTransaction())
+            {
+                Insert(transaction);
+                transaction.Commit();
+            }
+        }
+
+        public void Insert(Transaction transaction)
         {
             foreach (Rail rail in Rails)
-                rail.Insert(transaction, database);
+            {
+                rail.Insert(transaction, Database);
+                rail.SetLayer(ElectricalLayers.LadderLayer);
+            }
 
             foreach (LineNumber lineNumber in LineNumbers)
-                lineNumber.Insert(database, transaction);
+            {
+                lineNumber.Insert(transaction, Database);
+                lineNumber.SetLayer(ElectricalLayers.LadderLayer);
+            }
         }
 
         public string ClosestLineNumber(double yValue) => LineNumbers.Aggregate((closest, next) => Math.Abs(next.Position.Y - yValue) < Math.Abs(closest.Position.Y - yValue) ? next : closest).GetAttributeValue("LINENUMBER");
@@ -220,11 +230,12 @@ namespace ICA.AutoCAD.Adapter
             PromptKeywordOptions countOptions = new PromptKeywordOptions("\nChoose number of ladders [1/2] <1>: ");
             countOptions.Keywords.Add("1");
 
-            switch (CurrentDocument.Database.GetTitleBlock().Name)
+            switch (CurrentDocument.Database.GetTitleBlock()?.Name)
             {
                 case "ICA 8.5x11 Title Block":
                     template = new LadderTemplate()
                     {
+                        Database = CurrentDocument.Database,
                         Origin = new Point2d(2.5, 22.5),
                         Height = 19.5,
                         TotalWidth = 15
@@ -233,6 +244,7 @@ namespace ICA.AutoCAD.Adapter
                 case "ICA 11x17 Title Block":
                     template = new LadderTemplate()
                     {
+                        Database = CurrentDocument.Database,
                         Origin = new Point2d(2.5, 22.5),
                         Height = 19.5,
                         TotalWidth = 32.5,
@@ -243,6 +255,7 @@ namespace ICA.AutoCAD.Adapter
                 case "Nexteer 11x17 Title Block":
                     template = new LadderTemplate()
                     {
+                        Database = CurrentDocument.Database,
                         Origin = new Point2d(2.5, 22.5),
                         Height = 20,
                         TotalWidth = 25,
@@ -251,6 +264,7 @@ namespace ICA.AutoCAD.Adapter
                     countOptions.Keywords.Add("2");
                     break;
                 default:
+                    CurrentDocument.Editor.WriteMessage("No valid title block found.");
                     return null;
             }
 

@@ -181,7 +181,7 @@ namespace ICA.AutoCAD.Adapter
         {
             try
             {
-                ISymbol symbol = SchematicSymbolRecord.GetRecord(symbolName).InsertSymbol();
+                ISymbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName).InsertSymbol();
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
@@ -207,8 +207,7 @@ namespace ICA.AutoCAD.Adapter
                 CurrentDocument.Editor.WriteMessage("File does not belong to a project");
                 return;
             }
-            var test = new Project(Directory.GetFiles(Path.GetDirectoryName(CurrentDocument.Name), "*.wdp")[0]);
-            CurrentDocument.Editor.WriteMessage(test.Name);
+            CurrentDocument.Editor.WriteMessage(CurrentDocument.Database.GetProject().Name);
         }
 
         #region Ladder

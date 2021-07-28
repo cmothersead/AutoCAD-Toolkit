@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
@@ -80,6 +81,12 @@ namespace ICA.AutoCAD.Adapter
 
             return new Ladder(database.GetLayer(ElectricalLayers.LadderLayer).GetEntities());
         }
+
+        #endregion
+
+        #region Project
+
+        public static Project GetProject(this Database database) => new Project(Directory.GetFiles(Path.GetDirectoryName(database.OriginalFileName), "*.wdp")[0]);
 
         #endregion
 

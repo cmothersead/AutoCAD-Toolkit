@@ -109,8 +109,6 @@ namespace ICA.AutoCAD
 
             database.AddLayer(layer);
 
-            var test = database.GetLayer(layer.Name);
-
             return database.GetLayer(layer.Name);
         }
 

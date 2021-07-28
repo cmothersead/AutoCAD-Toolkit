@@ -78,9 +78,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Static Methods
 
-        public static SchematicSymbolRecord GetRecord(string name)
+        public static SchematicSymbolRecord GetRecord(Database database, string name)
         {
-            BlockTable blockTable = Application.DocumentManager.MdiActiveDocument.Database.GetBlockTable();
+            BlockTable blockTable = database.GetBlockTable();
             BlockTableRecord record;
 
             if (blockTable.Has(name))

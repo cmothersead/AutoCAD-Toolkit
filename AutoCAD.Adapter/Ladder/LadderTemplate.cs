@@ -1,9 +1,12 @@
-﻿using Autodesk.AutoCAD.Geometry;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace ICA.AutoCAD.Adapter
 {
     public class LadderTemplate
     {
+        public Database Database { get; set; }
+
         public Point2d Origin { get; set; }
         public double Height { get; set; }
         public double TotalWidth { get; set; }
@@ -27,7 +30,8 @@ namespace ICA.AutoCAD.Adapter
                 if (PhaseCount != 3)
                     width = (TotalWidth - Gap) / 2;
                 
-                Ladder firstLadder = new Ladder(Origin,
+                Ladder firstLadder = new Ladder(Database,
+                                                Origin,
                                                 Height,
                                                 width,
                                                 LineHeight,
@@ -35,7 +39,8 @@ namespace ICA.AutoCAD.Adapter
                                                 PhaseCount);
                 firstLadder.Insert();
 
-                Ladder secondLadder = new Ladder(new Point2d(Origin.X + separation, Origin.Y),
+                Ladder secondLadder = new Ladder(Database,
+                                                 new Point2d(Origin.X + separation, Origin.Y),
                                                  Height,
                                                  width,
                                                  LineHeight,
@@ -48,7 +53,8 @@ namespace ICA.AutoCAD.Adapter
                 if (PhaseCount != 3)
                     width = TotalWidth;
 
-                new Ladder(Origin,
+                new Ladder(Database,
+                           Origin,
                            Height,
                            width,
                            LineHeight,
