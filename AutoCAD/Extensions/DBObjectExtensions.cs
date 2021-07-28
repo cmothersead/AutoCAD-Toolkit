@@ -11,11 +11,6 @@ namespace ICA.AutoCAD
 
         public static void Erase(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
 
-        public static void SetLayer(this DBObject obj, Transaction transaction)
-        {
-
-        }
-
         #endregion
 
         #region Transaction Handlers
@@ -33,7 +28,9 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
             {
-                return function(obj, transaction);
+                TResult result = function(obj, transaction);
+                transaction.Commit();
+                return result;
             }
         }
 
@@ -50,7 +47,9 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
             {
-                return function(obj, transaction, value);
+                TResult result = function(obj, transaction, value);
+                transaction.Commit();
+                return result;
             }
         }
 
@@ -67,7 +66,9 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
             {
-                return function(obj, transaction, value1, value2);
+                TResult result = function(obj, transaction, value1, value2);
+                transaction.Commit();
+                return result;
             }
         }
 
