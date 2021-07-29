@@ -218,9 +218,10 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Static Methods
 
-        public static LadderTemplate Prompt()
+        public static LadderTemplate Prompt(Document document = null)
         {
-            Document CurrentDocument = Application.DocumentManager.MdiActiveDocument;
+            if (document is null)
+                document = Application.DocumentManager.MdiActiveDocument;
             LadderTemplate template;
 
             PromptKeywordOptions typeOptions = new PromptKeywordOptions("\nChoose ladder type: ");
@@ -232,12 +233,12 @@ namespace ICA.AutoCAD.Adapter
             countOptions.Keywords.Add("1");
             countOptions.Keywords.Default = "1";
 
-            switch (CurrentDocument.Database.GetTitleBlock()?.Name)
+            switch (document.Database.GetTitleBlock()?.Name)
             {
                 case "ICA 8.5x11 Title Block":
                     template = new LadderTemplate()
                     {
-                        Database = CurrentDocument.Database,
+                        Database = document.Database,
                         Origin = new Point2d(2.5, 22.5),
                         Height = 19.5,
                         TotalWidth = 15
@@ -246,7 +247,7 @@ namespace ICA.AutoCAD.Adapter
                 case "ICA 11x17 Title Block":
                     template = new LadderTemplate()
                     {
-                        Database = CurrentDocument.Database,
+                        Database = document.Database,
                         Origin = new Point2d(2.5, 22.5),
                         Height = 19.5,
                         TotalWidth = 32.5,
@@ -257,7 +258,7 @@ namespace ICA.AutoCAD.Adapter
                 case "Nexteer 11x17 Title Block":
                     template = new LadderTemplate()
                     {
-                        Database = CurrentDocument.Database,
+                        Database = document.Database,
                         Origin = new Point2d(2.5, 22.5),
                         Height = 20,
                         TotalWidth = 25,
@@ -266,11 +267,11 @@ namespace ICA.AutoCAD.Adapter
                     countOptions.Keywords.Add("2");
                     break;
                 default:
-                    CurrentDocument.Editor.WriteMessage("No valid title block found.");
+                    document.Editor.WriteMessage("No valid title block found.");
                     return null;
             }
 
-            PromptResult result = CurrentDocument.Editor.GetKeywords(typeOptions);
+            PromptResult result = document.Editor.GetKeywords(typeOptions);
             if (result.Status != PromptStatus.OK)
                 return null;
 
@@ -278,7 +279,7 @@ namespace ICA.AutoCAD.Adapter
 
             if (countOptions.Keywords.Count > 1)
             {
-                result = CurrentDocument.Editor.GetKeywords(countOptions);
+                result = document.Editor.GetKeywords(countOptions);
 
                 if (result.Status != PromptStatus.OK)
                     return null;
