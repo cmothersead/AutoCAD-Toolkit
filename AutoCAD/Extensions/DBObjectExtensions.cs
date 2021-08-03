@@ -36,10 +36,25 @@ namespace ICA.AutoCAD
 
         public static void Transact<TDBObject, TArgument>(this TDBObject obj, Action<TDBObject, Transaction, TArgument> action, TArgument value) where TDBObject: DBObject
         {
-            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            if(obj.Database != null)
             {
-                action(obj, transaction, value);
-                transaction.Commit();
+                using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+                {
+                    action(obj, transaction, value);
+                    transaction.Commit();
+                }
+            }
+            else if(value is Database database)
+            {
+                using (Transaction transaction = database.TransactionManager.StartTransaction())
+                {
+                    action(obj, transaction, value);
+                    transaction.Commit();
+                }
+            }
+            else
+            {
+                throw new ArgumentException("DBObject is not yet a database resident, and no database was provided");
             }
         }
 

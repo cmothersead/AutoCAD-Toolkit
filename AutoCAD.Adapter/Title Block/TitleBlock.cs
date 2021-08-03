@@ -24,9 +24,11 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
-        public Uri FilePath { get; set; }
+        public Uri FileUri { get; set; }
+        public string Name => Path.GetFileNameWithoutExtension(FileUri?.LocalPath) ?? _blockTableRecord.Name;
+        public bool IsLoaded => _blockTableRecord != null;
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
-        public string Name => _blockTableRecord.Name;
+        public Database Database => _blockTableRecord.Database;
         public List<string> Attributes => _blockTableRecord.AttributeDefinitions().Select(definition => definition.Tag).ToList();
         public bool IsInserted => _blockTableRecord.GetBlockReferenceIds(true, false).Count != 0;
         public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
@@ -46,16 +48,15 @@ namespace ICA.AutoCAD.Adapter
             _blockTableRecord = record;
         }
 
-        public TitleBlock(Database database, Uri blockFileUri)
+        public TitleBlock(Uri blockFileUri)
         {
-            FilePath = blockFileUri;
-            string fileName = Path.GetFileNameWithoutExtension(FilePath.LocalPath);
+            FileUri = blockFileUri;
+            string fileName = Path.GetFileNameWithoutExtension(FileUri.LocalPath);
 
             if (!fileName.Contains("Title Block"))
-                throw new ArgumentException($"\"{Path.GetFileName(FilePath.LocalPath)}\" is not a valid title block file. File name must contain \"Title Block\".");
+                throw new ArgumentException($"\"{Path.GetFileName(FileUri.LocalPath)}\" is not a valid title block file. File name must contain \"Title Block\".");
 
-            Database tempDatabase = new Database(false, true);
-            tempDatabase.ReadDwgFile(FilePath.LocalPath, FileShare.Read, true, null);
+            Database tempDatabase = Commands.LoadDatabase(blockFileUri);
 
             bool isTitleBlockDefinition = false;
             foreach (ObjectId id in tempDatabase.GetModelSpace())
@@ -69,21 +70,27 @@ namespace ICA.AutoCAD.Adapter
             }
             if (!isTitleBlockDefinition)
                 throw new ArgumentException($"\"{Path.GetFileName(blockFileUri.LocalPath)}\" is not a valid title block file. File must contain an attribute called \"TB\".");
-
-            database.Insert(fileName, tempDatabase, true);
-            _blockTableRecord = database.GetBlockTable().GetRecord(fileName);
         }
 
         #endregion
 
         #region Public Methods
 
+        public void Load(Database database)
+        {
+            database.Insert(Name, Commands.LoadDatabase(FileUri), true);
+            _blockTableRecord = database.GetBlockTable().GetRecord(Name);
+        }
+
         public void Insert()
         {
+            if (!IsLoaded)
+                throw new Exception("Title Block not loaded into database");
+
             if (IsInserted)
                 return;
 
-            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId).Insert();
+            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId).Insert(Database);
             Reference.SetLayer(ElectricalLayers.TitleBlockLayer);
             _blockTableRecord.Database.Limmax = Reference.GeometricExtents.MaxPoint.ToPoint2D();
             _blockTableRecord.Database.Limmin = Reference.GeometricExtents.MinPoint.ToPoint2D();
@@ -213,7 +220,7 @@ namespace ICA.AutoCAD.Adapter
                     if (currentTitleBlock != null && currentTitleBlock.Name == SelectedTitleBlock.Name)
                         return null;
 
-                    return new TitleBlock(CurrentDocument.Database, SelectedTitleBlock.Uri);
+                    return new TitleBlock(SelectedTitleBlock.Uri);
                 }
             }
             catch (ArgumentException ex)

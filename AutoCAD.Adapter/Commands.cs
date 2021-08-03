@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
 using System.IO;
+using System;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -250,17 +251,38 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TITLEBLOCK")]
         public static void TitleBlockCommand()
         {
-            TitleBlock oldTitleBlock = Application.DocumentManager.MdiActiveDocument.Database.GetTitleBlock();
             TitleBlock newTitleBlock = TitleBlock.Select();
+            RemoveLadder();
+            Database database = CurrentDocument.Database;
+            AddTitleBlock(database, newTitleBlock);
+            ZoomExtents(CurrentDocument, newTitleBlock.Reference.GeometricExtents);
+        }
 
-            if(newTitleBlock != null)
+        public static Database LoadDatabase(Uri uri)
+        {
+            foreach(Document document in Application.DocumentManager)
             {
-                RemoveLadder();
-                if(oldTitleBlock != null)
-                    oldTitleBlock.Purge();
-                newTitleBlock.Insert();
-                ZoomExtents(newTitleBlock.Reference.GeometricExtents);
+                if (document.Name == uri.LocalPath)
+                    return document.Database;
             }
+            Database database = new Database(false, true);
+            database.ReadDwgFile(uri.LocalPath, FileShare.ReadWrite, true, null);
+            return database;
+        }
+
+        [CommandMethod("PROJECTTITLEBLOCK")]
+        public static void ProjectTitleBlock()
+        {
+            TitleBlock titleBlock = TitleBlock.Select();
+            Project project = CurrentDocument.Database.GetProject();
+            project.Run(AddTitleBlock, new TitleBlock(titleBlock.FileUri));
+        }
+
+        public static void AddTitleBlock(Database database, TitleBlock titleBlock)
+        {
+            database.GetTitleBlock()?.Purge();
+            titleBlock?.Load(database);
+            titleBlock?.Insert();
         }
 
         [CommandMethod("REMOVETITLEBLOCK")]
@@ -337,16 +359,16 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
-        public static void ZoomExtents(Extents3d extents)
+        public static void ZoomExtents(Document document, Extents3d extents)
         {
-            using (ViewTableRecord view = CurrentDocument.Editor.GetCurrentView())
+            using (ViewTableRecord view = document.Editor.GetCurrentView())
             {
                 view.Width = extents.MaxPoint.X - extents.MinPoint.X;
                 view.Height = extents.MaxPoint.Y - extents.MinPoint.Y;
                 view.CenterPoint = new Point2d(
                     (extents.MaxPoint.X + extents.MinPoint.X) / 2.0,
                     (extents.MaxPoint.Y + extents.MinPoint.Y) / 2.0);
-                CurrentDocument.Editor.SetCurrentView(view);
+                document.Editor.SetCurrentView(view);
             }
         }
     }

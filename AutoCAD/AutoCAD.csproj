@@ -97,6 +97,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DocumentCollectionExtensions.cs" />
     <Compile Include="System Variables\Bitcode.cs" />
     <Compile Include="Extensions\BlockTableExtensions.cs" />
     <Compile Include="Extensions\BlockTableRecordExtensions.cs" />

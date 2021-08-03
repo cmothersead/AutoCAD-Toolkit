@@ -151,7 +151,7 @@ namespace ICA.AutoCAD.Adapter
                 {
                     var match = Attributes.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
                     if (match.Key != null)
-                        reference.GetForWrite(transaction).Layer = reference.Database.GetLayer(match.Value).Name;
+                        reference.SetLayer(match.Value);
                 }
         }
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -39,6 +41,24 @@ namespace ICA.AutoCAD.Adapter
                     drawing.FileUri = new Uri(projectUri, line);
                     Drawings.Add(drawing);
                     drawing = new Drawing();
+                }
+            }
+        }
+
+        public void Run<TArgument>(Action<Database, TArgument> action, TArgument value)
+        {
+            foreach(Drawing drawing in Drawings)
+            {
+                Database database = Commands.LoadDatabase(drawing.FileUri);
+                if(Application.DocumentManager.Contains(drawing.FileUri))
+                {
+                    using (DocumentLock doclock = Application.DocumentManager.GetDocument(database).LockDocument())
+                        action(database, value);
+                }
+                else
+                {
+                    action(database, value);
+                    database.SaveAs(database.OriginalFileName, DwgVersion.Current);
                 }
             }
         }
