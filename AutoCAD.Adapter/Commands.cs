@@ -180,7 +180,7 @@ namespace ICA.AutoCAD.Adapter
             return null;
         }
 
-        [CommandMethod("TESTINSERT")]
+        [CommandMethod("INSERTCOMPONENT")]
         public static void InsertSymbol()
         {
             InsertSymbol(PromptSymbolName());
@@ -208,6 +208,8 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
+        #region Project
+
         [CommandMethod("CURRENTPROJECT")]
         public static void GetCurrentProject()
         {
@@ -219,9 +221,11 @@ namespace ICA.AutoCAD.Adapter
             CurrentDocument.Editor.WriteMessage(CurrentDocument.Database.GetProject().Name);
         }
 
+        #endregion
+
         #region Ladder
 
-        [CommandMethod("NEWLADDER")]
+        [CommandMethod("LADDER")]
         public static void CommandLineInsertLadder()
         {
             LadderTemplate template = Ladder.Prompt();

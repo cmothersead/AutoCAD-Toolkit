@@ -142,6 +142,7 @@ namespace ICA.AutoCAD.Adapter
             { "CAT", PartNumberLayer },
             { "DESC", DescriptionLayer },
             { "TERM", TerminalLayer },
+            { "WIRENO", WireNumberLayer },
             { "XREF", XrefLayer }
         };
 
