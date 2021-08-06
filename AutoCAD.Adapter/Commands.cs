@@ -208,6 +208,12 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
+        [CommandMethod("ASSIGNLAYERS")]
+        public static void AssignLayers()
+        {
+            SelectSymbol()?.AssignLayers();
+        }
+
         #region Project
 
         [CommandMethod("CURRENTPROJECT")]

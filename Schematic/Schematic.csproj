@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IChildSymbol.cs" />
+    <Compile Include="ILayered.cs" />
     <Compile Include="Valve.cs" />
     <Page Include="ComponentsDetails.xaml">
       <SubType>Designer</SubType>

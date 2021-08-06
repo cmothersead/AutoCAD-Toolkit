@@ -254,6 +254,11 @@ namespace ICA.AutoCAD.Adapter
             BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
         }
 
+        public void AssignLayers()
+        {
+            ElectricalLayers.Assign(BlockReference);
+        }
+
         #endregion
     }
 }
