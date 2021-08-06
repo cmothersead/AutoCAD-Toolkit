@@ -214,6 +214,20 @@ namespace ICA.AutoCAD.Adapter
             SelectSymbol()?.AssignLayers();
         }
 
+        [CommandMethod("UPDATETAG")]
+        public static void UpdateTag()
+        {
+            if (SelectSymbol() is ParentSymbol symbol)
+                symbol.Tag = $"{symbol.Family}{symbol.LineNumber}1";
+        }
+
+        [CommandMethod("UPDATETAG2")]
+        public static void UpdateTag2()
+        {
+            if (SelectSymbol() is ParentSymbol symbol)
+                symbol.Tag = $"{symbol.LineNumber}{symbol.Family}";
+        }
+
         #region Project
 
         [CommandMethod("CURRENTPROJECT")]

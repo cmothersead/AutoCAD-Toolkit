@@ -63,13 +63,13 @@ namespace ICA.AutoCAD.Adapter
         public static LayerTableRecord ManufacturerLayer => new LayerTableRecord()
         {
             Name = "MFG",
-            Color = Color.FromColorIndex(ColorMethod.ByAci, 150),
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 140),
             Description = "Manufacturer name attributes"
         };
         public static LayerTableRecord PartNumberLayer => new LayerTableRecord()
         {
             Name = "CAT",
-            Color = Color.FromColorIndex(ColorMethod.ByAci, 141),
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 40),
             Description = "Part number attributes"
         };
         public static LayerTableRecord LadderLayer => new LayerTableRecord()

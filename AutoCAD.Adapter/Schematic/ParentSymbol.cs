@@ -204,6 +204,8 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
+
         #endregion
 
         #region Construtctor
