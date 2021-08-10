@@ -48,6 +48,18 @@ namespace ICA.AutoCAD.Adapter
             Color = Color.FromColorIndex(ColorMethod.ByAci, 9),
             Description = "Link lines"
         };
+        public static LayerTableRecord RatingLayer => new LayerTableRecord()
+        {
+            Name = "RATING",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 11),
+            Description = "Ratings"
+        };
+        public static LayerTableRecord MiscellaneousLayer = new LayerTableRecord()
+        {
+            Name = "MISC",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 40),
+            Description = "Miscellaneous electrical attributes"
+        };
         public static LayerTableRecord WireLayer => new LayerTableRecord()
         {
             Name = "WIRES",
@@ -140,8 +152,10 @@ namespace ICA.AutoCAD.Adapter
             { "TAG1", TagLayer },
             { "MFG", ManufacturerLayer },
             { "CAT", PartNumberLayer },
+            { "TERMDESC", MiscellaneousLayer },
             { "DESC", DescriptionLayer },
             { "TERM", TerminalLayer },
+            { "RATING", RatingLayer },
             { "WIRENO", WireNumberLayer },
             { "XREF", XrefLayer }
         };
