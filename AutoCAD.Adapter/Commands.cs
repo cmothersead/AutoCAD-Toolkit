@@ -10,6 +10,7 @@ using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
 using System.IO;
 using System;
+using ICA.AutoCAD.IO;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -73,6 +74,7 @@ namespace ICA.AutoCAD.Adapter
                 default:
                     return;
             }
+            symbol.AssignLayers();
         }
 
         /// <summary>
@@ -180,6 +182,53 @@ namespace ICA.AutoCAD.Adapter
             return null;
         }
 
+        public static SignalSymbol SelectSignal()
+        {
+            Editor currentEditor = CurrentDocument.Editor;
+            try
+            {
+                PromptSelectionResult selectionResult = currentEditor.SelectImplied();
+                if (selectionResult.Status == PromptStatus.Error)
+                {
+                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions
+                    {
+                        SingleOnly = true
+                    };
+                    selectionResult = currentEditor.GetSelection(selectionOptions);
+                }
+                else
+                {
+                    currentEditor.SetImpliedSelection(new ObjectId[0]);
+                }
+
+                if (selectionResult.Status == PromptStatus.OK)
+                {
+                    try
+                    {
+                        ObjectId[] objectIds = selectionResult.Value.GetObjectIds();
+                        foreach (ObjectId objectId in objectIds)
+                        {
+                            if (objectId.ObjectClass.Name == "AcDbBlockReference")
+                            {
+                                BlockReference reference = objectId.Open() as BlockReference;
+                                if (reference.HasAttributeReference("SIGCODE"))
+                                    return new SignalSymbol(reference);
+                            }
+                        }
+                    }
+                    catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                    {
+                        currentEditor.WriteMessage(ex.Message);
+                    }
+                }
+            }
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            {
+                currentEditor.WriteMessage(ex.Message);
+            }
+            return null;
+        }
+
         [CommandMethod("INSERTCOMPONENT")]
         public static void InsertSymbol()
         {
@@ -228,17 +277,88 @@ namespace ICA.AutoCAD.Adapter
                 symbol.Tag = $"{symbol.LineNumber}{symbol.Family}";
         }
 
+        [CommandMethod("MATCHWIRES")]
+        public static void Matchwires()
+        {
+            if (SelectSymbol() is ParentSymbol symbol)
+                symbol.MatchWireNumbers();
+        }
+
+        [CommandMethod("XREFSIGS")]
+        public static void XrefSignals()
+        {
+            if (SelectSignal() is SignalSymbol symbol1)
+                if (SelectSignal() is SignalSymbol symbol2)
+                    symbol1.CrossReference(symbol2);
+        }
+
         #region Project
 
         [CommandMethod("CURRENTPROJECT")]
-        public static void GetCurrentProject()
+        public static void PrintCurrentProject()
         {
-            if(!CurrentDocument.IsNamedDrawing)
+            Project test = CurrentProject();
+            if(test != null)
             {
-                CurrentDocument.Editor.WriteMessage("File does not belong to a project");
-                return;
+                CurrentDocument.Editor.WriteMessage(test.Name);
             }
-            CurrentDocument.Editor.WriteMessage(CurrentDocument.Database.GetProject().Name);
+            else
+            {
+                CurrentDocument.Editor.WriteMessage("Current document does not belong to a project.");
+            }
+        }
+
+        public static Project CurrentProject()
+        {
+            if (!CurrentDocument.IsNamedDrawing)
+                return null;
+            return CurrentDocument.Database.GetProject();
+        }
+
+        [CommandMethod("EXPORTCURRENTPROJECT")]
+        public static void ExportCurrentProject()
+        {
+            CurrentProject()?.ExportWDP("C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
+        }
+
+        [CommandMethod("ADDPAGE")]
+        public static void ProjectAddPage()
+        {
+            Project currentProject = CurrentProject();
+            currentProject.Properties = new ProjectProperties()
+            {
+                SchematicTemplate = new Uri($"{Paths.Templates}\\ICA 8.5x11 Title Block.dwt"),
+                PanelTemplate = new Uri($"{Paths.Templates}\\ICA 8.5x11 Title Block.dwt"),
+                ReferenceTemplate = new Uri($"{Paths.Templates}\\ICA 8.5x11 Title Block.dwt"),
+                Library = new Uri($"{Paths.Libraries}"),
+                Ladder = new LadderProperties(),
+                Component = new ComponentProperties(),
+                Wire = new WireProperties()
+            };
+            PromptKeywordOptions options = new PromptKeywordOptions("\nChoose page type: ");
+            options.Keywords.Add("Schematic");
+            options.Keywords.Add("Panel");
+            options.Keywords.Add("Reference");
+            options.Keywords.Default = "Schematic";
+
+            PromptResult result = CurrentDocument.Editor.GetKeywords(options);
+            if (result.Status != PromptStatus.OK)
+                return;
+
+            switch (result.StringResult)
+            {
+                case "Schematic":
+                    currentProject.AddPage(Project.DrawingType.Schematic, "test.dwg");
+                    break;
+                case "Panel":
+                    currentProject.AddPage(Project.DrawingType.Panel, "test.dwg");
+                    break;
+                case "Reference":
+                    currentProject.AddPage(Project.DrawingType.Reference, "test.dwg");
+                    break;
+                default:
+                    return;
+            }
         }
 
         #endregion

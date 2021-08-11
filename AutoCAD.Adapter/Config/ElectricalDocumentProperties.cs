@@ -9,6 +9,7 @@ namespace ICA.AutoCAD.Adapter
         public LadderProperties Ladder { get; set; }
         public ComponentProperties Component { get; set; }
         public WireProperties Wire { get; set; }
+        public CrossReferenceProperties CrossReference { get; set; }
 
         public Dictionary<string, string> ToDictionary()
         {
@@ -20,6 +21,8 @@ namespace ICA.AutoCAD.Adapter
             foreach (var property in Component.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
             foreach (var property in Wire.ToDictionary())
+                dictionary.Add(property.Key, property.Value);
+            foreach (var property in CrossReference.ToDictionary())
                 dictionary.Add(property.Key, property.Value);
             return dictionary;
         }
@@ -36,6 +39,7 @@ namespace ICA.AutoCAD.Adapter
             Ladder = new LadderProperties();
             Component = new ComponentProperties();
             Wire = new WireProperties();
+            CrossReference = new CrossReferenceProperties();
         }
 
         public ElectricalDocumentProperties(Dictionary<string, string>dictionary)
@@ -44,6 +48,18 @@ namespace ICA.AutoCAD.Adapter
             Ladder = new LadderProperties(dictionary);
             Component = new ComponentProperties(dictionary);
             Wire = new WireProperties(dictionary);
+            CrossReference = new CrossReferenceProperties(dictionary);
+        }
+
+        public ElectricalDocumentProperties(ProjectProperties project)
+        {
+            Sheet = new SheetProperties()
+            {
+                SheetNumber = $"temp"
+            };
+            Ladder = project.Ladder;
+            Component = project.Component;
+            Wire = project.Wire;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace ICA.AutoCAD.Adapter
             return new ElectricalDocumentProperties(database.GetCustomProperties());
         }
 
-        public static string GetPageNumber(this Database database) => database.ElectricalProperties().Sheet.SheetNumber;
+        public static string GetSheetNumber(this Database database) => database.ElectricalProperties().Sheet.SheetNumber;
 
         public static void SetPageNumber(this Database database, string value)
         {

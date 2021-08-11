@@ -97,16 +97,5 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
-
-        private Dictionary<string, string> TestAttributes => new Dictionary<string, string>()
-        {
-            { "DESC1", "TEST" },
-            { "DESC2", "TEST2" },
-            { "DESC3", "TEST3" },
-            { "MFG", "MFG" },
-            { "CAT", "PN" },
-            { "TERM01", "1" },
-            { "TERM02", "2" }
-        };
     }
 }

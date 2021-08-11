@@ -34,16 +34,16 @@ namespace ICA.AutoCAD.Adapter
             { "TAGFMT", nameof(ElectricalDocumentProperties.Component.TagFormat) },
 
             //Wire Properties
-            { "WIREMODE", nameof(ElectricalDocumentProperties.Wire.WireMode) },
-            { "WIRE-START", nameof(ElectricalDocumentProperties.Wire.WireStart) },
-            { "WIRE-RSUF", nameof(ElectricalDocumentProperties.Wire.WireSuffixes) },
-            { "WIREFMT", nameof(ElectricalDocumentProperties.Wire.WireFormat) },
-            { "WINC", nameof(ElectricalDocumentProperties.Wire.WireIncremement) },
-            { "WLEADERS", nameof(ElectricalDocumentProperties.Wire.WireLeaders) },
-            { "GAP_STYLE", nameof(ElectricalDocumentProperties.Wire.WireGapStyle) },
-            { "SORTMODE", nameof(ElectricalDocumentProperties.Wire.WireSortMode) },
-            { "WNUM_OFFSET", nameof(ElectricalDocumentProperties.Wire.WireOffsetDistance) },
-            { "WNUM_FLAGS", nameof(ElectricalDocumentProperties.Wire.WireFlags) }
+            { "WIREMODE", nameof(ElectricalDocumentProperties.Wire.Mode) },
+            { "WIRE-START", nameof(ElectricalDocumentProperties.Wire.Start) },
+            { "WIRE-RSUF", nameof(ElectricalDocumentProperties.Wire.Suffixes) },
+            { "WIREFMT", nameof(ElectricalDocumentProperties.Wire.Format) },
+            { "WINC", nameof(ElectricalDocumentProperties.Wire.Incremement) },
+            { "WLEADERS", nameof(ElectricalDocumentProperties.Wire.LeaderMode) },
+            { "GAP_STYLE", nameof(ElectricalDocumentProperties.Wire.GapStyle) },
+            { "SORTMODE", nameof(ElectricalDocumentProperties.Wire.SortMode) },
+            { "WNUM_OFFSET", nameof(ElectricalDocumentProperties.Wire.Offset) },
+            { "WNUM_FLAGS", nameof(ElectricalDocumentProperties.Wire.Flags) }
         };
 
         #endregion

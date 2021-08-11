@@ -97,6 +97,10 @@
   <ItemGroup>
     <Compile Include="CommandEndedHandler.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="Config\CrossReferenceProperties.cs" />
+    <Compile Include="Config\Enums\CrossReferenceSortMode.cs" />
+    <Compile Include="Config\Enums\CrossReferenceStyle.cs" />
+    <Compile Include="Config\Enums\WireNumberPosition.cs" />
     <Compile Include="Config\Enums\WireSortMode.cs" />
     <Compile Include="Config\ElectricalLayers.cs" />
     <Compile Include="Config\Enums\LeaderInsertMode.cs" />
@@ -119,14 +123,16 @@
     <Compile Include="Ladder\LadderTemplate.cs" />
     <Compile Include="Config\LadderProperties.cs" />
     <Compile Include="Project.cs" />
-    <Compile Include="ProjectSettings.cs" />
+    <Compile Include="ProjectProperties.cs" />
     <Compile Include="Schematic\ChildSymbol.cs" />
     <Compile Include="Schematic\ParentSymbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schematic\SchematicSymbolRecord.cs" />
     <Compile Include="Config\SheetProperties.cs" />
+    <Compile Include="Schematic\SignalSymbol.cs" />
     <Compile Include="SymbolJig.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
+    <Compile Include="WDPProperty.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

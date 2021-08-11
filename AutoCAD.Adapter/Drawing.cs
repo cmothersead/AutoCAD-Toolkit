@@ -8,6 +8,7 @@ namespace ICA.AutoCAD.Adapter
         #region Public Properties
 
         public Uri FileUri { get; set; }
+        public Project Project { get; set; }
         public List<string> Description { get; set; } = new List<string>();
         public ElectricalDocumentProperties Properties { get; set; }
 

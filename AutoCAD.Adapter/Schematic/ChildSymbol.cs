@@ -51,61 +51,37 @@ namespace ICA.AutoCAD.Adapter
         public string Tag
         {
             get => TagAttribute?.TextString;
-            set
-            {
-                if (TagAttribute != null)
-                    TagAttribute.SetValue(value);
-            }
+            set => TagAttribute?.SetValue(value);
         }
 
         public string Family
         {
             get => FamilyAttribute?.TextString;
-            set
-            {
-                if (FamilyAttribute != null)
-                    FamilyAttribute.SetValue(value);
-            }
+            set => FamilyAttribute?.SetValue(value);
         }
 
         public string ManufacturerName
         {
             get => MfgAttribute?.TextString;
-            set
-            {
-                if (MfgAttribute != null)
-                    MfgAttribute.SetValue(value);
-            }
+            set => MfgAttribute?.SetValue(value);
         }
 
         public string PartNumber
         {
             get => CatAttribute?.TextString;
-            set
-            {
-                if (CatAttribute != null)
-                    CatAttribute.SetValue(value);
-            }
+            set => CatAttribute?.SetValue(value);
         }
 
         public string Enclosure
         {
             get => InstAttribute?.TextString;
-            set
-            {
-                if (InstAttribute != null)
-                    InstAttribute.SetValue(value);
-            }
+            set => InstAttribute?.SetValue(value);
         }
 
         public string Location
         {
             get => LocAttribute?.TextString;
-            set
-            {
-                if (LocAttribute != null)
-                    LocAttribute.SetValue(value);
-            }
+            set => LocAttribute?.SetValue(value);
         }
 
         public List<string> Description
