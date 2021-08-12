@@ -67,14 +67,14 @@ namespace ICA.AutoCAD.Adapter
                 if (_sheetNumber != null)
                     return _sheetNumber;
 
-                _sheetNumber = Application.DocumentManager.MdiActiveDocument.Database.GetSheetNumber();
+                _sheetNumber = Database.GetSheetNumber();
 
-                if (_sheetNumber is null)
+                if (_sheetNumber is null | _sheetNumber == "")
                 {
-                    PromptStringOptions options = new PromptStringOptions("Sheet Number");
+                    PromptStringOptions options = new PromptStringOptions("Sheet Number: ");
                     PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
                     _sheetNumber = result.StringResult;
-                    Application.DocumentManager.MdiActiveDocument.Database.SetPageNumber(result.StringResult);
+                    Database.SetSheetNumber(result.StringResult);
                 }
 
                 return _sheetNumber;
@@ -222,7 +222,14 @@ namespace ICA.AutoCAD.Adapter
         {
             if (document is null)
                 document = Application.DocumentManager.MdiActiveDocument;
-            LadderTemplate template;
+
+            if (document.Database.GetTitleBlock() == null)
+            {
+                document.Editor.WriteMessage("No title block found.");
+                return null;
+            }
+
+            LadderTemplate template = new LadderTemplate(document.Database);
 
             PromptKeywordOptions typeOptions = new PromptKeywordOptions("\nChoose ladder type: ");
             typeOptions.Keywords.Add("1 Phase");
@@ -231,46 +238,9 @@ namespace ICA.AutoCAD.Adapter
 
             PromptKeywordOptions countOptions = new PromptKeywordOptions("\nChoose number of ladders: ");
             countOptions.Keywords.Add("1");
+            if (template.Gap != 0)
+                countOptions.Keywords.Add("2");
             countOptions.Keywords.Default = "1";
-
-            switch (document.Database.GetTitleBlock()?.Name)
-            {
-                case "ICA 8.5x11 Title Block":
-                    template = new LadderTemplate()
-                    {
-                        Database = document.Database,
-                        Origin = new Point2d(2.5, 22.5),
-                        Height = 19.5,
-                        TotalWidth = 15
-                    };
-                    break;
-                case "ICA 11x17 Title Block":
-                    template = new LadderTemplate()
-                    {
-                        Database = document.Database,
-                        Origin = new Point2d(2.5, 22.5),
-                        Height = 19.5,
-                        TotalWidth = 32.5,
-                        Gap = 2.5,
-                    };
-                    countOptions.Keywords.Add("2");
-                    break;
-                case "Nexteer 11x17 Title Block":
-                    template = new LadderTemplate()
-                    {
-                        Database = document.Database,
-                        Origin = new Point2d(2.5, 22.5),
-                        Height = 20,
-                        TotalWidth = 25,
-                        Gap = 5,
-                    };
-                    countOptions.Keywords.Add("2");
-                    break;
-                default:
-                    document.Editor.WriteMessage("No valid title block found.");
-                    return null;
-            }
-
             PromptResult result = document.Editor.GetKeywords(typeOptions);
             if (result.Status != PromptStatus.OK)
                 return null;

@@ -8,42 +8,37 @@ namespace ICA.AutoCAD.Adapter
         #region Private Properties
 
         /// <summary>
-        /// Dictionary storing Electrical properties by their WD_M attribute tag
+        /// Dictionary storing properties by their WD_M attribute tag
         /// </summary>
         private static readonly Dictionary<string, string> Names = new Dictionary<string, string>
         {
             //Sheet Properties
-            { "SHEET", nameof(ElectricalDocumentProperties.Sheet.SheetNumber) },
-            { "IEC_PROJ", nameof(ElectricalDocumentProperties.Sheet.IECProjectCode) },
-            { "IEC_INST", nameof(ElectricalDocumentProperties.Sheet.IECInstallationCode) },
-            { "IEC_LOC", nameof(ElectricalDocumentProperties.Sheet.IECLocationCode) },
-            { "UNIT_SCL", nameof(ElectricalDocumentProperties.Sheet.UnitScale) },
-            { "FEATURE_SCL", nameof(ElectricalDocumentProperties.Sheet.FeatureScale) },
+            { "SHEET", "Sheet" + nameof(ElectricalDocumentProperties.Sheet.Number) },
 
             //Ladder Properties
-            { "RUNGHORV", nameof(ElectricalDocumentProperties.Ladder.RungOrientation) },
-            { "RUNGDIST", nameof(ElectricalDocumentProperties.Ladder.RungSpacing) },
-            { "RUNGINC", nameof(ElectricalDocumentProperties.Ladder.RungIncrement) },
-            { "DRWRUNG", nameof(ElectricalDocumentProperties.Ladder.DrawRungs) },
-            { "PH3SPACE", nameof(ElectricalDocumentProperties.Ladder.ThreePhaseSpacing) },
+            { "RUNGHORV", "Ladder" + nameof(ElectricalDocumentProperties.Ladder.RungOrientation) },
+            { "RUNGDIST", "Ladder" + nameof(ElectricalDocumentProperties.Ladder.RungSpacing) },
+            { "RUNGINC", "Ladder" + nameof(ElectricalDocumentProperties.Ladder.RungIncrement) },
+            { "DRWRUNG", "Ladder" + nameof(ElectricalDocumentProperties.Ladder.DrawRungs) },
+            { "PH3SPACE", "Ladder" + nameof(ElectricalDocumentProperties.Ladder.ThreePhaseSpacing) },
 
             //Component Properties
-            { "TAGMODE", nameof(ElectricalDocumentProperties.Component.TagMode) },
-            { "TAG-START", nameof(ElectricalDocumentProperties.Component.TagStart) },
-            { "TAG-RSUF", nameof(ElectricalDocumentProperties.Component.TagSuffixes) },
-            { "TAGFMT", nameof(ElectricalDocumentProperties.Component.TagFormat) },
+            { "TAGMODE", "Tag" + nameof(ElectricalDocumentProperties.Component.Mode) },
+            { "TAG-START", "Tag" + nameof(ElectricalDocumentProperties.Component.Start) },
+            { "TAG-RSUF", "Tag" + nameof(ElectricalDocumentProperties.Component.Suffixes) },
+            { "TAGFMT", "Tag" + nameof(ElectricalDocumentProperties.Component.Format) },
 
             //Wire Properties
-            { "WIREMODE", nameof(ElectricalDocumentProperties.Wire.Mode) },
-            { "WIRE-START", nameof(ElectricalDocumentProperties.Wire.Start) },
-            { "WIRE-RSUF", nameof(ElectricalDocumentProperties.Wire.Suffixes) },
-            { "WIREFMT", nameof(ElectricalDocumentProperties.Wire.Format) },
-            { "WINC", nameof(ElectricalDocumentProperties.Wire.Incremement) },
-            { "WLEADERS", nameof(ElectricalDocumentProperties.Wire.LeaderMode) },
-            { "GAP_STYLE", nameof(ElectricalDocumentProperties.Wire.GapStyle) },
-            { "SORTMODE", nameof(ElectricalDocumentProperties.Wire.SortMode) },
-            { "WNUM_OFFSET", nameof(ElectricalDocumentProperties.Wire.Offset) },
-            { "WNUM_FLAGS", nameof(ElectricalDocumentProperties.Wire.Flags) }
+            { "WIREMODE", "Wire" + nameof(ElectricalDocumentProperties.Wire.Mode) },
+            { "WIRE-START", "Wire" + nameof(ElectricalDocumentProperties.Wire.Start) },
+            { "WIRE-RSUF", "Wire" + nameof(ElectricalDocumentProperties.Wire.Suffixes) },
+            { "WIREFMT", "Wire" + nameof(ElectricalDocumentProperties.Wire.Format) },
+            { "WINC", "Wire" + nameof(ElectricalDocumentProperties.Wire.Incremement) },
+            { "WLEADERS", "Wire" + nameof(ElectricalDocumentProperties.Wire.LeaderMode) },
+            { "GAP_STYLE", "Wire" + nameof(ElectricalDocumentProperties.Wire.GapStyle) },
+            { "SORTMODE", "Wire" + nameof(ElectricalDocumentProperties.Wire.SortMode) },
+            { "WNUM_OFFSET", "Wire" + nameof(ElectricalDocumentProperties.Wire.Offset) },
+            { "WNUM_FLAGS", "Wire" + nameof(ElectricalDocumentProperties.Wire.Flags) }
         };
 
         #endregion
@@ -52,6 +47,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static Dictionary<string, string> Read(Database database)
         {
+            database.SetCustomProperty("WD_MRead", "1");
             return RenameKeys(WDMToDictionary(database));
         }
 

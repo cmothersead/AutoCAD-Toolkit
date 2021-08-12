@@ -78,7 +78,9 @@ namespace ICA.AutoCAD.Adapter
 
         public void Load(Database database)
         {
-            database.Insert(Name, Commands.LoadDatabase(FileUri), true);
+            Database titleBlockDatabase = Commands.LoadDatabase(FileUri);
+            database.Insert(Name, titleBlockDatabase, true);
+            database.SetCustomProperties(titleBlockDatabase.GetAllCustomProperties());
             _blockTableRecord = database.GetBlockTable().GetRecord(Name);
         }
 
@@ -118,6 +120,8 @@ namespace ICA.AutoCAD.Adapter
         {
             if (_blockTableRecord.GetBlockReferenceIds(true, false).Count != 0)
                 Remove();
+
+            _blockTableRecord.Database.RemoveCustomProperties(new TitleBlockProperties().ToDictionary().Select(kv => kv.Key));
 
             using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
             {

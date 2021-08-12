@@ -4,14 +4,15 @@ namespace ICA.AutoCAD.Adapter
 {
     public class SheetProperties : Properties
     {
+        #region Private Properties
+
+        private static string Prefix => "Sheet";
+
+        #endregion
+
         #region Public Properties
 
-        public string SheetNumber { get; set; }
-        public string IECProjectCode { get; set; }
-        public string IECInstallationCode { get; set; }
-        public string IECLocationCode { get; set; }
-        public double UnitScale { get; set; } = 1;
-        public double FeatureScale { get; set; } = 0;
+        public string Number { get; set; }
 
         #endregion
 
@@ -19,7 +20,13 @@ namespace ICA.AutoCAD.Adapter
 
         public SheetProperties () { }
 
-        public SheetProperties (Dictionary<string, string> dictionary) : base(dictionary) { }
+        public SheetProperties (Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
+
+        #endregion
+
+        #region Public Methods
+
+        public Dictionary<string, string> ToDictionary() => ToDictionary(Prefix);
 
         #endregion
     }

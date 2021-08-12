@@ -14,7 +14,7 @@ namespace ICA.AutoCAD
         /// </summary>
         /// <param name="database">Instance this method applies to.</param>
         /// <returns>A strongly typed dictionary containing the entries.</returns>
-        public static Dictionary<string, string> GetCustomProperties(this Database database)
+        public static Dictionary<string, string> GetAllCustomProperties(this Database database)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
             IDictionaryEnumerator dictEnum = database.SummaryInfo.CustomProperties;
@@ -64,6 +64,32 @@ namespace ICA.AutoCAD
                 custProps[key] = value;
             else
                 custProps.Add(key, value);
+            database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
+        }
+
+        public static void RemoveCustomProperty(this Database database, string key)
+        {
+            DatabaseSummaryInfoBuilder infoBuilder = new DatabaseSummaryInfoBuilder(database.SummaryInfo);
+            infoBuilder.CustomPropertyTable.Remove(key);
+            database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
+        }
+
+        public static void RemoveCustomProperties(this Database database, IEnumerable<string> keys)
+        {
+            DatabaseSummaryInfoBuilder infoBuilder = new DatabaseSummaryInfoBuilder(database.SummaryInfo);
+            foreach(string key in keys)
+                infoBuilder.CustomPropertyTable.Remove(key);
+            database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
+        }
+
+        public static void RemoveAllCustomProperties(this Database database)
+        {
+            DatabaseSummaryInfoBuilder infoBuilder = new DatabaseSummaryInfoBuilder(database.SummaryInfo);
+            IDictionaryEnumerator dictEnum = database.SummaryInfo.CustomProperties;
+            while (dictEnum.MoveNext())
+            {
+                infoBuilder.CustomPropertyTable.Remove(dictEnum.Key);
+            }
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 

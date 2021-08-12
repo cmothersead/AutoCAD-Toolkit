@@ -113,6 +113,7 @@
     <Compile Include="Config\WDM.cs" />
     <Compile Include="Config\WireProperties.cs" />
     <Compile Include="Drawing.cs" />
+    <Compile Include="ElectricalDocument.cs" />
     <Compile Include="Extensions\DatabaseExtensions.cs" />
     <Compile Include="Config\ElectricalDocumentProperties.cs" />
     <Compile Include="Extensions\LayerTableRecordExtensions.cs" />

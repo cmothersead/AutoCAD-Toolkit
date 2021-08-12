@@ -157,10 +157,10 @@ namespace ICA.AutoCAD.Adapter
 
             lines.Add($"?[0]{Properties.Ladder.RungOrientation.ToString().Substring(0, 1)}");   //RUNGHORV
             lines.Add($"?[1]1"); //Line reference numbers (1)                                   //REFNUMS
-            lines.Add($"?[2]{Properties.Component.TagMode.ToString().Substring(0, 1)}");        //TAGMODE
-            lines.Add($"?[3]{Properties.Component.TagStart}");                                  //TAG-START
-            lines.Add($"?[4]{string.Join(",", Properties.Component.TagSuffixes)}");             //TAG-RSUF
-            lines.Add($"?[5]{Properties.Component.TagFormat}");                                 //TAGFMT
+            lines.Add($"?[2]{Properties.Component.Mode.ToString().Substring(0, 1)}");        //TAGMODE
+            lines.Add($"?[3]{Properties.Component.Start}");                                  //TAG-START
+            lines.Add($"?[4]{string.Join(",", Properties.Component.Suffixes)}");             //TAG-RSUF
+            lines.Add($"?[5]{Properties.Component.Format}");                                 //TAGFMT
             lines.Add($"?[6]{Properties.Wire.Mode.ToString().Substring(0, 1)}");                //WIREMODE
             lines.Add($"?[7]{Properties.Wire.Start}");                                          //WIRE-START
             lines.Add($"?[8]{string.Join(",", Properties.Wire.Suffixes)}");                     //WIRE-RSUF
@@ -171,7 +171,7 @@ namespace ICA.AutoCAD.Adapter
             //lines.Add($"?[13]");  //-----------------------Missing, Obsolete?----------------------------
             lines.Add($"?[14]{Properties.CrossReference.Format}");                              //XREFFMT
             lines.Add($"?[15]{Properties.Ladder.RungIncrement}");                               //RUNGINC
-            lines.Add($"?[16]{Properties.Ladder.DrawRungs}");                                   //DRWRUNG
+            lines.Add($"?[16]{Convert.ToInt32(Properties.Ladder.DrawRungs)}");                                   //DRWRUNG
             lines.Add($"?[17]{Properties.Ladder.ThreePhaseSpacing}");                           //PH3SPACE
             lines.Add($"?[18]");                                                                //DATUMX
             lines.Add($"?[19]");                                                                //DATUMY

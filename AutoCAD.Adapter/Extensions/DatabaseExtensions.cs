@@ -13,22 +13,16 @@ namespace ICA.AutoCAD.Adapter
 
         public static ElectricalDocumentProperties ElectricalProperties(this Database database)
         {
-            Dictionary<string, string> properties = database.GetCustomProperties();
-            if (properties.Count != 0)
-                return new ElectricalDocumentProperties(properties);
+            if (database.GetCustomProperty("WD_MRead") == "1")
+                return new ElectricalDocumentProperties(database.GetAllCustomProperties());
 
             database.SetCustomProperties(WDM.Read(database));
-            return new ElectricalDocumentProperties(database.GetCustomProperties());
+            return new ElectricalDocumentProperties(database.GetAllCustomProperties());
         }
 
-        public static string GetSheetNumber(this Database database) => database.ElectricalProperties().Sheet.SheetNumber;
+        public static string GetSheetNumber(this Database database) => database.ElectricalProperties().Sheet.Number;
 
-        public static void SetPageNumber(this Database database, string value)
-        {
-            ElectricalDocumentProperties properties = database.ElectricalProperties();
-            properties.Sheet.SheetNumber = value;
-            database.SetCustomProperties(properties.ToDictionary());
-        }
+        public static void SetSheetNumber(this Database database, string value) => database.SetCustomProperty("SheetNumber", value);
 
         #endregion
 

@@ -5,6 +5,8 @@ namespace ICA.AutoCAD.Adapter
 {
     public class LadderTemplate
     {
+        #region Public Properties
+
         public Database Database { get; set; }
 
         public Point2d Origin { get; set; }
@@ -18,6 +20,24 @@ namespace ICA.AutoCAD.Adapter
 
         public int LadderCount { get; set; } = 1;
         public int PhaseCount { get; set; } = 1;
+
+        #endregion
+
+        #region Constructors
+
+        public LadderTemplate(Database database)
+        {
+            Database = database;
+            TitleBlockProperties properties = database.ElectricalProperties().TitleBlock;
+            Origin = properties.LadderOrigin;
+            Height = properties.LadderTotalHeight;
+            TotalWidth = properties.LadderTotalWidth;
+            Gap = properties.LadderGap;
+        }
+
+        #endregion
+
+        #region Public Methods
 
         public void Insert()
         {
@@ -63,5 +83,7 @@ namespace ICA.AutoCAD.Adapter
                 .Insert();
             }
         }
+
+        #endregion
     }
 }
