@@ -59,10 +59,15 @@ namespace ICA.AutoCAD.Adapter
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                ObjectIdCollection references = database.GetBlockTable(transaction)
-                                                        .GetRecord("WD_M")
-                                                        .GetBlockReferenceIds(true, false);
-                if (references.Count == 0)
+                BlockTable blockTable = database.GetBlockTable(transaction);
+
+                if (!blockTable.Has("WD_M"))
+                    return null;
+
+                ObjectIdCollection references = blockTable.GetRecord("WD_M")
+                                                          .GetBlockReferenceIds(true, false);
+
+                if (references is null | references.Count == 0)
                     return null;
 
                 BlockReference wd_m = transaction.GetObject(references[0], OpenMode.ForRead) as BlockReference;
@@ -80,6 +85,9 @@ namespace ICA.AutoCAD.Adapter
 
         private static Dictionary<string, string> RenameKeys(Dictionary<string, string> wdm)
         {
+            if (wdm is null)
+                return new Dictionary<string, string>();
+
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
             foreach (var entry in wdm)
                 if (Names.ContainsKey(entry.Key))

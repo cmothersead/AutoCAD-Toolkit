@@ -396,6 +396,9 @@ namespace ICA.AutoCAD.Adapter
         public static void TitleBlockCommand()
         {
             TitleBlock newTitleBlock = TitleBlock.Select();
+            if (newTitleBlock is null)
+                return;
+
             RemoveLadder();
             Database database = CurrentDocument.Database;
             AddTitleBlock(database, newTitleBlock);
