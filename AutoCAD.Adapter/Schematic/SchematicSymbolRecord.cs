@@ -51,7 +51,7 @@ namespace ICA.AutoCAD.Adapter
             if (blockReference.Position == Point3d.Origin)
             {
                 Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-                var jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, blockReference);
+                SymbolJig jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, blockReference);
 
                 if (jig.Run() != PromptStatus.OK)
                     return null;

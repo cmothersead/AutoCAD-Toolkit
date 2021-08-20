@@ -487,6 +487,12 @@ namespace ICA.AutoCAD.Adapter
                 } 
         }
 
+        [CommandMethod("DRAWWIRE")]
+        public static void DrawWire()
+        {
+            Wire.Draw(CurrentDocument);
+        }
+
         public static void ZoomExtents(Document document, Extents3d extents)
         {
             using (ViewTableRecord view = document.Editor.GetCurrentView())

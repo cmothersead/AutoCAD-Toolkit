@@ -137,6 +137,7 @@
     <Compile Include="Title Block\TitleBlock.cs" />
     <Compile Include="WDPProperty.cs" />
     <Compile Include="Wire.cs" />
+    <Compile Include="WireJig.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

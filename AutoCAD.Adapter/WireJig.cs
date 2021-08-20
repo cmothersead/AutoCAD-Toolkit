@@ -2,44 +2,46 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class SymbolJig : EntityJig
+    public class WireJig : EntityJig
     {
-        private Matrix3d _ucs;
         private Point3d _position;
-        private Transaction _transaction;
 
-        public SymbolJig(Matrix3d ucs, Transaction transaction, BlockReference blockReference) : base(blockReference)
+        public WireJig(Line line) : base(line)
         {
-            _ucs = ucs;
-            _position = blockReference.Position;
-            _transaction = transaction;
+            _position = line.EndPoint;
         }
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
-            JigPromptPointOptions options = new JigPromptPointOptions("\nSelect insertion point:")
+            JigPromptPointOptions options = new JigPromptPointOptions("\nNext wire point:")
             {
-                BasePoint = Point3d.Origin,
                 UserInputControls = UserInputControls.NoZeroResponseAccepted
             };
 
             PromptPointResult result = prompts.AcquirePoint(options);
-            Point3d ucsPoint = result.Value.TransformBy(_ucs.Inverse());
 
-            if (_position == ucsPoint)
+            if (_position == result.Value)
                 return SamplerStatus.NoChange;
 
-            _position = ucsPoint;
+            _position = result.Value;
             return SamplerStatus.OK;
         }
 
         protected override bool Update()
         {
-            BlockReference blockReference = Entity as BlockReference;
-            blockReference.MoveTo(_transaction, _position);
+            Line line = Entity as Line;
+            if (Math.Abs(line.StartPoint.X - _position.X) > Math.Abs(line.StartPoint.Y - _position.Y))
+                line.EndPoint = new Point3d(_position.X, line.StartPoint.Y, line.StartPoint.Z);
+            else
+                line.EndPoint = new Point3d(line.StartPoint.X, _position.Y, line.StartPoint.Z);
             return true;
         }
 
