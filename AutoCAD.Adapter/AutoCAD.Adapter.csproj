@@ -117,6 +117,7 @@
     <Compile Include="Extensions\DatabaseExtensions.cs" />
     <Compile Include="Config\ElectricalDocumentProperties.cs" />
     <Compile Include="Extensions\LayerTableRecordExtensions.cs" />
+    <Compile Include="Extensions\LineExtensions.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="Insertable.cs" />
     <Compile Include="Ladder\Ladder.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="SymbolJig.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
     <Compile Include="WDPProperty.cs" />
+    <Compile Include="Wire.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">

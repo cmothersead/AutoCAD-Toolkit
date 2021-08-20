@@ -11,6 +11,8 @@ using Autodesk.AutoCAD.Geometry;
 using System.IO;
 using System;
 using ICA.AutoCAD.IO;
+using Autodesk.AutoCAD.Colors;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -129,103 +131,63 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public static ObjectId? SelectSingleImplied()
+        {
+            Editor currentEditor = CurrentDocument.Editor;
+
+            PromptSelectionResult selectionResult = currentEditor.SelectImplied();
+            if (selectionResult.Status == PromptStatus.Error)
+            {
+                PromptSelectionOptions selectionOptions = new PromptSelectionOptions
+                {
+                    SingleOnly = true
+                };
+                selectionResult = currentEditor.GetSelection(selectionOptions);
+            }
+            else
+                currentEditor.SetImpliedSelection(new ObjectId[0]);
+
+            if (selectionResult.Status == PromptStatus.OK)
+                return selectionResult.Value.GetObjectIds()[0];
+
+            return null;
+        }
+
+        public static ObjectIdCollection SelectMultiple()
+        {
+            Editor currentEditor = CurrentDocument.Editor;
+
+            PromptSelectionResult selectionResult = currentEditor.GetSelection();
+
+            if (selectionResult.Status == PromptStatus.OK)
+                return new ObjectIdCollection(selectionResult.Value.GetObjectIds());
+
+            return null;
+        }
+
         /// <summary>
         /// Prompts for selection of a schematic symbol from the current drawing, or selects the implied symbol
         /// </summary>
         /// <returns></returns>
         public static ISymbol SelectSymbol()
         {
-            Editor currentEditor = CurrentDocument.Editor;
-            try
+            if (SelectSingleImplied()?.Open() is BlockReference reference)
             {
-                PromptSelectionResult selectionResult = currentEditor.SelectImplied();
-                if (selectionResult.Status == PromptStatus.Error)
-                {
-                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true
-                    };
-                    selectionResult = currentEditor.GetSelection(selectionOptions);
-                }
-                else
-                {
-                    currentEditor.SetImpliedSelection(new ObjectId[0]);
-                }
+                if (reference.HasAttributeReference("TAG1"))
+                    return new ParentSymbol(reference);
+                else if (reference.HasAttributeReference("TAG2"))
+                    return new ChildSymbol(reference);
+            }
 
-                if (selectionResult.Status == PromptStatus.OK)
-                {
-                    try
-                    {
-                        ObjectId[] objectIds = selectionResult.Value.GetObjectIds();
-                        foreach (ObjectId objectId in objectIds)
-                        {
-                            if (objectId.ObjectClass.Name == "AcDbBlockReference")
-                            {
-                                BlockReference reference = objectId.Open() as BlockReference;
-                                if (reference.HasAttributeReference("TAG1"))
-                                    return new ParentSymbol(reference);
-                                else if (reference.HasAttributeReference("TAG2"))
-                                    return new ChildSymbol(reference);
-                            }
-                        }
-                    }
-                    catch (Autodesk.AutoCAD.Runtime.Exception ex)
-                    {
-                        currentEditor.WriteMessage(ex.Message);
-                    }
-                }
-            }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
-            {
-                currentEditor.WriteMessage(ex.Message);
-            }
             return null;
         }
 
         public static SignalSymbol SelectSignal()
         {
-            Editor currentEditor = CurrentDocument.Editor;
-            try
-            {
-                PromptSelectionResult selectionResult = currentEditor.SelectImplied();
-                if (selectionResult.Status == PromptStatus.Error)
-                {
-                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true
-                    };
-                    selectionResult = currentEditor.GetSelection(selectionOptions);
-                }
-                else
-                {
-                    currentEditor.SetImpliedSelection(new ObjectId[0]);
-                }
+            if (SelectSingleImplied()?.Open() is BlockReference reference)
+                if (reference.HasAttributeReference("SIGCODE"))
+                    return new SignalSymbol(reference);
 
-                if (selectionResult.Status == PromptStatus.OK)
-                {
-                    try
-                    {
-                        ObjectId[] objectIds = selectionResult.Value.GetObjectIds();
-                        foreach (ObjectId objectId in objectIds)
-                        {
-                            if (objectId.ObjectClass.Name == "AcDbBlockReference")
-                            {
-                                BlockReference reference = objectId.Open() as BlockReference;
-                                if (reference.HasAttributeReference("SIGCODE"))
-                                    return new SignalSymbol(reference);
-                            }
-                        }
-                    }
-                    catch (Autodesk.AutoCAD.Runtime.Exception ex)
-                    {
-                        currentEditor.WriteMessage(ex.Message);
-                    }
-                }
-            }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
-            {
-                currentEditor.WriteMessage(ex.Message);
-            }
             return null;
         }
 
@@ -365,7 +327,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Ladder
 
-        [CommandMethod("LADDER")]
+        [CommandMethod("NEWLADDER")]
         public static void CommandLineInsertLadder()
         {
             LadderTemplate template = Ladder.Prompt();
@@ -505,6 +467,25 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        [CommandMethod("GETWIRE", CommandFlags.UsePickSet)]
+        public static void HighlightWire()
+        {
+            if (SelectSingleImplied()?.Open() is Line selectedLine)
+                if (selectedLine.Layer == ElectricalLayers.WireLayer.Name)
+                {
+                    LayerTableRecord wireLayer = selectedLine.Database.GetLayer(selectedLine.Layer);
+                    List<Line> potentialLines = new List<Line>();
+                    foreach (ObjectId id in wireLayer.GetEntities())
+                        if (id.Open() is Line line)
+                            potentialLines.Add(line);
+                    Wire test = new Wire()
+                    {
+                        Lines = selectedLine.GetConnected(potentialLines)
+                    };
+                    test.Highlight();
+                } 
+        }
 
         public static void ZoomExtents(Document document, Extents3d extents)
         {

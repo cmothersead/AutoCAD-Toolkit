@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices.Core;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace ICA.AutoCAD
@@ -55,5 +56,9 @@ namespace ICA.AutoCAD
         }
 
         public static void SetLayer(this Entity entity, LayerTableRecord layer) => entity.Transact(SetLayer, layer);
+
+        public static void SetColor(this Entity entity, Transaction transaction, Color color) => entity.GetForWrite(transaction).Color = color;
+
+        public static void SetColor(this Entity entity, Color color) => entity.Transact(SetColor, color);
     }
 }
