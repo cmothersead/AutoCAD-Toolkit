@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using ICA.Schematic;
@@ -51,11 +52,7 @@ namespace ICA.AutoCAD.Adapter
         public string Tag
         {
             get => TagAttribute?.TextString;
-            set
-            {
-                if (TagAttribute != null)
-                    TagAttribute.SetValue(value);
-            }
+            set => TagAttribute?.SetValue(value);
         }
 
         public string Family
@@ -205,6 +202,11 @@ namespace ICA.AutoCAD.Adapter
         }
 
         public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
+
+        public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
+                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
+                                                                     .Select(reference => new WireConnection(reference))
+                                                                     .ToList();
 
         #endregion
 

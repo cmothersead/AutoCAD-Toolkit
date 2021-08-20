@@ -5,6 +5,15 @@ namespace ICA.AutoCAD
 {
     public static class AttributeReferenceExtensions
     {
+        #region Public Transactionless Extension Methods
+
+        public static Point2d GetPosition(this AttributeReference attributeReference) => attributeReference.Justify
+                                                                                         == AttachmentPoint.BaseLeft ?
+                                                                                         attributeReference.Position.ToPoint2D() :
+                                                                                         attributeReference.AlignmentPoint.ToPoint2D();
+
+        #endregion
+
         #region Public Extenstion Methods
 
         public static void Hide(this AttributeReference attributeReference, Transaction transaction) => attributeReference.GetForWrite(transaction).Invisible = true;

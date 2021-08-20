@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DocumentCollectionExtensions.cs" />
+    <Compile Include="Extensions\LineExtensions.cs" />
     <Compile Include="System Variables\Bitcode.cs" />
     <Compile Include="Extensions\BlockTableExtensions.cs" />
     <Compile Include="Extensions\BlockTableRecordExtensions.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsInitializer.cs" />
     <Compile Include="System Variables\SupportPath.cs" />
+    <Compile Include="Vector3dExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

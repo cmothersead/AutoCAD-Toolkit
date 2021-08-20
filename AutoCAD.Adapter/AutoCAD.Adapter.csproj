@@ -126,6 +126,7 @@
     <Compile Include="Config\LadderProperties.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectProperties.cs" />
+    <Compile Include="Select.cs" />
     <Compile Include="SchematicTemplate.cs" />
     <Compile Include="Schematic\ChildSymbol.cs" />
     <Compile Include="Schematic\ParentSymbol.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Title Block\TitleBlock.cs" />
     <Compile Include="WDPProperty.cs" />
     <Compile Include="Wire.cs" />
+    <Compile Include="WireConnection.cs" />
     <Compile Include="WireJig.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices.Core;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace ICA.AutoCAD
 {
@@ -60,5 +61,12 @@ namespace ICA.AutoCAD
         public static void SetColor(this Entity entity, Transaction transaction, Color color) => entity.GetForWrite(transaction).Color = color;
 
         public static void SetColor(this Entity entity, Color color) => entity.Transact(SetColor, color);
+
+        public static bool IntersectsWith(this Entity entity, Entity otherEntity)
+        {
+            Point3dCollection collection = new Point3dCollection();
+            entity.IntersectWith(otherEntity, Intersect.OnBothOperands, collection, 0, 0);
+            return collection.Count != 0;
+        }
     }
 }

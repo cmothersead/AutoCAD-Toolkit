@@ -2,8 +2,10 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using ICA.AutoCAD.Adapter.Prompt;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -31,26 +33,29 @@ namespace ICA.AutoCAD.Adapter
 
         public static void Draw(Document document)
         {
-            PromptPointResult result = document.Editor.GetPoint("\nSelect wire start point:");
-            Point3d currentPoint = result.Value;
+            //PromptPointResult result = document.Editor.GetPoint("\nSelect wire start point:");
+            //Point3d currentPoint = result.Value;
+            ParentSymbol symbol = Select.Symbol(document.Editor) as ParentSymbol;
+            List<WireConnection> currentPoints = symbol.WireConnections;
+
             do
             {
-                Line line = DrawSegment(currentPoint);
+                Line line = DrawSegment(currentPoints);
 
                 if (line is null)
                     break;
 
-                currentPoint = line.EndPoint;
+                currentPoints = new List<WireConnection>() { new WireConnection(line) };
                 line.Insert(document.Database);
                 line.SetLayer(ElectricalLayers.WireLayer);
 
             } while (true);
         }
 
-        private static Line DrawSegment(Point3d startPoint)
+        private static Line DrawSegment(List<WireConnection> startPoints)
         {
-            Line line = new Line(startPoint, Point3d.Origin);
-            WireJig jig = new WireJig(line);
+            Line line = new Line(startPoints[0].Location.ToPoint3d(), Point3d.Origin);
+            WireJig jig = new WireJig(line, startPoints);
 
             if (jig.Run() != PromptStatus.OK)
                 return null;
