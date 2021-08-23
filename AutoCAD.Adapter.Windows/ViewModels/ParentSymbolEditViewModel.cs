@@ -25,6 +25,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
                 OnPropertyChanged(nameof(Family));
             }
         }
+        public string Manufacturer { get; set; }
+        public string PartNumber { get; set; }
         public bool PartInfoHidden { get; set; }
 
         public ParentSymbolEditViewModel(IParentSymbol symbol)
@@ -42,6 +44,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
                 CurrentManufacturer = new Manufacturer() { Name = _symbol.ManufacturerName },
                 CurrentPart = new Part() { Number = _symbol.PartNumber }
             };
+            Manufacturer = _symbol.ManufacturerName;
+            PartNumber = _symbol.PartNumber;
             PartInfoHidden = _symbol.PartInfoHidden;
         }
 
@@ -65,8 +69,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             _symbol.Enclosure = Installation;
             _symbol.Location = Location;
             _symbol.InstallationHidden = InstallationHidden;
-            _symbol.ManufacturerName = Family.CurrentManufacturer.Name;
-            _symbol.PartNumber = Family.CurrentPart.Number;
+            _symbol.ManufacturerName = Manufacturer;
+            _symbol.PartNumber = PartNumber;
             _symbol.PartInfoHidden = PartInfoHidden;
             _symbol.CollapseAttributeStack();
         }
