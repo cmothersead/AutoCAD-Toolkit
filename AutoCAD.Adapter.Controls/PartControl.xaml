@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
-             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:fa="http://schemas.fontawesome.io/icons/" d:DataContext="{d:DesignInstance Type=local:PartControl}"
              mc:Ignorable="d">
     <GroupBox ToolTip="Catalog information" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PartControl}}">
         <GroupBox.Header>
