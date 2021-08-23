@@ -6,20 +6,8 @@ namespace ICA.AutoCAD
     {
         public static bool GridSnap
         {
-            get
-            {
-                if ((short)Application.GetSystemVariable("SNAPMODE") == 1)
-                    return true;
-                else
-                    return false;
-            }
-            set
-            {
-                if (value)
-                    Application.SetSystemVariable("SNAPMODE", 1);
-                else
-                    Application.SetSystemVariable("SNAPMODE", 0);
-            }
+            get => (short)Application.GetSystemVariable("SNAPMODE") == 1;
+            set => Application.SetSystemVariable("SNAPMODE", value ? 1 : 0);
         }
     }
 }

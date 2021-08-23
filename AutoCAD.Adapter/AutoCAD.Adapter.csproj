@@ -124,8 +124,8 @@
     <Compile Include="Ladder\ILadder.cs" />
     <Compile Include="Ladder\LadderTemplate.cs" />
     <Compile Include="Config\LadderProperties.cs" />
-    <Compile Include="Project.cs" />
-    <Compile Include="ProjectProperties.cs" />
+    <Compile Include="Project\Project.cs" />
+    <Compile Include="Project\ProjectProperties.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="SchematicTemplate.cs" />
     <Compile Include="Schematic\ChildSymbol.cs" />
@@ -134,12 +134,12 @@
     <Compile Include="Schematic\SchematicSymbolRecord.cs" />
     <Compile Include="Config\SheetProperties.cs" />
     <Compile Include="Schematic\SignalSymbol.cs" />
-    <Compile Include="SymbolJig.cs" />
+    <Compile Include="Schematic\SymbolJig.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
-    <Compile Include="WDPProperty.cs" />
-    <Compile Include="Wire.cs" />
-    <Compile Include="WireConnection.cs" />
-    <Compile Include="WireJig.cs" />
+    <Compile Include="Project\WDPProperty.cs" />
+    <Compile Include="Wire\Wire.cs" />
+    <Compile Include="Wire\WireConnection.cs" />
+    <Compile Include="Wire\WireJig.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">
