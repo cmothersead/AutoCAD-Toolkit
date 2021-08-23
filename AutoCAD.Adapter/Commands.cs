@@ -61,18 +61,25 @@ namespace ICA.AutoCAD.Adapter
         public static Editor Editor => CurrentDocument.Editor;
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
-        public static async void EditAsync()
+        public static void EditSymbol(BlockReference reference = null)
         {
-            ISymbol symbol = Select.Symbol(Editor);
+            ISymbol symbol;
+
+            if (reference is null)
+                symbol = Select.Symbol(Editor);
+            else if (reference.HasAttributeReference("TAG1"))
+                symbol = new ParentSymbol(reference);
+            else
+                symbol = new ChildSymbol(reference);
 
             switch (symbol)
             {
                 case ParentSymbol parent:
-                    var editView = new ParentSymbolEditView(parent);
+                    ParentSymbolEditView editView = new ParentSymbolEditView(parent);
                     Application.ShowModalWindow(editView);
                     break;
                 case ChildSymbol child:
-                    var childEditView = new ChildSymbolEditView(child);
+                    ChildSymbolEditView childEditView = new ChildSymbolEditView(child);
                     Application.ShowModalWindow(childEditView);
                     break;
                 default:
@@ -271,7 +278,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Ladder
 
-        [CommandMethod("NEWLADDER")]
+        [CommandMethod("LADDER")]
         public static void CommandLineInsertLadder()
         {
             LadderTemplate template = Ladder.Prompt();
@@ -358,55 +365,30 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet | CommandFlags.Redraw)]
         public static void AttributeBlockEdit()
         {
-            Editor currentEditor = Editor;
             try
             {
-                PromptSelectionResult selectionResult = currentEditor.SelectImplied();
-                if (selectionResult.Status == PromptStatus.Error)
-                {
-                    PromptSelectionOptions selectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true
-                    };
-                    selectionResult = currentEditor.GetSelection(selectionOptions);
-                }
-                else
-                {
-                    currentEditor.SetImpliedSelection(new ObjectId[0]);
-                }
+                BlockReference reference = Select.SingleImplied(Editor)?.Open() as BlockReference;
 
-                if (selectionResult.Status == PromptStatus.OK)
+                switch (reference.Layer)
                 {
-                    if (selectionResult.Value.Count > 1)
+                    case "LADDER":
+                        //Ladder();
+                        break;
+                    case "TITLE BLOCK":
+                        TitleBlockCommand();
+                        break;
+                    case "SYMS":
+                        EditSymbol(reference);
+                        break;
+                    default:
+                        Editor.SetImpliedSelection(new ObjectId[1] { reference.ObjectId });
+                        CurrentDocument.SendStringToExecute("_EATTEDIT ", false, false, false);
                         return;
-
-                    if (selectionResult.Value[0].ObjectId.ObjectClass.Name != "AcDbBlockReference")
-                        return;
-
-                    BlockReference reference = selectionResult.Value[0].ObjectId.Open() as BlockReference;
-
-                    switch (reference.Layer)
-                    {
-                        case "LADDER":
-                            //Ladder();
-                            break;
-                        case "TITLE BLOCK":
-                            TitleBlockCommand();
-                            break;
-                        case "SYMS":
-                            EditAsync();
-                            break;
-                        default:
-                            Editor.SetImpliedSelection(selectionResult.Value);
-                            CurrentDocument.SendStringToExecute("_EATTEDIT ", false, false, false);
-                            return;
-                    }
-
                 }
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
-                currentEditor.WriteMessage(ex.Message);
+                Editor.WriteMessage(ex.Message);
             }
         }
 

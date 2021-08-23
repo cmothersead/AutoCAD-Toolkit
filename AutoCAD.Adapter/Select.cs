@@ -1,16 +1,11 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Runtime;
 using ICA.Schematic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter.Prompt
 {
-    public class Select
+    public static class Select
     {
 
         /// <summary>
@@ -53,10 +48,7 @@ namespace ICA.AutoCAD.Adapter.Prompt
             else
                 editor.SetImpliedSelection(new ObjectId[0]);
 
-            if (selectionResult.Status == PromptStatus.OK)
-                return selectionResult.Value.GetObjectIds()[0];
-
-            return null;
+            return selectionResult.Status == PromptStatus.OK ? (ObjectId?)selectionResult.Value.GetObjectIds()[0] : null;
         }
 
         public static ObjectIdCollection Multiple(Editor editor)

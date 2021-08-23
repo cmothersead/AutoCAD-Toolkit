@@ -98,6 +98,12 @@ namespace ICA.AutoCAD.Adapter
             Description = "Title Blocks",
             IsLocked = true
         };
+        public static LayerTableRecord ConductorLayer => new LayerTableRecord()
+        {
+            Name = "CONDUCTOR",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 11),
+            Description = "Cable conductor markings"
+        };
 
         private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
                                                                                               .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
@@ -149,12 +155,13 @@ namespace ICA.AutoCAD.Adapter
 
         private static Dictionary<string, LayerTableRecord> Attributes => new Dictionary<string, LayerTableRecord>()
         {
-            { "TAG1", TagLayer },
+            { "TAG", TagLayer },
             { "MFG", ManufacturerLayer },
             { "CAT", PartNumberLayer },
             { "TERMDESC", MiscellaneousLayer },
             { "DESC", DescriptionLayer },
             { "TERM", TerminalLayer },
+            { "CON", ConductorLayer },
             { "RATING", RatingLayer },
             { "WIRENO", WireNumberLayer },
             { "XREF", XrefLayer }
@@ -162,12 +169,12 @@ namespace ICA.AutoCAD.Adapter
 
         public static void Assign(Transaction transaction, BlockReference blockReference)
         {
-                foreach (AttributeReference reference in blockReference.GetAttributeReferences(transaction))
-                {
-                    var match = Attributes.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
-                    if (match.Key != null)
-                        reference.SetLayer(match.Value);
-                }
+            foreach (AttributeReference reference in blockReference.GetAttributeReferences(transaction))
+            {
+                KeyValuePair<string, LayerTableRecord> match = Attributes.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
+                if (match.Key != null)
+                    reference.SetLayer(match.Value);
+            }
         }
 
         public static void Assign(BlockReference blockReference)
