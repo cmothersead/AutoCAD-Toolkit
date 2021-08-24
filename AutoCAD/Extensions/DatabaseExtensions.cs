@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD
 {
@@ -104,6 +105,16 @@ namespace ICA.AutoCAD
         /// <returns><see cref="BlockTableRecord"/> representing the model space of the database.</returns>
         public static BlockTableRecord GetModelSpace(this Database database, Transaction transaction) => database.GetBlockTable(transaction).GetRecord(BlockTableRecord.ModelSpace);
 
+        public static List<ObjectId> GetObjectIds(this Database database, Transaction transaction)
+        {
+            List<ObjectId> output = new List<ObjectId>();
+            foreach (ObjectId id in database.GetModelSpace(transaction))
+                output.Add(id);
+            return output;
+        }
+
+        public static List<Entity> GetEntities(this Database database, Transaction transaction) => database.GetObjectIds(transaction).Select(id => id.Open(transaction) as Entity).ToList();
+
         public static bool HasLayer(this Database database, Transaction transaction, string name) => database.GetLayerTable(transaction).Has(name);
 
         public static bool HasLayer(this Database database, Transaction transaction, LayerTableRecord layer) => database.HasLayer(transaction, layer.Name);
@@ -151,6 +162,10 @@ namespace ICA.AutoCAD
         #region Transacted Overloads
 
         public static BlockTableRecord GetModelSpace(this Database database) => database.Transact(GetModelSpace);
+
+        public static List<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
+
+        public static List<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
 
         public static bool HasLayer(this Database database, string name) => database.Transact(HasLayer, name);
 

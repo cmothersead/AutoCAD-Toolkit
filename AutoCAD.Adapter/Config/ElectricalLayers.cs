@@ -104,6 +104,12 @@ namespace ICA.AutoCAD.Adapter
             Color = Color.FromColorIndex(ColorMethod.ByAci, 11),
             Description = "Cable conductor markings"
         };
+        public static LayerTableRecord GroundLayer => new LayerTableRecord()
+        {
+            Name = "GROUND",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
+            Description = "Ground wires layer"
+        };
 
         private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
                                                                                               .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);

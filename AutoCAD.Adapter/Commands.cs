@@ -11,6 +11,7 @@ using System.IO;
 using System;
 using ICA.AutoCAD.IO;
 using ICA.AutoCAD.Adapter.Prompt;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -377,10 +378,7 @@ namespace ICA.AutoCAD.Adapter
                 if (selectedLine.Layer == ElectricalLayers.WireLayer.Name)
                 {
                     LayerTableRecord wireLayer = selectedLine.Database.GetLayer(selectedLine.Layer);
-                    List<Line> potentialLines = new List<Line>();
-                    foreach (ObjectId id in wireLayer.GetEntities())
-                        if (id.Open() is Line line)
-                            potentialLines.Add(line);
+                    List<Line> potentialLines = wireLayer.GetEntities().Where(entity => entity is Line).Select(entity => entity as Line).ToList();
                     Wire test = new Wire()
                     {
                         Lines = selectedLine.GetConnected(potentialLines)
@@ -396,6 +394,13 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        [CommandMethod("GROUND")]
+        public static void InsertGround()
+        {
+            GroundSymbol symbol = GroundSymbol.Insert(CurrentDocument);
+            symbol.GroundConnectedWires();
+        }
 
         [CommandMethod("TESTPREFERENCES")]
         public static void TestPrefs()

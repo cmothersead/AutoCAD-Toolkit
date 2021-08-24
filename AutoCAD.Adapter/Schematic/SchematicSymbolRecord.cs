@@ -22,6 +22,8 @@ namespace ICA.AutoCAD.Adapter
 
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
 
+        public Database Database => _blockTableRecord.Database;
+
         #endregion
 
         #region Constructors
@@ -37,16 +39,9 @@ namespace ICA.AutoCAD.Adapter
 
         public ISymbol InsertSymbol(Transaction transaction, Point2d location = new Point2d())
         {
-            BlockReference blockReference;
+            BlockReference blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
 
-            if (location != new Point2d())
-                blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
-            else
-                blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId);
-
-            blockReference.Insert(transaction, _blockTableRecord.Database);
-
-            ElectricalLayers.Assign(transaction, blockReference);
+            blockReference.Insert(transaction, Database);
 
             if (blockReference.Position == Point3d.Origin)
             {
@@ -57,10 +52,19 @@ namespace ICA.AutoCAD.Adapter
                     return null;
             }
 
-            if (blockReference.Database.HasLadder())
-                blockReference.SetAttributeValue("TAG1", $"{blockReference.Database.GetLadder().ClosestLineNumber(blockReference.Position)}{blockReference.GetAttributeValue("FAMILY")}");
+            if (_blockTableRecord.HasAttribute("TAG1"))
+            {
+                if (blockReference.Database.HasLadder())
+                    blockReference.SetAttributeValue("TAG1", $"{blockReference.Database.GetLadder().ClosestLineNumber(blockReference.Position)}{blockReference.GetAttributeValue("FAMILY")}");
 
-            return new ParentSymbol(blockReference);
+                return new ParentSymbol(blockReference);
+            }  
+            else if (_blockTableRecord.HasAttribute("TAG2"))
+            {
+                return new ChildSymbol(blockReference);
+            }
+
+            return null;
         }
 
         public ISymbol InsertSymbol(Point2d location = new Point2d())

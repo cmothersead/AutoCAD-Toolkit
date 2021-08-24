@@ -148,22 +148,21 @@ namespace ICA.AutoCAD.Adapter
             PhaseCount = phaseCount;
         }
 
-        public Ladder(ObjectIdCollection objects)
+        public Ladder(List<Entity> entities)
         {
             _rails = new List<Line>();
             _lineNumbers = new List<BlockReference>();
-            Database = objects[0].Database;
-            foreach (ObjectId id in objects)
+            Database = entities[0].Database;
+            foreach (Entity entity in entities)
             {
-                DBObject obj = id.Open();
-
-                if (obj is Line line)
+                switch (entity)
                 {
-                    _rails.Add(line);
-                }
-                else if (obj is BlockReference lineNumber)
-                {
-                    _lineNumbers.Add(lineNumber);
+                    case Line line:
+                        _rails.Add(line);
+                        break;
+                    case BlockReference lineNumber:
+                        _lineNumbers.Add(lineNumber);
+                        break;
                 }
             }
             _rails = _rails.OrderBy(rail => rail.StartPoint.X).ToList();
@@ -270,8 +269,8 @@ namespace ICA.AutoCAD.Adapter
             ladderLayer.UnlockWithoutWarning();
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                foreach (ObjectId id in ladderLayer.GetEntities())
-                    ((Entity)transaction.GetObject(id, OpenMode.ForWrite)).Erase();
+                foreach (Entity entity in ladderLayer.GetEntities())
+                    entity.GetForWrite(transaction).Erase();
                 transaction.Commit();
             }
             ladderLayer.LockWithWarning();

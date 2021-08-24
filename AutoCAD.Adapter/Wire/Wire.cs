@@ -3,7 +3,6 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.Adapter.Prompt;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,10 +10,26 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Wire
     {
+        #region Public Properties
+
         public List<Line> Lines { get; set; } = new List<Line>();
+
+        public LayerTableRecord Layer
+        {
+            set => Lines.ForEach(line => line.SetLayer(value));
+        }
+        #endregion
+
+        #region Constructors
 
         public Wire()
         {
+        }
+
+        public Wire(Line line)
+        {
+            if (line.Layer == ElectricalLayers.WireLayer.Name)
+                Lines.AddRange(line.GetConnected(GetAllSegments(line.Database)));
         }
 
         public Wire(ObjectIdCollection collection)
@@ -24,6 +39,10 @@ namespace ICA.AutoCAD.Adapter
                     if (line.Layer == ElectricalLayers.WireLayer.Name)
                         Lines.Add(line);
         }
+
+        #endregion
+
+        #region Public Methods
 
         public void Highlight()
         {
@@ -62,5 +81,17 @@ namespace ICA.AutoCAD.Adapter
 
             return line;
         }
+
+        #endregion
+
+        #region Public Static Methods
+
+        public static List<Line> GetAllSegments(Database database) => database.GetLayer(ElectricalLayers.WireLayer)
+                                                                              .GetEntities()
+                                                                              .Where(entity => entity is Line)
+                                                                              .Select(entity => entity as Line)
+                                                                              .ToList();
+
+        #endregion
     }
 }

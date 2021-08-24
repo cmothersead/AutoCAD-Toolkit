@@ -180,6 +180,8 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public Point2d Position => BlockReference.Position.ToPoint2D();
+
         #endregion
 
         #region Construtctor

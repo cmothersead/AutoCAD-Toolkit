@@ -126,6 +126,7 @@
     <Compile Include="Config\LadderProperties.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Project\ProjectProperties.cs" />
+    <Compile Include="Schematic\GroundSymbol.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="SchematicTemplate.cs" />
     <Compile Include="Schematic\ChildSymbol.cs" />

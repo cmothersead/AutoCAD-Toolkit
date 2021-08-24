@@ -68,5 +68,7 @@ namespace ICA.AutoCAD
             entity.IntersectWith(otherEntity, Intersect.OnBothOperands, collection, 0, 0);
             return collection.Count != 0;
         }
+
+        public static bool IntersectsWith(this Entity entity, Point2d point) => entity.IntersectsWith(new DBPoint(point.ToPoint3d()));
     }
 }
