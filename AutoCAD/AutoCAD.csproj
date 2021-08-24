@@ -99,16 +99,15 @@
   <ItemGroup>
     <Compile Include="Extensions\DocumentCollectionExtensions.cs" />
     <Compile Include="Extensions\LineExtensions.cs" />
-    <Compile Include="System Variables\Bitcode.cs" />
     <Compile Include="Extensions\BlockTableExtensions.cs" />
     <Compile Include="Extensions\BlockTableRecordExtensions.cs" />
     <Compile Include="Extensions\DatabaseExtensions.cs" />
     <Compile Include="Extensions\DBObjectExtensions.cs" />
     <Compile Include="Extensions\EntityExtenstions.cs" />
-    <Compile Include="System Variables\GridDisplay.cs" />
+    <Compile Include="System Variables\Enums\GridDisplay.cs" />
     <Compile Include="LayerFilter.cs" />
     <Compile Include="Extensions\ObjectIdExtensions.cs" />
-    <Compile Include="System Variables\ObjectSnap.cs" />
+    <Compile Include="System Variables\Enums\ObjectSnap.cs" />
     <Compile Include="Extensions\Point2dExtensions.cs" />
     <Compile Include="Extensions\Point3dExtensions.cs" />
     <Compile Include="Extensions\SymbolTableExtensions.cs" />

@@ -16,6 +16,9 @@ namespace ICA.AutoCAD.Adapter
 {
     public static class Commands
     {
+        public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
+        public static Editor Editor => CurrentDocument.Editor;
+
         private static bool? _mountMode;
         public static bool? MountMode
         {
@@ -41,8 +44,7 @@ namespace ICA.AutoCAD.Adapter
                 else if (value is false)
                 {
                     HideMountingLayers();
-                    if (PreviousGridSnap)
-                        SystemVariables.GridSnap = true;
+                    SystemVariables.GridSnap = PreviousGridSnap;
                     SystemVariables.ObjectSnap = PreviousObjectSnap;
                 }
                 _mountMode = value;
@@ -50,10 +52,41 @@ namespace ICA.AutoCAD.Adapter
             }
         }
         private static bool PreviousGridSnap;
-        public static ObjectSnap? PreviousObjectSnap;
+        public static ObjectSnap PreviousObjectSnap;
 
-        public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
-        public static Editor Editor => CurrentDocument.Editor;
+        /// <summary>
+        /// Toggles between layer states to help with manual mounting of panel components
+        /// </summary>
+        [CommandMethod("MOUNT")]
+        public static void ToggleMountingLayers() => MountMode = !MountMode;
+
+        private static List<string> MountingLayers => new List<string>
+        {
+            "MOUNTING",
+            "BOUNDS",
+            "CLEARANCE"
+        };
+        private static List<string> ViewingLayers => new List<string>
+        {
+            "COMPONENTS",
+            "WIPEOUT"
+        };
+
+        public static void HideMountingLayers()
+        {
+            foreach (string layerName in MountingLayers)
+                CurrentDocument.Database.GetLayer(layerName).Freeze();
+            foreach (string layerName in ViewingLayers)
+                CurrentDocument.Database.GetLayer(layerName).Thaw();
+        }
+
+        public static void ShowMountingLayers()
+        {
+            foreach (string layerName in MountingLayers)
+                CurrentDocument.Database.GetLayer(layerName).Thaw();
+            foreach (string layerName in ViewingLayers)
+                CurrentDocument.Database.GetLayer(layerName).Freeze();
+        }
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static void EditSymbol(BlockReference reference = null)
@@ -82,60 +115,6 @@ namespace ICA.AutoCAD.Adapter
             }
             symbol.AssignLayers();
         }
-
-        /// <summary>
-        /// Toggles between layer states to help with manual mounting of panel components
-        /// </summary>
-        [CommandMethod("MOUNT")]
-        public static void ToggleMountingLayers() => MountMode = !MountMode;
-
-        public static void HideMountingLayers()
-        {
-            List<string> mountingLayers = new List<string>
-            {
-                "MOUNTING",
-                "BOUNDS",
-                "CLEARANCE"
-            };
-            List<string> viewingLayers = new List<string>
-            {
-                "COMPONENTS",
-                "WIPEOUT"
-            };
-            foreach (string layerName in mountingLayers)
-            {
-                CurrentDocument.Database.GetLayer(layerName).Freeze();
-            }
-            foreach (string layerName in viewingLayers)
-            {
-                CurrentDocument.Database.GetLayer(layerName).Thaw();
-            }
-        }
-
-        public static void ShowMountingLayers()
-        {
-            List<string> mountingLayers = new List<string>
-            {
-                "MOUNTING",
-                "BOUNDS",
-                "CLEARANCE"
-            };
-            List<string> viewingLayers = new List<string>
-            {
-                "COMPONENTS",
-                "WIPEOUT"
-            };
-            foreach (string layerName in mountingLayers)
-            {
-                CurrentDocument.Database.GetLayer(layerName).Thaw();
-            }
-            foreach (string layerName in viewingLayers)
-            {
-                CurrentDocument.Database.GetLayer(layerName).Freeze();
-            }
-        }
-
-        
 
         [CommandMethod("INSERTCOMPONENT")]
         public static void InsertSymbol()
@@ -206,7 +185,7 @@ namespace ICA.AutoCAD.Adapter
         public static void PrintCurrentProject()
         {
             Project test = CurrentProject();
-            if(test != null)
+            if (test != null)
             {
                 Editor.WriteMessage(test.Name);
             }
@@ -315,7 +294,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static Database LoadDatabase(Uri uri)
         {
-            foreach(Document document in Application.DocumentManager)
+            foreach (Document document in Application.DocumentManager)
             {
                 if (document.Name == uri.LocalPath)
                     return document.Database;
@@ -389,6 +368,8 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Wire
+
         [CommandMethod("GETWIRE", CommandFlags.UsePickSet)]
         public static void HighlightWire()
         {
@@ -405,13 +386,21 @@ namespace ICA.AutoCAD.Adapter
                         Lines = selectedLine.GetConnected(potentialLines)
                     };
                     test.Highlight();
-                } 
+                }
         }
 
         [CommandMethod("DRAWWIRE")]
         public static void DrawWire()
         {
             Wire.Draw(CurrentDocument);
+        }
+
+        #endregion
+
+        [CommandMethod("TESTPREFERENCES")]
+        public static void TestPrefs()
+        {
+            SupportPath.GetDefault();
         }
 
         public static void ZoomExtents(Document document, Extents3d extents)

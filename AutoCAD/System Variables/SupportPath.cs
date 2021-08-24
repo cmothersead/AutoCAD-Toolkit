@@ -1,9 +1,5 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD
 {
@@ -11,9 +7,10 @@ namespace ICA.AutoCAD
     {
         public static List<string> GetDefault ()
         {
-            string localRootPrefix = Application.GetSystemVariable("LOCALROOTPREFIX") as string;
-            string myDocumentsPrefix = Application.GetSystemVariable("MYDOCUMENTSPREFIX") as string;
-            string roamableRootPrefix = Application.GetSystemVariable("ROAMABLEROOTPREFIX") as string;
+            dynamic application = Application.AcadApplication;
+            string path = application.Path;
+            dynamic preferences = Application.Preferences;
+            preferences.Output.AutomaticPlotLog = false;
             return new List<string>
             {
                 "C:\\Program Files\\Autodesk\\AutoCAD 2022\\Acade\\",

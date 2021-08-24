@@ -96,7 +96,7 @@ namespace ICA.AutoCAD.Adapter
             Reference.SetLayer(ElectricalLayers.TitleBlockLayer);
             _blockTableRecord.Database.Limmax = Reference.GeometricExtents.MaxPoint.ToPoint2D();
             _blockTableRecord.Database.Limmin = Reference.GeometricExtents.MinPoint.ToPoint2D();
-            GridDisplay.Limits = true;
+            SystemVariables.GridDisplay |= GridDisplay.Limits;
         }
 
         public void Remove()
@@ -111,7 +111,7 @@ namespace ICA.AutoCAD.Adapter
                 foreach (ObjectId id in _blockTableRecord.GetBlockReferenceIds(true, false))
                     id.Erase(transaction);
                 titleBlockLayer.LockWithWarning();
-                GridDisplay.Limits = false;
+                SystemVariables.GridDisplay &= ~GridDisplay.Limits;
                 transaction.Commit();
             }
         }
