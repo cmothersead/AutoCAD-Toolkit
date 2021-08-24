@@ -3,7 +3,6 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
-using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
 using System.Collections.Generic;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
@@ -11,8 +10,6 @@ using Autodesk.AutoCAD.Geometry;
 using System.IO;
 using System;
 using ICA.AutoCAD.IO;
-using Autodesk.AutoCAD.Colors;
-using System.Linq;
 using ICA.AutoCAD.Adapter.Prompt;
 
 namespace ICA.AutoCAD.Adapter
@@ -20,42 +17,40 @@ namespace ICA.AutoCAD.Adapter
     public static class Commands
     {
         private static bool? _mountMode;
-        public static bool MountMode
+        public static bool? MountMode
         {
             get
             {
                 if (_mountMode is null)
                 {
                     LayerTableRecord mountingLayer = CurrentDocument.Database.GetLayer("MOUNTING");
-                    return !mountingLayer.IsFrozen;
+                    return !mountingLayer?.IsFrozen;
                 }
-                return (bool)_mountMode;
+                return _mountMode;
             }
             set
             {
-                if (value)
+                if (value is true)
                 {
                     ShowMountingLayers();
                     PreviousGridSnap = SystemVariables.GridSnap;
                     SystemVariables.GridSnap = false;
-                    PreviousObjectSnap = ObjectSnap.Value;
-                    ObjectSnap.None();
-                    ObjectSnap.Endpoint = true;
-                    ObjectSnap.Perpendicular = true;
+                    PreviousObjectSnap = SystemVariables.ObjectSnap;
+                    SystemVariables.ObjectSnap = ObjectSnap.Endpoint | ObjectSnap.Perpendicular;
                 }
-                else
+                else if (value is false)
                 {
                     HideMountingLayers();
                     if (PreviousGridSnap)
                         SystemVariables.GridSnap = true;
-                    ObjectSnap.Value = PreviousObjectSnap;
+                    SystemVariables.ObjectSnap = PreviousObjectSnap;
                 }
                 _mountMode = value;
                 Editor.Regen();
             }
         }
         private static bool PreviousGridSnap;
-        public static short PreviousObjectSnap;
+        public static ObjectSnap? PreviousObjectSnap;
 
         public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
         public static Editor Editor => CurrentDocument.Editor;

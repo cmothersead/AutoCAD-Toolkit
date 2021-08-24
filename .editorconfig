@@ -2,3 +2,6 @@
 
 # IDE0011: Add braces
 csharp_prefer_braces = false
+
+# IDE0022: Use block body for methods
+csharp_style_expression_bodied_methods = false
