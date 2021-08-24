@@ -59,7 +59,7 @@ namespace ICA.AutoCAD.Adapter
         /// Toggles between layer states to help with manual mounting of panel components
         /// </summary>
         [CommandMethod("MOUNT")]
-        public static void ToggleMountingLayers() => MountMode = !MountMode;
+        public static void ToggleMountingLayers() => MountMode ^= true;
 
         private static List<string> MountingLayers => new List<string>
         {
@@ -333,6 +333,12 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TITLEBLOCKCONFIG")]
         public static void ConfigureTitleBlock() { }
 
+        [CommandMethod("SPARE")]
+        public static void SpareSheet()
+        {
+            CurrentDocument.Database.GetTitleBlock().Spare ^= true;
+        }
+
         #endregion
 
         #region Multiplexers
@@ -398,8 +404,8 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("GROUND")]
         public static void InsertGround()
         {
-            GroundSymbol symbol = GroundSymbol.Insert(CurrentDocument);
-            symbol.GroundConnectedWires();
+            GroundSymbol.Insert(CurrentDocument)
+                        .GroundConnectedWires();
         }
 
         [CommandMethod("TESTPREFERENCES")]

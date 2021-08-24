@@ -32,6 +32,17 @@ namespace ICA.AutoCAD.Adapter
         public List<string> Attributes => _blockTableRecord.AttributeDefinitions().Select(definition => definition.Tag).ToList();
         public bool IsInserted => _blockTableRecord.GetBlockReferenceIds(true, false).Count != 0;
         public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
+        public bool Spare
+        {
+            get => !Reference.GetAttributeReference("SPARE").Invisible;
+            set
+            {
+                if (value)
+                    Reference.GetAttributeReference("SPARE").Unhide();
+                else
+                    Reference.GetAttributeReference("SPARE").Hide();
+            }
+        }
 
         #endregion
 
