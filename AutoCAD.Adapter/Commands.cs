@@ -321,14 +321,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("REMOVETITLEBLOCK")]
-        public static void PurgeTitleBlock()
-        {
-            try
-            {
-                CurrentDocument.Database.GetTitleBlock().Purge();
-            }
-            catch { }
-        }
+        public static void PurgeTitleBlock() => CurrentDocument.Database.GetTitleBlock()?.Purge();
 
         [CommandMethod("TITLEBLOCKCONFIG")]
         public static void ConfigureTitleBlock() { }
@@ -337,6 +330,7 @@ namespace ICA.AutoCAD.Adapter
         public static void SpareSheet()
         {
             CurrentDocument.Database.GetTitleBlock().Spare ^= true;
+            Editor.Regen();
         }
 
         #endregion

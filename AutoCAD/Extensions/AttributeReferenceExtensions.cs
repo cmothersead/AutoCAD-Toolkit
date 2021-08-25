@@ -20,6 +20,8 @@ namespace ICA.AutoCAD
 
         public static void Unhide(this AttributeReference attributeReference, Transaction transaction) => attributeReference.GetForWrite(transaction).Invisible = false;
 
+        public static void ToggleVisibility(this AttributeReference attributeReference, Transaction transaction) => attributeReference.GetForWrite(transaction).Invisible ^= true;
+
         public static void SetValue(this AttributeReference attributeReference, Transaction transaction, string value) => attributeReference.GetForWrite(transaction).TextString = value;
 
         public static void SetPosition(this AttributeReference attributeReference, Transaction transaction, Point3d position)
@@ -37,6 +39,8 @@ namespace ICA.AutoCAD
         public static void Hide(this AttributeReference attributeReference) => attributeReference.Transact(Hide);
 
         public static void Unhide(this AttributeReference attributeReference) => attributeReference.Transact(Unhide);
+
+        public static void ToggleVisibility(this AttributeReference attributeReference) => attributeReference.Transact(ToggleVisibility);
 
         public static void SetValue(this AttributeReference attributeReference, string value) => attributeReference.Transact(SetValue, value);
 

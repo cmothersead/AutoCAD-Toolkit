@@ -22,6 +22,12 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Private Properties
+
+        private AttributeDefinition SpareAttribute => _blockTableRecord.AttributeDefinitions().First(d => d.Tag == "SPARE");
+
+        #endregion
+
         #region Public Properties
 
         public Uri FileUri { get; set; }
@@ -34,13 +40,11 @@ namespace ICA.AutoCAD.Adapter
         public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
         public bool Spare
         {
-            get => !Reference.GetAttributeReference("SPARE").Invisible;
+            get => !SpareAttribute.Invisible;
             set
             {
-                if (value)
-                    Reference.GetAttributeReference("SPARE").Unhide();
-                else
-                    Reference.GetAttributeReference("SPARE").Hide();
+                SpareAttribute.SetVisibility(value);
+                Reference.RecordGraphicsModified(true);
             }
         }
 
@@ -165,7 +169,7 @@ namespace ICA.AutoCAD.Adapter
         public static void Delete(object sender, EventArgs args)
         {
             Application.Idle -= Delete;
-            if(_forDelete.Count > 0)
+            if (_forDelete.Count > 0)
             {
                 using (DocumentLock lockDoc = Application.DocumentManager.GetDocument(_forDelete[0].Database).LockDocument())
                 {
