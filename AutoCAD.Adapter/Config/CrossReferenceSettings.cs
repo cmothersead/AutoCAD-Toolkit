@@ -2,15 +2,11 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class CrossReferenceProperties : Properties
+    public class CrossReferenceSettings : Settings
     {
-        #region Private Properties
-
-        private static string Prefix => "Xref";
-
-        #endregion
-
         #region Public Properties
+
+        public static string Prefix => "Xref";
 
         public string Format { get; set; } = "%S%N";
         public string ExternalFormat { get; set; } = "%S%N";
@@ -26,9 +22,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public CrossReferenceProperties() { }
+        public CrossReferenceSettings() { }
 
-        public CrossReferenceProperties(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
+        public CrossReferenceSettings(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
 
         #endregion
 

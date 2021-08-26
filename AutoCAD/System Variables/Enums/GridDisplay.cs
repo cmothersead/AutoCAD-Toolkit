@@ -8,7 +8,7 @@ namespace ICA.AutoCAD
         /// <summary>
         /// Displays grid beyond the document's specified LIMITS.
         /// </summary>
-        Limits = 1,
+        BeyondLimits = 1,
         /// <summary>
         /// Adjusts the density of the grid lines when zoomed out.
         /// </summary>

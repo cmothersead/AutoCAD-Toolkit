@@ -2,15 +2,11 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class LadderProperties : Properties
+    public class LadderSettings : Settings
     {
-        #region Private Properties
-
-        private static string Prefix => "Ladder";
-
-        #endregion
-
         #region Public Properties
+
+        public static string Prefix => "Ladder";
 
         public RungOrientation RungOrientation { get; set; } = RungOrientation.Horizontal;
         public double RungSpacing { get; set; } = 0.5;
@@ -22,9 +18,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public LadderProperties() { }
+        public LadderSettings() { }
 
-        public LadderProperties(Dictionary<string, string> dictionary) : base (Prefix, dictionary) { }
+        public LadderSettings(Dictionary<string, string> dictionary) : base (Prefix, dictionary) { }
 
         #endregion
 

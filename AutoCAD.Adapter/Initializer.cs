@@ -26,7 +26,7 @@ namespace ICA.AutoCAD.Adapter
             ElectricalLayers.HandleLocks(args.Document.Database);
             if (args.Document.Database.GetTitleBlock() is TitleBlock titleBlock)
             {
-                SystemVariables.GridDisplay &= ~GridDisplay.Limits;
+                SystemVariables.GridDisplay &= ~GridDisplay.BeyondLimits;
                 Commands.ZoomExtents(args.Document, titleBlock.Reference.GeometricExtents);
             }
         }

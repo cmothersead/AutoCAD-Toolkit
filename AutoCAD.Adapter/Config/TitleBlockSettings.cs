@@ -3,15 +3,11 @@ using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class TitleBlockProperties : Properties
+    public class TitleBlockSettings : Settings
     {
-        #region Private Properties
-
-        private static string Prefix => "";
-
-        #endregion
-
         #region Public Properties
+
+        public static string Prefix => "";
 
         public Point2d LadderOrigin { get; set; }
         public double LadderTotalHeight { get; set; }
@@ -22,9 +18,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public TitleBlockProperties() { }
+        public TitleBlockSettings() { }
 
-        public TitleBlockProperties(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
+        public TitleBlockSettings(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
 
         #endregion
 

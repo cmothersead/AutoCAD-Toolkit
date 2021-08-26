@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using System.Collections.Generic;
 using System.Linq;
 using ICA.Schematic;
+using System.Text.RegularExpressions;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -43,6 +44,21 @@ namespace ICA.AutoCAD.Adapter
         private AttributeReference InstAttribute => BlockReference.GetAttributeReference("INST");
 
         private AttributeReference LocAttribute => BlockReference.GetAttributeReference("LOC");
+
+        private List<AttributeReference> InstallationAttributes => new List<AttributeReference>() { InstAttribute, LocAttribute };
+
+        private List<AttributeReference> PartAttributes => new List<AttributeReference>() { MfgAttribute, CatAttribute };
+
+        private AttributeReference NewDescAttribute => new AttributeReference()
+        {
+            Tag = $"DESC{DescAttributes.Count + 1}",
+            Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
+            TextString = "",
+            Justify = TagAttribute.Justify,
+            LockPositionInBlock = true,
+            Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
+            Invisible = DescriptionHidden
+        };
 
         #endregion
 
@@ -86,15 +102,7 @@ namespace ICA.AutoCAD.Adapter
 
         public List<string> Description
         {
-            get
-            {
-                List<string> list = new List<string>();
-                foreach (AttributeReference attributeReference in DescAttributes)
-                {
-                    list.Add(attributeReference.TextString);
-                }
-                return list;
-            }
+            get => DescAttributes.Select(a => a.TextString).ToList();
             set
             {
                 if (value.Count == 0)
@@ -117,70 +125,28 @@ namespace ICA.AutoCAD.Adapter
 
         public bool DescriptionHidden
         {
-            get
-            {
-                return DescAttributes[0].Invisible;
-            }
-            set
-            {
-                foreach (AttributeReference attributeReference in DescAttributes)
-                {
-                    if (value)
-                    {
-                        attributeReference.Hide();
-                    }
-                    else
-                    {
-                        attributeReference.Unhide();
-                    }
-
-                }
-            }
+            get => DescAttributes[0].Invisible;
+            set => DescAttributes.ForEach(a => a.SetVisibility(!value));
         }
 
         public bool InstallationHidden
         {
-            get
-            {
-                return InstAttribute.Invisible;
-            }
-            set
-            {
-                if (value)
-                {
-                    InstAttribute.Hide();
-                    LocAttribute?.Hide();
-                }
-                else
-                {
-                    InstAttribute.Unhide();
-                    LocAttribute?.Unhide();
-                }
-            }
+            get => InstAttribute.Invisible;
+            set => InstallationAttributes.ForEach(a => a.SetVisibility(!value));
         }
 
         public bool PartInfoHidden
         {
-            get
-            {
-                return true;
-            }
-            set
-            {
-                if (value)
-                {
-                    MfgAttribute.Hide();
-                    CatAttribute.Hide();
-                }
-                else
-                {
-                    MfgAttribute.Unhide();
-                    CatAttribute.Unhide();
-                }
-            }
+            get => true;
+            set => PartAttributes.ForEach(a => a.SetVisibility(!value));
         }
 
         public Point2d Position => BlockReference.Position.ToPoint2D();
+
+        public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
+                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
+                                                                     .Select(reference => new WireConnection(reference))
+                                                                     .ToList();
 
         #endregion
 
@@ -192,10 +158,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public void CollapseAttributeStack()
-        {
-            CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
-        }
+        public void CollapseAttributeStack() => CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
 
         public void CollapseAttributeStack(Point3d position)
         {
@@ -212,30 +175,11 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public void AddDescription()
-        {
-            AttributeReference ref1 = new AttributeReference()
-            {
-                Tag = $"DESC{DescAttributes.Count + 1}",
-                Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
-                TextString = "",
-                Justify = TagAttribute.Justify,
-                LockPositionInBlock = true,
-                Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
-                Invisible = DescriptionHidden
-            };
-            BlockReference.AddAttributeReference(ref1);
-        }
+        public void AddDescription() => BlockReference.AddAttributeReference(NewDescAttribute);
 
-        public void RemoveDescription()
-        {
-            BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
-        }
+        public void RemoveDescription() => BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
 
-        public void AssignLayers()
-        {
-            ElectricalLayers.Assign(BlockReference);
-        }
+        public void AssignLayers() => ElectricalLayers.Assign(BlockReference);
 
         #endregion
     }

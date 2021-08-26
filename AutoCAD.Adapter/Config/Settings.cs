@@ -5,13 +5,13 @@ using System.Reflection;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class Properties
+    public class Settings
     {
         #region Constructors
 
-        public Properties() { }
+        public Settings() { }
 
-        public Properties(string prefix, Dictionary<string, string> dictionary)
+        public Settings(string prefix, Dictionary<string, string> dictionary)
         {
             PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (PropertyInfo property in properties)

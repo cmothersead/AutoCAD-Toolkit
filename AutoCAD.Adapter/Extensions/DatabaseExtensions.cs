@@ -11,18 +11,18 @@ namespace ICA.AutoCAD.Adapter
 
         #region Document Properties
 
-        public static ElectricalDocumentProperties ElectricalProperties(this Database database)
+        public static DrawingSettings ElectricalSetting(this Database database)
         {
             if (database.GetCustomProperty("WD_MRead") == "1")
-                return new ElectricalDocumentProperties(database.GetAllCustomProperties());
+                return new DrawingSettings(database.GetAllCustomProperties());
 
             database.SetCustomProperties(WDM.Read(database));
-            return new ElectricalDocumentProperties(database.GetAllCustomProperties());
+            return new DrawingSettings(database.GetAllCustomProperties());
         }
 
-        public static string GetSheetNumber(this Database database) => database.ElectricalProperties().Sheet.Number;
+        public static string GetSheetNumber(this Database database) => database.GetCustomProperty("Sheet");
 
-        public static void SetSheetNumber(this Database database, string value) => database.SetCustomProperty("SheetNumber", value);
+        public static void SetSheetNumber(this Database database, string value) => database.SetCustomProperty("Sheet", value);
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Project GetProject(this Database database) => new Project(Directory.GetFiles(Path.GetDirectoryName(database.OriginalFileName), "*.wdp")[0]);
+        public static Project GetProject(this Database database) => WDP.Import(Directory.GetFiles(Path.GetDirectoryName(database.OriginalFileName), "*.wdp")[0]);
 
         #endregion
 

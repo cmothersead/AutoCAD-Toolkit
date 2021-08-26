@@ -2,15 +2,11 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class ComponentProperties : Properties
+    public class ComponentSettings : Settings
     {
-        #region Private Properties
-
-        private static string Prefix => "Tag";
-
-        #endregion
-
         #region Public Properties
+
+        public static string Prefix => "Tag";
 
         public NumberMode Mode { get; set; } = NumberMode.Referential;
         public int Start { get; set; } = 1;
@@ -21,9 +17,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public ComponentProperties() { }
+        public ComponentSettings() { }
 
-        public ComponentProperties(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
+        public ComponentSettings(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
 
         #endregion
 

@@ -2,15 +2,11 @@
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class WireProperties : Properties
+    public class WireSettings : Settings
     {
-        #region Private Properties
-
-        private static string Prefix => "Wire";
-
-        #endregion
-
         #region Public Properties
+
+        public static string Prefix => "Wire";
 
         public NumberMode Mode { get; set; } = NumberMode.Referential;
         public int Start { get; set; } = 100;
@@ -61,9 +57,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public WireProperties() { }
+        public WireSettings() { }
 
-        public WireProperties(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
+        public WireSettings(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
 
         #endregion
 

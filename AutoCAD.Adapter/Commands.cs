@@ -190,23 +190,15 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("EXPORTCURRENTPROJECT")]
         public static void ExportCurrentProject()
         {
-            CurrentProject()?.ExportWDP("C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
+            Project project = CurrentProject();
+            WDP.Export(project, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
         }
 
         [CommandMethod("ADDPAGE")]
         public static void ProjectAddPage()
         {
             Project currentProject = CurrentProject();
-            currentProject.Properties = new ProjectProperties()
-            {
-                SchematicTemplate = new Uri($"{Paths.Templates}\\ICA 8.5x11 Title Block.dwt"),
-                PanelTemplate = new Uri($"{Paths.Templates}\\ICA 8.5x11 Title Block.dwt"),
-                ReferenceTemplate = new Uri($"{Paths.Templates}\\ICA 8.5x11 Title Block.dwt"),
-                Library = new Uri($"{Paths.Libraries}"),
-                Ladder = new LadderProperties(),
-                Component = new ComponentProperties(),
-                Wire = new WireProperties()
-            };
+            currentProject.Settings = new ProjectSettings();
             PromptKeywordOptions options = new PromptKeywordOptions("\nChoose page type: ");
             options.Keywords.Add("Schematic");
             options.Keywords.Add("Panel");
@@ -386,7 +378,6 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TESTPREFERENCES")]
         public static void TestPrefs()
         {
-            SupportPath.GetDefault();
         }
 
         public static void ZoomExtents(Document document, Extents3d extents)

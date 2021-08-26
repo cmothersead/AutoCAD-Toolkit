@@ -45,9 +45,9 @@ namespace ICA.AutoCAD.Adapter
 
         private AttributeReference LocAttribute => BlockReference.GetAttributeReference("LOC");
 
-        private List<AttributeReference> InstallationInfo => new List<AttributeReference>() { InstAttribute, LocAttribute };
+        private List<AttributeReference> InstallationAttributes => new List<AttributeReference>() { InstAttribute, LocAttribute };
 
-        private List<AttributeReference> PartInfo => new List<AttributeReference>() { MfgAttribute, CatAttribute };
+        private List<AttributeReference> PartAttributes => new List<AttributeReference>() { MfgAttribute, CatAttribute };
 
         private AttributeReference NewDescAttribute => new AttributeReference()
         {
@@ -102,7 +102,7 @@ namespace ICA.AutoCAD.Adapter
 
         public List<string> Description
         {
-            get => DescAttributes.Select(att => att.TextString).ToList();
+            get => DescAttributes.Select(a => a.TextString).ToList();
             set
             {
                 if (value.Count == 0)
@@ -132,13 +132,13 @@ namespace ICA.AutoCAD.Adapter
         public bool InstallationHidden
         {
             get => InstAttribute.Invisible;
-            set => InstallationInfo.ForEach(a => a.SetVisibility(!value));
+            set => InstallationAttributes.ForEach(a => a.SetVisibility(!value));
         }
 
         public bool PartInfoHidden
         {
             get => MfgAttribute.Invisible;
-            set => PartInfo.ForEach(a => a.SetVisibility(!value));
+            set => PartAttributes.ForEach(a => a.SetVisibility(!value));
         }
 
         public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);

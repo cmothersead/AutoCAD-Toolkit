@@ -111,7 +111,7 @@ namespace ICA.AutoCAD.Adapter
             Reference.SetLayer(ElectricalLayers.TitleBlockLayer);
             _blockTableRecord.Database.Limmax = Reference.GeometricExtents.MaxPoint.ToPoint2D();
             _blockTableRecord.Database.Limmin = Reference.GeometricExtents.MinPoint.ToPoint2D();
-            SystemVariables.GridDisplay |= GridDisplay.Limits;
+            SystemVariables.GridDisplay &= ~GridDisplay.BeyondLimits;
         }
 
         public void Remove()
@@ -126,7 +126,7 @@ namespace ICA.AutoCAD.Adapter
                 foreach (ObjectId id in _blockTableRecord.GetBlockReferenceIds(true, false))
                     id.Erase(transaction);
                 titleBlockLayer.LockWithWarning();
-                SystemVariables.GridDisplay &= ~GridDisplay.Limits;
+                SystemVariables.GridDisplay |= GridDisplay.BeyondLimits;
                 transaction.Commit();
             }
         }
@@ -136,7 +136,7 @@ namespace ICA.AutoCAD.Adapter
             if (_blockTableRecord.GetBlockReferenceIds(true, false).Count != 0)
                 Remove();
 
-            _blockTableRecord.Database.RemoveCustomProperties(new TitleBlockProperties().ToDictionary().Select(kv => kv.Key));
+            _blockTableRecord.Database.RemoveCustomProperties(new TitleBlockSettings().ToDictionary().Select(kv => kv.Key));
 
             using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
             {

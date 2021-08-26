@@ -12,7 +12,7 @@ namespace ICA.AutoCAD.Adapter
         public static void CommandEnded(object sender, CommandEventArgs commandEventArgs)
         {
             if (commandEventArgs.GlobalCommandName == "DWGPROPS")
-                ElectricalDocumentProperties.Update();
+                DrawingSettings.Update();
         }
     }
 }

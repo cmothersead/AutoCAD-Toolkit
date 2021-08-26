@@ -28,7 +28,7 @@ namespace ICA.AutoCAD.Adapter
         public LadderTemplate(Database database)
         {
             Database = database;
-            TitleBlockProperties properties = database.ElectricalProperties().TitleBlock;
+            TitleBlockSettings properties = database.ElectricalSetting().TitleBlock;
             Origin = properties.LadderOrigin;
             Height = properties.LadderTotalHeight;
             TotalWidth = properties.LadderTotalWidth;
