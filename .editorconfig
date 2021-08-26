@@ -4,4 +4,7 @@
 csharp_prefer_braces = false
 
 # IDE0022: Use block body for methods
-csharp_style_expression_bodied_methods = false
+csharp_style_expression_bodied_methods = true
+
+# IDE0021: Use block body for constructors
+csharp_style_expression_bodied_constructors = true

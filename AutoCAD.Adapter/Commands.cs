@@ -118,22 +118,9 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("INSERTCOMPONENT")]
-        public static void InsertSymbol()
-        {
-            InsertSymbol(PromptSymbolName());
-        }
+        public static void InsertSymbol() => InsertSymbol(PromptSymbolName());
 
-        public static void InsertSymbol(string symbolName)
-        {
-            try
-            {
-                ISymbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName).InsertSymbol();
-            }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
-            {
-                Editor.WriteMessage(ex.Message);
-            }
-        }
+        public static void InsertSymbol(string symbolName) => SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol();
 
         public static string PromptSymbolName()
         {
@@ -146,23 +133,20 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("ASSIGNLAYERS")]
-        public static void AssignLayers()
-        {
-            Select.Symbol(Editor)?.AssignLayers();
-        }
+        public static void AssignLayers() => Select.Symbol(Editor)?.AssignLayers();
 
         [CommandMethod("UPDATETAG")]
         public static void UpdateTag()
         {
             if (Select.Symbol(Editor) is ParentSymbol symbol)
-                symbol.Tag = $"{symbol.Family}{symbol.LineNumber}1";
+                symbol.UpdateTag($"%F%N1");
         }
 
         [CommandMethod("UPDATETAG2")]
         public static void UpdateTag2()
         {
             if (Select.Symbol(Editor) is ParentSymbol symbol)
-                symbol.Tag = $"{symbol.LineNumber}{symbol.Family}";
+                symbol.UpdateTag($"%N%F");
         }
 
         [CommandMethod("MATCHWIRES")]
@@ -396,11 +380,8 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         [CommandMethod("GROUND")]
-        public static void InsertGround()
-        {
-            GroundSymbol.Insert(CurrentDocument)
-                        .GroundConnectedWires();
-        }
+        public static void InsertGround() => GroundSymbol.Insert(CurrentDocument)
+                                                         .GroundConnectedWires();
 
         [CommandMethod("TESTPREFERENCES")]
         public static void TestPrefs()

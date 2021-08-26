@@ -45,6 +45,21 @@ namespace ICA.AutoCAD.Adapter
 
         private AttributeReference LocAttribute => BlockReference.GetAttributeReference("LOC");
 
+        private List<AttributeReference> InstallationInfo => new List<AttributeReference>() { InstAttribute, LocAttribute };
+
+        private List<AttributeReference> PartInfo => new List<AttributeReference>() { MfgAttribute, CatAttribute };
+
+        private AttributeReference NewDescAttribute => new AttributeReference()
+        {
+            Tag = $"DESC{DescAttributes.Count + 1}",
+            Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
+            TextString = "",
+            Justify = TagAttribute.Justify,
+            LockPositionInBlock = true,
+            Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
+            Invisible = DescriptionHidden
+        };
+
         #endregion
 
         #region Public Properties
@@ -58,70 +73,42 @@ namespace ICA.AutoCAD.Adapter
         public string Family
         {
             get => FamilyAttribute?.TextString;
-            set
-            {
-                if(FamilyAttribute != null)
-                    FamilyAttribute.SetValue(value);
-            }
+            set => FamilyAttribute?.SetValue(value);
         }
 
         public string ManufacturerName
         {
             get => MfgAttribute?.TextString;
-            set
-            {
-                if (MfgAttribute != null)
-                    MfgAttribute.SetValue(value);
-            }
+            set => MfgAttribute?.SetValue(value);
         }
 
         public string PartNumber
         {
             get => CatAttribute?.TextString;
-            set
-            {
-                if (CatAttribute != null)
-                    CatAttribute.SetValue(value);
-            }
+            set => CatAttribute?.SetValue(value);
         }
 
         public string Enclosure
         {
             get => InstAttribute?.TextString;
-            set
-            {
-                if (InstAttribute != null)
-                    InstAttribute.SetValue(value);
-            }
+            set => InstAttribute?.SetValue(value);
         }
 
         public string Location
         {
             get => LocAttribute?.TextString;
-            set
-            {
-                if (LocAttribute != null)
-                    LocAttribute.SetValue(value);
-            }
+            set => LocAttribute?.SetValue(value);
         }
 
         public List<string> Description
         {
-            get
-            {
-                List<string> list = new List<string>();
-                foreach (AttributeReference attributeReference in DescAttributes)
-                {
-                    list.Add(attributeReference.TextString);
-                }
-                return list;
-            }
+            get => DescAttributes.Select(att => att.TextString).ToList();
             set
             {
-                if(value.Count == 0)
+                if (value.Count == 0)
                     value.Add("");
 
-                while(DescAttributes.Count != value.Count)
+                while (DescAttributes.Count != value.Count)
                 {
                     if (DescAttributes.Count > value.Count)
                         RemoveDescription();
@@ -129,7 +116,7 @@ namespace ICA.AutoCAD.Adapter
                         AddDescription();
                 }
                 int position = 0;
-                foreach(string val in value)
+                foreach (string val in value)
                 {
                     DescAttributes[position++].SetValue(val);
                 }
@@ -138,67 +125,20 @@ namespace ICA.AutoCAD.Adapter
 
         public bool DescriptionHidden
         {
-            get
-            {
-                return DescAttributes[0].Invisible;
-            }
-            set
-            {
-                foreach (AttributeReference attributeReference in DescAttributes)
-                {
-                    if (value)
-                    {
-                        attributeReference.Hide();
-                    }
-                    else
-                    {
-                        attributeReference.Unhide();
-                    }
-
-                }
-            }
+            get => DescAttributes[0].Invisible;
+            set => DescAttributes.ForEach(a => a.SetVisibility(!value));
         }
 
         public bool InstallationHidden
         {
-            get
-            {
-                return InstAttribute.Invisible;
-            }
-            set
-            {
-                if (value)
-                {
-                    InstAttribute.Hide();
-                    LocAttribute?.Hide();
-                }
-                else
-                {
-                    InstAttribute.Unhide();
-                    LocAttribute?.Unhide();
-                }
-            }
+            get => InstAttribute.Invisible;
+            set => InstallationInfo.ForEach(a => a.SetVisibility(!value));
         }
 
         public bool PartInfoHidden
         {
-            get
-            {
-                return MfgAttribute.Invisible;
-            }
-            set
-            {
-                if (value)
-                {
-                    MfgAttribute.Hide();
-                    CatAttribute.Hide();
-                }
-                else
-                {
-                    MfgAttribute.Unhide();
-                    CatAttribute.Unhide();
-                }
-            }
+            get => MfgAttribute.Invisible;
+            set => PartInfo.ForEach(a => a.SetVisibility(!value));
         }
 
         public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
@@ -218,10 +158,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public void CollapseAttributeStack()
-        {
-            CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
-        }
+        public void CollapseAttributeStack() => CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
 
         public void CollapseAttributeStack(Point3d position)
         {
@@ -240,34 +177,25 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public void AddDescription()
-        {
-            AttributeReference ref1 = new AttributeReference()
-            {
-                Tag = $"DESC{DescAttributes.Count + 1}",
-                Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
-                TextString = "",
-                Justify = TagAttribute.Justify,
-                LockPositionInBlock = true,
-                Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
-                Invisible = DescriptionHidden
-            };
-            BlockReference.AddAttributeReference(ref1);
-        }
+        public void AddDescription() => BlockReference.AddAttributeReference(NewDescAttribute);
 
-        public void RemoveDescription()
-        {
-            BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
-        }
+        public void RemoveDescription() => BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
 
-        public void AssignLayers()
+        public void AssignLayers() => ElectricalLayers.Assign(BlockReference);
+
+        private Dictionary<string, string> Replacements => new Dictionary<string, string>()
         {
-            ElectricalLayers.Assign(BlockReference);
-        }
+            { "%F", $"{Family}" },
+            { "%S", $"SheetNumber" },
+            { "%N", $"{LineNumber}" },
+            { "%X", "1" } //suffix character for reference based tagging
+        };
+
+        public void UpdateTag(string format) => Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
 
         public void MatchWireNumbers()
         {
-            foreach(AttributeReference reference in BlockReference.GetAttributeReferences().Where(r => r.Tag.Contains("WIRENO")))
+            foreach (AttributeReference reference in BlockReference.GetAttributeReferences().Where(r => r.Tag.Contains("WIRENO")))
             {
                 if (BlockReference.GetAttributeReference($"X1TERM{reference.Tag.Substring(6, 2)}") is AttributeReference term1)
                     reference.SetValue(term1.TextString);
