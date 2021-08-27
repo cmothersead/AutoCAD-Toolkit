@@ -198,7 +198,6 @@ namespace ICA.AutoCAD.Adapter
         public static void ProjectAddPage()
         {
             Project currentProject = CurrentProject();
-            currentProject.Settings = new ProjectSettings();
             PromptKeywordOptions options = new PromptKeywordOptions("\nChoose page type: ");
             options.Keywords.Add("Schematic");
             options.Keywords.Add("Panel");
@@ -212,7 +211,7 @@ namespace ICA.AutoCAD.Adapter
             switch (result.StringResult)
             {
                 case "Schematic":
-                    currentProject.AddPage(Project.DrawingType.Schematic, "test.dwg");
+                    currentProject.AddPage(Project.DrawingType.Schematic, "newschematic.dwg");
                     break;
                 case "Panel":
                     currentProject.AddPage(Project.DrawingType.Panel, "test.dwg");

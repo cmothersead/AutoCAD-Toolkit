@@ -80,7 +80,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Project GetProject(this Database database) => WDP.Import(Directory.GetFiles(Path.GetDirectoryName(database.OriginalFileName), "*.wdp")[0]);
+        public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName));
 
         #endregion
 

@@ -6,10 +6,11 @@ namespace ICA.AutoCAD.Adapter
 {
     public class ProjectSettings
     {
-        public Uri SchematicTemplate { get; set; } = new Uri($"{Paths.Templates}\\ICA 11X17 Title Block.dwg");
-        public Uri PanelTemplate { get; set; } = new Uri($"{Paths.Templates}\\ICA 11X17 Title Block.dwg");
-        public Uri ReferenceTemplate { get; set; } = new Uri($"{Paths.Templates}\\ICA 11X17 Title Block.dwg");
-        public Uri Library { get; set; } = new Uri(Paths.Libraries);
+        public string SchematicTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwg";
+        public string PanelTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwg";
+        public string ReferenceTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwg";
+        public string Library { get; set; } = Paths.Libraries;
+        public string FileNameFormat = "%PPG%S";
         public LadderSettings Ladder { get; set; } = new LadderSettings();
         public ComponentSettings Component { get; set; } = new ComponentSettings();
         public WireSettings Wire { get; set; } = new WireSettings();

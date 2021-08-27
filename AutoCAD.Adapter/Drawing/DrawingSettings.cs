@@ -21,6 +21,8 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
+        public DrawingSettings() { }
+
         public DrawingSettings(Database database) 
         {
             Database = database;

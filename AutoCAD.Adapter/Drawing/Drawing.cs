@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -14,8 +15,12 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
-        public Uri FileUri { get; set; }
+        [XmlIgnore]
+        public Uri Uri { get; set; }
+        [XmlIgnore]
         public Project Project { get; set; }
+
+        public string Path => Project.Uri.MakeRelativeUri(Uri).ToString();
         public List<string> Description { get; set; } = new List<string>();
         public DrawingSettings Settings { get; set; }
         public string SheetNumber { get; set; }

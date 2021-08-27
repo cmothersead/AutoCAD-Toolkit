@@ -94,7 +94,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 Drawings = new List<Drawing>(),
                 Name = Path.GetFileNameWithoutExtension(filePath),
-                Uri = new Uri(filePath)
+                Uri = new Uri(Path.ChangeExtension(filePath, ".xml"))
             };
             string[] test = File.ReadAllLines(filePath);
             Drawing drawing = new Drawing();
@@ -120,7 +120,7 @@ namespace ICA.AutoCAD.Adapter
                     continue;
                 else
                 {
-                    drawing.FileUri = new Uri(output.Uri, line);
+                    drawing.Uri = new Uri(output.Uri, line);
                     drawing.Project = output;
                     output.Drawings.Add(drawing);
                     drawing = new Drawing();
@@ -263,7 +263,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 foreach (string description in drawing.Description)
                     lines.Add($"==={description}");
-                lines.Add($"{input.Uri.MakeRelativeUri(drawing.FileUri)}");
+                lines.Add($"{input.Uri.MakeRelativeUri(drawing.Uri)}");
             }
 
             File.WriteAllLines(savePath, lines.ToArray());

@@ -4,6 +4,8 @@ using ICA.AutoCAD.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -18,8 +20,10 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
-        public string Name { get; set; }
+        [XmlIgnore]
         public Uri Uri { get; set; }
+
+        public string Name { get; set; }
         public List<Drawing> Drawings { get; set; }
         public ProjectSettings Settings { get; set; }
 
@@ -27,9 +31,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public Project()
-        {
-        }
+        public Project() { }
 
         #endregion
 
@@ -37,8 +39,8 @@ namespace ICA.AutoCAD.Adapter
         {
             foreach(Drawing drawing in Drawings)
             {
-                Database database = Commands.LoadDatabase(drawing.FileUri);
-                if(Application.DocumentManager.Contains(drawing.FileUri))
+                Database database = Commands.LoadDatabase(drawing.Uri);
+                if(Application.DocumentManager.Contains(drawing.Uri))
                 {
                     using (DocumentLock doclock = Application.DocumentManager.GetDocument(database).LockDocument())
                         action(database, value);
@@ -57,27 +59,43 @@ namespace ICA.AutoCAD.Adapter
             switch (type)
             {
                 case DrawingType.Schematic:
-                    newPage = Application.DocumentManager.Add(Settings.SchematicTemplate.LocalPath);
+                    newPage = Application.DocumentManager.Add(Settings.SchematicTemplatePath);
                     break;
                 case DrawingType.Panel:
-                    newPage = Application.DocumentManager.Add(Settings.PanelTemplate.LocalPath);
+                    newPage = Application.DocumentManager.Add(Settings.PanelTemplatePath);
                     break;
                 case DrawingType.Reference:
-                    newPage = Application.DocumentManager.Add(Settings.ReferenceTemplate.LocalPath);
+                    newPage = Application.DocumentManager.Add(Settings.ReferenceTemplatePath);
                     break;
                 default:
                     return null;
             }
-            newPage.Database.SaveAs(savePath, DwgVersion.Current);
+            newPage.Database.SaveAs(new Uri(Uri, savePath).LocalPath, DwgVersion.Current);
             Drawings.Add(new Drawing()
             {
-                FileUri = new Uri(Uri, savePath),
+                Uri = new Uri(Uri, savePath),
                 Project = this,
                 Settings = new DrawingSettings(Settings)
             });
+            Save();
             return newPage;
         }
 
+        public static Project Open(string directoryPath)
+        {
+            XmlSerializer reader = new XmlSerializer(typeof(Project));
+            string filePath = Directory.GetFiles(directoryPath, "*.xml").FirstOrDefault() ?? Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault();
+            FileStream file = File.OpenRead(filePath);
+            Project project = reader.Deserialize(file) as Project;
+            project.Uri = new Uri(filePath);
+            return project;
+        }
 
+        public void Save()
+        {
+            XmlSerializer writer = new XmlSerializer(typeof(Project));
+            FileStream file = File.OpenWrite(Uri.LocalPath);
+            writer.Serialize(file, this);
+        }
     }
 }
