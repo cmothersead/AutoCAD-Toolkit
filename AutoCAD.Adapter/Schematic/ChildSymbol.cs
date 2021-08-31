@@ -126,19 +126,19 @@ namespace ICA.AutoCAD.Adapter
         public bool DescriptionHidden
         {
             get => DescAttributes[0].Invisible;
-            set => DescAttributes.ForEach(a => a.SetVisibility(!value));
+            set => DescAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
         public bool InstallationHidden
         {
             get => InstAttribute.Invisible;
-            set => InstallationAttributes.ForEach(a => a.SetVisibility(!value));
+            set => InstallationAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
         public bool PartInfoHidden
         {
             get => true;
-            set => PartAttributes.ForEach(a => a.SetVisibility(!value));
+            set => PartAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
         public Point2d Position => BlockReference.Position.ToPoint2D();
