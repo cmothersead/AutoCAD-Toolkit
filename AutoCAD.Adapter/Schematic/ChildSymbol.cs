@@ -56,8 +56,22 @@ namespace ICA.AutoCAD.Adapter
             TextString = "",
             Justify = TagAttribute.Justify,
             LockPositionInBlock = true,
-            Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
+            Layer = BlockReference.Database.GetLayer(ElectricalLayers.ChildDescriptionLayer).Name,
             Invisible = DescriptionHidden
+        };
+
+        private static Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
+        {
+            { "TAG", ElectricalLayers.TagLayer },
+            { "MFG", ElectricalLayers.ManufacturerLayer },
+            { "CAT", ElectricalLayers.PartNumberLayer },
+            { "TERMDESC", ElectricalLayers.MiscellaneousLayer },
+            { "DESC", ElectricalLayers.ChildDescriptionLayer },
+            { "TERM", ElectricalLayers.TerminalLayer },
+            { "CON", ElectricalLayers.ConductorLayer },
+            { "RATING", ElectricalLayers.RatingLayer },
+            { "WIRENO", ElectricalLayers.WireNumberLayer },
+            { "XREF", ElectricalLayers.ChildXrefLayer }
         };
 
         #endregion
@@ -179,7 +193,19 @@ namespace ICA.AutoCAD.Adapter
 
         public void RemoveDescription() => BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
 
-        public void AssignLayers() => ElectricalLayers.Assign(BlockReference);
+        public void AssignLayers()
+        {
+            using (Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
+            {
+                foreach (AttributeReference reference in BlockReference.GetAttributeReferences(transaction))
+                {
+                    KeyValuePair<string, LayerTableRecord> match = AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
+                    if (match.Key != null)
+                        reference.SetLayer(transaction, match.Value);
+                }
+                transaction.Commit();
+            }
+        }
 
         #endregion
     }

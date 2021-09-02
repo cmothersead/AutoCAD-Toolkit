@@ -164,6 +164,12 @@ namespace ICA.AutoCAD.Adapter
                     symbol1.CrossReference(symbol2);
         }
 
+        [CommandMethod("UPDATELAYERS")]
+        public static void UpdateLayers()
+        {
+            ElectricalLayers.Update(CurrentDocument.Database);
+        }
+
         #region Project
 
         [CommandMethod("CURRENTPROJECT")]

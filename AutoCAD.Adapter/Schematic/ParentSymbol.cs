@@ -60,6 +60,28 @@ namespace ICA.AutoCAD.Adapter
             Invisible = DescriptionHidden
         };
 
+        private static Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
+        {
+            { "TAG", ElectricalLayers.TagLayer },
+            { "MFG", ElectricalLayers.ManufacturerLayer },
+            { "CAT", ElectricalLayers.PartNumberLayer },
+            { "TERMDESC", ElectricalLayers.MiscellaneousLayer },
+            { "DESC", ElectricalLayers.DescriptionLayer },
+            { "TERM", ElectricalLayers.TerminalLayer },
+            { "CON", ElectricalLayers.ConductorLayer },
+            { "RATING", ElectricalLayers.RatingLayer },
+            { "WIRENO", ElectricalLayers.WireNumberLayer },
+            { "XREF", ElectricalLayers.XrefLayer }
+        };
+
+        private Dictionary<string, string> Replacements => new Dictionary<string, string>()
+        {
+            { "%F", $"{Family}" },
+            { "%S", $"SheetNumber" },
+            { "%N", $"{LineNumber}" },
+            { "%X", "1" } //suffix character for reference based tagging
+        };
+
         #endregion
 
         #region Public Properties
@@ -181,15 +203,19 @@ namespace ICA.AutoCAD.Adapter
 
         public void RemoveDescription() => BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
 
-        public void AssignLayers() => ElectricalLayers.Assign(BlockReference);
-
-        private Dictionary<string, string> Replacements => new Dictionary<string, string>()
+        public void AssignLayers()
         {
-            { "%F", $"{Family}" },
-            { "%S", $"SheetNumber" },
-            { "%N", $"{LineNumber}" },
-            { "%X", "1" } //suffix character for reference based tagging
-        };
+            using(Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
+            {
+                foreach (AttributeReference reference in BlockReference.GetAttributeReferences(transaction))
+                {
+                    KeyValuePair<string, LayerTableRecord> match = AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
+                    if (match.Key != null)
+                        reference.SetLayer(transaction, match.Value);
+                }
+                transaction.Commit();
+            }
+        }
 
         public void UpdateTag(string format) => Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
 

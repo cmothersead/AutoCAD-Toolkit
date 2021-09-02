@@ -185,7 +185,7 @@ namespace ICA.AutoCAD.Adapter
 
         public void Insert()
         {
-            using(Transaction transaction = Database.TransactionManager.StartTransaction())
+            using (Transaction transaction = Database.TransactionManager.StartTransaction())
             {
                 Insert(transaction);
                 transaction.Commit();
@@ -207,11 +207,12 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public string ClosestLineNumber(double yValue) => LineNumbers.Aggregate((closest, next) => Math.Abs(next.Position.Y - yValue) < Math.Abs(closest.Position.Y - yValue) ? next : closest).GetAttributeValue("LINENUMBER");
+        public string ClosestLineNumber(Point2d position) => LineNumbers.OrderByDescending(number => number.Position.X)
+                                                                        .Where(number => number.Position.X < position.X)
+                                                                        .Aggregate((closest, next) => Math.Abs(next.Position.Y - position.Y) < Math.Abs(closest.Position.Y - position.Y) ? next : closest)
+                                                                        .GetAttributeValue("LINENUMBER");
 
-        public string ClosestLineNumber(Point2d position) => ClosestLineNumber(position.Y);
-
-        public string ClosestLineNumber(Point3d position) => ClosestLineNumber(position.Y);
+        public string ClosestLineNumber(Point3d position) => ClosestLineNumber(position.ToPoint2D());
 
         #endregion
 

@@ -30,6 +30,12 @@ namespace ICA.AutoCAD.Adapter
             Color = Color.FromColorIndex(ColorMethod.ByAci, 1),
             Description = "Description attributes"
         };
+        public static LayerTableRecord ChildDescriptionLayer => new LayerTableRecord()
+        {
+            Name = "DESCCHILD",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 20),
+            Description = "Description attributes on child components (contacts, etc.)"
+        };
         public static LayerTableRecord TerminalLayer => new LayerTableRecord()
         {
             Name = "TERMS",
@@ -41,6 +47,12 @@ namespace ICA.AutoCAD.Adapter
             Name = "XREF",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Cross reference attributes"
+        };
+        public static LayerTableRecord ChildXrefLayer => new LayerTableRecord()
+        {
+            Name = "XREFCHILD",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 134),
+            Description = "Cross reference attributes on child components (contacts, etc.)"
         };
         public static LayerTableRecord LinkLayer => new LayerTableRecord()
         {
@@ -101,7 +113,7 @@ namespace ICA.AutoCAD.Adapter
         public static LayerTableRecord ConductorLayer => new LayerTableRecord()
         {
             Name = "CONDUCTOR",
-            Color = Color.FromColorIndex(ColorMethod.ByAci, 11),
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 31),
             Description = "Cable conductor markings"
         };
         public static LayerTableRecord GroundLayer => new LayerTableRecord()
@@ -159,35 +171,16 @@ namespace ICA.AutoCAD.Adapter
                 forRelock.Lock();
         }
 
-        private static Dictionary<string, LayerTableRecord> Attributes => new Dictionary<string, LayerTableRecord>()
+        public static void Update(Database database)
         {
-            { "TAG", TagLayer },
-            { "MFG", ManufacturerLayer },
-            { "CAT", PartNumberLayer },
-            { "TERMDESC", MiscellaneousLayer },
-            { "DESC", DescriptionLayer },
-            { "TERM", TerminalLayer },
-            { "CON", ConductorLayer },
-            { "RATING", RatingLayer },
-            { "WIRENO", WireNumberLayer },
-            { "XREF", XrefLayer }
-        };
-
-        public static void Assign(Transaction transaction, BlockReference blockReference)
-        {
-            foreach (AttributeReference reference in blockReference.GetAttributeReferences(transaction))
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                KeyValuePair<string, LayerTableRecord> match = Attributes.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
-                if (match.Key != null)
-                    reference.SetLayer(match.Value);
-            }
-        }
-
-        public static void Assign(BlockReference blockReference)
-        {
-            using (Transaction transaction = blockReference.Database.TransactionManager.StartTransaction())
-            {
-                Assign(transaction, blockReference);
+                foreach (LayerTableRecord layer in Layers.Select(v => v.Value))
+                {
+                    LayerTableRecord layerInDoc = database.GetLayer(transaction, layer).GetForWrite(transaction);
+                    layerInDoc.Color = layer.Color;
+                    layerInDoc.Description = layer.Description;
+                }
                 transaction.Commit();
             }
         }
