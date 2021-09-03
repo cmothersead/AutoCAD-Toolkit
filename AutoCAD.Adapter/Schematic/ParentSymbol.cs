@@ -2,20 +2,19 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using ICA.Schematic;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class ParentSymbol : IParentSymbol
+    public class ParentSymbol : Symbol, IParentSymbol
     {
         #region Private Properties
 
-        private BlockReference BlockReference { get; }
-
         private AttributeReference TagAttribute => BlockReference.GetAttributeReference("TAG1");
 
-        private AttributeReference FamilyAttribute => BlockReference.GetAttributeReference("FAMILY");
+        private AttributeReference MfgAttribute => BlockReference.GetAttributeReference("MFG");
+
+        private AttributeReference CatAttribute => BlockReference.GetAttributeReference("CAT");
 
         private List<AttributeReference> DescAttributes
         {
@@ -37,50 +36,33 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        private AttributeReference MfgAttribute => BlockReference.GetAttributeReference("MFG");
-
-        private AttributeReference CatAttribute => BlockReference.GetAttributeReference("CAT");
-
         private AttributeReference InstAttribute => BlockReference.GetAttributeReference("INST");
 
         private AttributeReference LocAttribute => BlockReference.GetAttributeReference("LOC");
 
+        private List<string> AttributeNames => new List<string>
+        {
+            "TAG",
+            "MFG",
+            "CAT",
+            "DESC",
+            "LOC",
+            "INST"
+        };
+
+        private List<string> RequiredAttributes => new List<string>
+        {
+            "TAG1",
+            "MFG",
+            "CAT",
+            "DESC1",
+            "LOC",
+            "INST"
+        };
+
         private List<AttributeReference> InstallationAttributes => new List<AttributeReference>() { InstAttribute, LocAttribute };
 
         private List<AttributeReference> PartAttributes => new List<AttributeReference>() { MfgAttribute, CatAttribute };
-
-        private AttributeReference NewDescAttribute => new AttributeReference()
-        {
-            Tag = $"DESC{DescAttributes.Count + 1}",
-            Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
-            TextString = "",
-            Justify = TagAttribute.Justify,
-            LockPositionInBlock = true,
-            Layer = BlockReference.Database.GetLayer(ElectricalLayers.DescriptionLayer).Name,
-            Invisible = DescriptionHidden
-        };
-
-        private static Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
-        {
-            { "TAG", ElectricalLayers.TagLayer },
-            { "MFG", ElectricalLayers.ManufacturerLayer },
-            { "CAT", ElectricalLayers.PartNumberLayer },
-            { "TERMDESC", ElectricalLayers.MiscellaneousLayer },
-            { "DESC", ElectricalLayers.DescriptionLayer },
-            { "TERM", ElectricalLayers.TerminalLayer },
-            { "CON", ElectricalLayers.ConductorLayer },
-            { "RATING", ElectricalLayers.RatingLayer },
-            { "WIRENO", ElectricalLayers.WireNumberLayer },
-            { "XREF", ElectricalLayers.XrefLayer }
-        };
-
-        private Dictionary<string, string> Replacements => new Dictionary<string, string>()
-        {
-            { "%F", $"{Family}" },
-            { "%S", $"SheetNumber" },
-            { "%N", $"{LineNumber}" },
-            { "%X", "1" } //suffix character for reference based tagging
-        };
 
         #endregion
 
@@ -90,12 +72,6 @@ namespace ICA.AutoCAD.Adapter
         {
             get => TagAttribute?.TextString;
             set => TagAttribute?.SetValue(value);
-        }
-
-        public string Family
-        {
-            get => FamilyAttribute?.TextString;
-            set => FamilyAttribute?.SetValue(value);
         }
 
         public string ManufacturerName
@@ -133,9 +109,9 @@ namespace ICA.AutoCAD.Adapter
                 while (DescAttributes.Count != value.Count)
                 {
                     if (DescAttributes.Count > value.Count)
-                        RemoveDescription();
+                        Stack.Add($"DESC{DescAttributes.Count}");
                     else
-                        AddDescription();
+                        Stack.Add($"DESC{DescAttributes.Count + 1}");
                 }
                 int position = 0;
                 foreach (string val in value)
@@ -147,23 +123,21 @@ namespace ICA.AutoCAD.Adapter
 
         public bool DescriptionHidden
         {
-            get => DescAttributes[0].Invisible;
+            get => DescAttributes.Count != 0 && DescAttributes[0].Invisible;
             set => DescAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
         public bool InstallationHidden
         {
-            get => InstAttribute.Invisible;
+            get => InstAttribute != null && InstAttribute.Invisible;
             set => InstallationAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
         public bool PartInfoHidden
         {
-            get => MfgAttribute.Invisible;
+            get => MfgAttribute != null && MfgAttribute.Invisible;
             set => PartAttributes.ForEach(a => a?.SetVisibility(!value));
         }
-
-        public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
 
         public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
                                                                      .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
@@ -172,36 +146,20 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
-        #region Construtctor
+        #region Constructor
 
-        public ParentSymbol(BlockReference blockReference) => BlockReference = blockReference;
+        public ParentSymbol(BlockReference blockReference) : base(blockReference)
+        {
+            Stack.Add(BlockReference.GetAttributeReferences()
+                                    .Select(att => att.Tag)
+                                    .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
+                                    .Union(RequiredAttributes)
+                                    .ToList());
+        }
 
         #endregion
 
         #region Public Methods
-
-        public void CollapseAttributeStack() => CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
-
-        public void CollapseAttributeStack(Point3d position)
-        {
-            List<AttributeReference> list = DescAttributes;
-            list.Add(MfgAttribute);
-            list.Add(CatAttribute);
-            list.Add(TagAttribute);
-            list.Reverse();
-            foreach (AttributeReference attributeReference in list)
-            {
-                attributeReference.SetPosition(position);
-                if (!(attributeReference.Invisible | attributeReference.TextString == ""))
-                {
-                    position = new Point3d(position.X, position.Y + 0.15625, position.Z);
-                }
-            }
-        }
-
-        public void AddDescription() => BlockReference.AddAttributeReference(NewDescAttribute);
-
-        public void RemoveDescription() => BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
 
         public void AssignLayers()
         {
@@ -216,6 +174,8 @@ namespace ICA.AutoCAD.Adapter
                 transaction.Commit();
             }
         }
+
+        public void CollapseAttributeStack() => Stack.Collapse();
 
         public void UpdateTag(string format) => Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
 

@@ -12,6 +12,21 @@ namespace ICA.AutoCAD.Adapter
 {
     public static class ElectricalLayers
     {
+        #region Private Fields
+
+        private static LayerTableRecord _forRelock;
+
+        #endregion
+
+        #region Private Properties
+
+        private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
+                                                                                      .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
+        
+        #endregion
+
+        #region Public Properties
+
         public static LayerTableRecord SymbolLayer => new LayerTableRecord()
         {
             Name = "SYMS",
@@ -123,8 +138,9 @@ namespace ICA.AutoCAD.Adapter
             Description = "Ground wires layer"
         };
 
-        private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
-                                                                                              .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
+        #endregion
+
+        #region Methods
 
         public static void HandleLocks(Database database)
         {
@@ -156,19 +172,17 @@ namespace ICA.AutoCAD.Adapter
                                                           MessageBoxImage.Warning);
                 if (result != MessageBoxResult.OK)
                 {
-                    forRelock = layer;
+                    _forRelock = layer;
                     Application.Idle += Relock;
                 }
             }
         }
 
-        private static LayerTableRecord forRelock;
-
         private static void Relock(object sender, EventArgs e)
         {
             Application.Idle -= Relock;
-            using (DocumentLock lockDoc = Application.DocumentManager.GetDocument(forRelock.Database).LockDocument())
-                forRelock.Lock();
+            using (DocumentLock lockDoc = Application.DocumentManager.GetDocument(_forRelock.Database).LockDocument())
+                _forRelock.Lock();
         }
 
         public static void Update(Database database)
@@ -184,5 +198,8 @@ namespace ICA.AutoCAD.Adapter
                 transaction.Commit();
             }
         }
+
+        #endregion
+
     }
 }

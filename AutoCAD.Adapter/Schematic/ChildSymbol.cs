@@ -1,21 +1,19 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using ICA.Schematic;
 using System.Collections.Generic;
 using System.Linq;
-using ICA.Schematic;
 using System.Text.RegularExpressions;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class ChildSymbol : IChildSymbol
+    public class ChildSymbol : Symbol, IChildSymbol
     {
-        #region Private Properties
+        #region Properties
 
-        private BlockReference BlockReference { get; }
+        #region Private
 
         private AttributeReference TagAttribute => BlockReference.GetAttributeReference("TAG2");
-
-        private AttributeReference FamilyAttribute => BlockReference.GetAttributeReference("FAMILY");
 
         private List<AttributeReference> DescAttributes
         {
@@ -45,22 +43,13 @@ namespace ICA.AutoCAD.Adapter
 
         private AttributeReference LocAttribute => BlockReference.GetAttributeReference("LOC");
 
+        private AttributeReference XrefAttribute => BlockReference.GetAttributeReference("XREF");
+
         private List<AttributeReference> InstallationAttributes => new List<AttributeReference>() { InstAttribute, LocAttribute };
 
         private List<AttributeReference> PartAttributes => new List<AttributeReference>() { MfgAttribute, CatAttribute };
 
-        private AttributeReference NewDescAttribute => new AttributeReference()
-        {
-            Tag = $"DESC{DescAttributes.Count + 1}",
-            Position = TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint,
-            TextString = "",
-            Justify = TagAttribute.Justify,
-            LockPositionInBlock = true,
-            Layer = BlockReference.Database.GetLayer(ElectricalLayers.ChildDescriptionLayer).Name,
-            Invisible = DescriptionHidden
-        };
-
-        private static Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
+        private static new Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
         {
             { "TAG", ElectricalLayers.TagLayer },
             { "MFG", ElectricalLayers.ManufacturerLayer },
@@ -76,18 +65,14 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
-        #region Public Properties
+        #region Public
+
+        public Database Database => BlockReference.Database;
 
         public string Tag
         {
             get => TagAttribute?.TextString;
             set => TagAttribute?.SetValue(value);
-        }
-
-        public string Family
-        {
-            get => FamilyAttribute?.TextString;
-            set => FamilyAttribute?.SetValue(value);
         }
 
         public string ManufacturerName
@@ -114,6 +99,12 @@ namespace ICA.AutoCAD.Adapter
             set => LocAttribute?.SetValue(value);
         }
 
+        public string Xref
+        {
+            get => XrefAttribute?.TextString;
+            set => XrefAttribute?.SetValue(value);
+        }
+
         public List<string> Description
         {
             get => DescAttributes.Select(a => a.TextString).ToList();
@@ -125,9 +116,9 @@ namespace ICA.AutoCAD.Adapter
                 while (DescAttributes.Count != value.Count)
                 {
                     if (DescAttributes.Count > value.Count)
-                        RemoveDescription();
+                        Stack.Remove($"DESC{DescAttributes.Count}");
                     else
-                        AddDescription();
+                        Stack.Add($"DESC{DescAttributes.Count + 1}");
                 }
                 int position = 0;
                 foreach (string val in value)
@@ -139,13 +130,13 @@ namespace ICA.AutoCAD.Adapter
 
         public bool DescriptionHidden
         {
-            get => DescAttributes[0].Invisible;
+            get => DescAttributes.Count != 0 && DescAttributes[0].Invisible;
             set => DescAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
         public bool InstallationHidden
         {
-            get => InstAttribute.Invisible;
+            get => InstAttribute != null && InstAttribute.Invisible;
             set => InstallationAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
@@ -164,13 +155,17 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #endregion
+
         #region Construtctor
 
-        public ChildSymbol(BlockReference blockReference) => BlockReference = blockReference;
+        public ChildSymbol(BlockReference blockReference) : base(blockReference) { }
 
         #endregion
 
-        #region Public Methods
+        #region Methods
+
+        #region Public
 
         public void CollapseAttributeStack() => CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
 
@@ -189,10 +184,6 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public void AddDescription() => BlockReference.AddAttributeReference(NewDescAttribute);
-
-        public void RemoveDescription() => BlockReference.RemoveAttributeReference(DescAttributes.Last().Tag);
-
         public void AssignLayers()
         {
             using (Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
@@ -206,6 +197,8 @@ namespace ICA.AutoCAD.Adapter
                 transaction.Commit();
             }
         }
+
+        #endregion
 
         #endregion
     }

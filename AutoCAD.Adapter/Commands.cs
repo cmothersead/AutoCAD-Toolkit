@@ -9,7 +9,6 @@ using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Autodesk.AutoCAD.Geometry;
 using System.IO;
 using System;
-using ICA.AutoCAD.IO;
 using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
 
@@ -96,10 +95,10 @@ namespace ICA.AutoCAD.Adapter
 
             if (reference is null)
                 symbol = Select.Symbol(Editor);
-            else if (reference.HasAttributeReference("TAG1"))
-                symbol = new ParentSymbol(reference);
-            else
+            else if (reference.HasAttributeReference("TAG2"))
                 symbol = new ChildSymbol(reference);
+            else
+                symbol = new ParentSymbol(reference);
 
             switch (symbol)
             {
@@ -168,6 +167,20 @@ namespace ICA.AutoCAD.Adapter
         public static void UpdateLayers()
         {
             ElectricalLayers.Update(CurrentDocument.Database);
+        }
+
+        [CommandMethod("FINDPARENT")]
+        public static void FindParent()
+        {
+            if(Select.Symbol(Editor) is ChildSymbol symbol)
+            {
+                foreach(BlockReference reference in symbol.Database.GetLayer("SYMS").GetEntities().Where(entity => entity is BlockReference))
+                {
+                    ParentSymbol parent = new ParentSymbol(reference);
+                    if (parent.Tag == symbol.Tag)
+                        symbol.Xref = parent.LineNumber;
+                }
+            }
         }
 
         #region Project

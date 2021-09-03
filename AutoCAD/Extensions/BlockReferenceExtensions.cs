@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD
 {
@@ -31,33 +32,19 @@ namespace ICA.AutoCAD
         /// <param name="blockReference"></param>
         /// <param name="tag">Name of the attribute reference to retrieve</param>
         /// <returns></returns>
-        public static AttributeReference GetAttributeReference(this BlockReference blockReference, Transaction transaction, string tag)
-        {
-            foreach (ObjectId attRefID in blockReference.AttributeCollection)
-            {
-                AttributeReference attRef = transaction.GetObject(attRefID, OpenMode.ForRead) as AttributeReference;
-                if (attRef.Tag == tag)
-                {
-                    return attRef;
-                }
-            }
+        public static AttributeReference GetAttributeReference(this BlockReference blockReference, Transaction transaction, string tag) => blockReference.GetAttributeReferences(transaction)
+                                                                                                                                                         .FirstOrDefault(att => att.Tag == tag);
 
-            return null;
-        }
+        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction) => blockReference.AttributeCollection.Cast<ObjectId>()
+                                                                                                                                                                        .Select(id => id.Open(transaction) as AttributeReference)
+                                                                                                                                                                        .ToList();
 
-        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction)
-        {
-            List<AttributeReference> list = new List<AttributeReference>();
-            foreach (ObjectId attRefID in blockReference.AttributeCollection)
-                list.Add(transaction.GetObject(attRefID, OpenMode.ForRead) as AttributeReference);
-            return list;
-        }
-
-        public static void AddAttributeReference(this BlockReference blockReference, Transaction transaction, AttributeReference attributeReference)
+        public static AttributeReference AddAttributeReference(this BlockReference blockReference, Transaction transaction, AttributeReference attributeReference)
         {
             BlockReference blockReferenceForWrite = transaction.GetObject(blockReference.Id, OpenMode.ForWrite) as BlockReference;
             blockReferenceForWrite.AttributeCollection.AppendAttribute(attributeReference);
             transaction.AddNewlyCreatedDBObject(attributeReference, true);
+            return attributeReference;
         }
 
         public static void RemoveAttributeReference(this BlockReference blockReference, Transaction transaction, string tag)
@@ -171,7 +158,7 @@ namespace ICA.AutoCAD
 
         public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference) => blockReference.Transact(GetAttributeReferences);
 
-        public static void AddAttributeReference(this BlockReference blockReference, AttributeReference attributeReference) => blockReference.Transact(AddAttributeReference, attributeReference);
+        public static AttributeReference AddAttributeReference(this BlockReference blockReference, AttributeReference attributeReference) => blockReference.Transact(AddAttributeReference, attributeReference);
 
         public static void RemoveAttributeReference(this BlockReference blockReference, string tag) => blockReference.Transact(RemoveAttributeReference, tag);
 

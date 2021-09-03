@@ -10,6 +10,32 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Ladder : ILadder
     {
+        #region Private Properties
+
+        private string _sheetNumber;
+        private string SheetNumber
+        {
+            get
+            {
+                if (_sheetNumber != null)
+                    return _sheetNumber;
+
+                _sheetNumber = Database.GetSheetNumber();
+
+                if (_sheetNumber is null | _sheetNumber == "")
+                {
+                    PromptStringOptions options = new PromptStringOptions("Sheet Number: ");
+                    PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
+                    _sheetNumber = result.StringResult;
+                    Database.SetSheetNumber(result.StringResult);
+                }
+
+                return _sheetNumber;
+            }
+        }
+
+        #endregion
+
         #region Public Properties
 
         public Point2d Origin { get; }
@@ -52,32 +78,6 @@ namespace ICA.AutoCAD.Adapter
                     reference++;
                 }
                 return _lineNumbers;
-            }
-        }
-
-        #endregion
-
-        #region Private Properties
-
-        private string _sheetNumber;
-        private string SheetNumber
-        {
-            get
-            {
-                if (_sheetNumber != null)
-                    return _sheetNumber;
-
-                _sheetNumber = Database.GetSheetNumber();
-
-                if (_sheetNumber is null | _sheetNumber == "")
-                {
-                    PromptStringOptions options = new PromptStringOptions("Sheet Number: ");
-                    PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetString(options);
-                    _sheetNumber = result.StringResult;
-                    Database.SetSheetNumber(result.StringResult);
-                }
-
-                return _sheetNumber;
             }
         }
 

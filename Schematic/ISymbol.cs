@@ -2,7 +2,7 @@
 
 namespace ICA.Schematic
 {
-    public interface ISymbol : IHideableAttributes, ILayered
+    public interface ISymbol : ILayered
     {
         string Tag { get; set; }
         string Family { get; set; }

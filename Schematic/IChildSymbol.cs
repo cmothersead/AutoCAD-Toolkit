@@ -1,6 +1,6 @@
 ﻿namespace ICA.Schematic
 {
-    public interface IChildSymbol : ISymbol
+    public interface IChildSymbol : ISymbol, IHideableAttributes
     {
     }
 }
