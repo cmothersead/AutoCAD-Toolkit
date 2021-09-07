@@ -141,6 +141,9 @@ namespace ICA.AutoCAD
         /// <returns><see cref="LayerTableRecord"/> of the layer if it exists. Else null</returns>
         public static LayerTableRecord GetLayer(this Database database, Transaction transaction, LayerTableRecord layer)
         {
+            if (layer is null)
+                return null;
+
             if (database.HasLayer(transaction, layer.Name))
                 return database.GetLayer(transaction, layer.Name);
 

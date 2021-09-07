@@ -56,7 +56,18 @@ namespace ICA.AutoCAD
             entity.GetForWrite(transaction).Layer = layer.Name;
         }
 
+        public static bool SetLayer(this Entity entity, Transaction transaction, string name)
+        {
+            if (!entity.Database.HasLayer(name))
+                return false;
+
+            entity.GetForWrite(transaction).Layer = name;
+            return true;
+        }
+
         public static void SetLayer(this Entity entity, LayerTableRecord layer) => entity.Transact(SetLayer, layer);
+
+        public static void SetLayer(this Entity entity, string name) => entity.Transact(SetLayer, name);
 
         public static void SetColor(this Entity entity, Transaction transaction, Color color) => entity.GetForWrite(transaction).Color = color;
 

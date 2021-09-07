@@ -64,13 +64,15 @@ namespace ICA.AutoCAD.Adapter
         {
             if (!Owner.HasAttributeReference(name))
             {
-                AttributeReference reference = new AttributeReference();
-                reference.Tag = name;
-                reference.Position = Position.ToPoint3d();
-                reference.Justify = Justification;
-                reference.Height = TextHeight;
-                reference.LockPositionInBlock = true;
-                reference.Invisible = true;
+                AttributeReference reference = new AttributeReference
+                {
+                    Tag = name,
+                    Position = Position.ToPoint3d(),
+                    Justify = Justification,
+                    Height = TextHeight,
+                    LockPositionInBlock = true
+                };
+                reference.Invisible = !reference.Tag.Contains("TAG");
                 Owner.AddAttributeReference(reference).SetLayer(GetLayer(name));
             }
                 
@@ -80,7 +82,7 @@ namespace ICA.AutoCAD.Adapter
         private string GetLayer(string name)
         {
             LayerTableRecord layer = Layers.FirstOrDefault(pair => name.Contains(pair.Key)).Value;
-            return Owner.Database.GetLayer(layer).Name;
+            return Owner.Database.GetLayer(layer)?.Name;
         }
 
         public int IndexOf(string item) => Attributes.IndexOf(item);

@@ -109,7 +109,7 @@ namespace ICA.AutoCAD.Adapter
                 while (DescAttributes.Count != value.Count)
                 {
                     if (DescAttributes.Count > value.Count)
-                        Stack.Add($"DESC{DescAttributes.Count}");
+                        Stack.Remove($"DESC{DescAttributes.Count}");
                     else
                         Stack.Add($"DESC{DescAttributes.Count + 1}");
                 }
