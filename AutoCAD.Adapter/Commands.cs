@@ -134,11 +134,12 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("ASSIGNLAYERS")]
         public static void AssignLayers() => Select.Symbol(Editor)?.AssignLayers();
 
-        [CommandMethod("UPDATETAG")]
+        [CommandMethod("UPDATETAGS")]
         public static void UpdateTag()
         {
-            if (Select.Symbol(Editor) is ParentSymbol symbol)
-                symbol.UpdateTag($"%F%N1");
+            foreach (ISymbol symbol in Select.Symbols(Editor))
+                if (symbol is ParentSymbol parent)
+                    parent.UpdateTag($"%F%N1");
         }
 
         [CommandMethod("UPDATETAG2")]
@@ -180,6 +181,29 @@ namespace ICA.AutoCAD.Adapter
                     if (parent.Tag == symbol.Tag)
                         symbol.Xref = parent.LineNumber;
                 }
+            }
+        }
+
+        [CommandMethod("SETPARENT")]
+        public static void SetParent()
+        {
+            if (Select.Symbol(Editor) is ParentSymbol parent)
+                foreach(ChildSymbol child in Select.Symbols(Editor))
+                    if (parent.Family == child.Family)
+                    {
+                        child.Tag = parent.Tag;
+                        child.Xref = parent.LineNumber;
+                        child.Description = parent.Description;
+                    }
+        }
+
+        [CommandMethod("HIDETAG")]
+        public static void HideTags()
+        {
+            foreach (ChildSymbol symbol in Select.Symbols(Editor))
+            {
+                symbol.TagHidden ^= true;
+                symbol.CollapseAttributeStack();
             }
         }
 

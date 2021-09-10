@@ -47,6 +47,9 @@ namespace ICA.AutoCAD
         /// <param name="properties">Property key-value pairs.</param>
         public static void SetCustomProperties(this Database database, Dictionary<string, string> properties)
         {
+            if (properties is null)
+                return;
+
             foreach (var entry in properties)
                 database.SetCustomProperty(entry.Key, entry.Value);
         }

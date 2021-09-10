@@ -48,12 +48,12 @@ namespace ICA.AutoCAD.IO
         /// <summary>
         /// ICA schematic library directory. Contains schematic block drawings
         /// </summary>
-        public static string SchematicLibrary => Path.GetFullPath($"{Libraries}\\schematic\\library");
+        public static string SchematicLibrary => Path.GetFullPath($"{Libraries}\\dev\\schematic\\library");
 
         /// <summary>
         /// ICA schematic menu directory. Contains menu file and images
         /// </summary>
-        public static string SchematicMenu => Path.GetFullPath($"{Libraries}\\schematic\\menu");
+        public static string SchematicMenu => Path.GetFullPath($"{Libraries}\\dev\\schematic\\menu");
 
         /// <summary>
         /// ICA panel library directory. Contains panel representation drawings

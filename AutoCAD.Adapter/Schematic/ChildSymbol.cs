@@ -63,6 +63,24 @@ namespace ICA.AutoCAD.Adapter
             { "XREF", ElectricalLayers.ChildXrefLayer }
         };
 
+        private List<string> AttributeNames => new List<string>
+        {
+            "TAG",
+            "MFG",
+            "CAT",
+            "DESC",
+            "LOC",
+            "INST"
+        };
+
+        private List<string> RequiredAttributes => new List<string>
+        {
+            "TAG2",
+            "DESC1",
+            "LOC",
+            "INST"
+        };
+
         #endregion
 
         #region Public
@@ -128,6 +146,12 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public bool TagHidden
+        {
+            get => TagAttribute != null && TagAttribute.Invisible;
+            set => TagAttribute?.SetVisibility(!value);
+        }
+
         public bool DescriptionHidden
         {
             get => DescAttributes.Count != 0 && DescAttributes[0].Invisible;
@@ -159,7 +183,14 @@ namespace ICA.AutoCAD.Adapter
 
         #region Construtctor
 
-        public ChildSymbol(BlockReference blockReference) : base(blockReference) { }
+        public ChildSymbol(BlockReference blockReference) : base(blockReference)
+        {
+            Stack.Add(BlockReference.GetAttributeReferences()
+                                    .Select(att => att.Tag)
+                                    .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
+                                    .Union(RequiredAttributes)
+                                    .ToList());
+        }
 
         #endregion
 
@@ -167,22 +198,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public
 
-        public void CollapseAttributeStack() => CollapseAttributeStack(TagAttribute.Justify == AttachmentPoint.BaseLeft ? TagAttribute.Position : TagAttribute.AlignmentPoint);
-
-        public void CollapseAttributeStack(Point3d position)
-        {
-            List<AttributeReference> list = DescAttributes;
-            list.Add(TagAttribute);
-            list.Reverse();
-            foreach (AttributeReference attributeReference in list)
-            {
-                attributeReference.SetPosition(position);
-                if (!(attributeReference.Invisible | attributeReference.TextString == ""))
-                {
-                    position = new Point3d(position.X, position.Y + 0.15625, position.Z);
-                }
-            }
-        }
+        public void CollapseAttributeStack() => Stack.Collapse();
 
         public void AssignLayers()
         {
