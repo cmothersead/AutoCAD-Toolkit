@@ -63,6 +63,25 @@ namespace ICA.AutoCAD.Adapter
             {
                 return new ChildSymbol(blockReference);
             }
+            else
+            {
+                PromptKeywordOptions options = new PromptKeywordOptions("\nSymbol type: ");
+                options.Keywords.Add("Parent");
+                options.Keywords.Add("Child");
+                options.Keywords.Default = "Parent";
+
+                PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(options);
+                if (result.Status != PromptStatus.OK)
+                    return null;
+
+                switch (result.StringResult)
+                {
+                    case "Parent":
+                        return new ParentSymbol(blockReference);
+                    case "Child":
+                        return new ChildSymbol(blockReference);
+                }
+            }
 
             return null;
         }

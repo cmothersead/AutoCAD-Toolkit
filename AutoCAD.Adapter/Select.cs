@@ -52,7 +52,7 @@ namespace ICA.AutoCAD.Adapter.Prompt
 
         public static List<ISymbol> Symbols(Editor editor)
         {
-            List<ISymbol> list = Multiple(editor).Where(obj => obj is BlockReference)
+            List<ISymbol> list = Multiple(editor)?.Where(obj => obj is BlockReference)
                                            .Select(reference => FromReference(editor, (BlockReference)reference))
                                            .ToList();
             return list;

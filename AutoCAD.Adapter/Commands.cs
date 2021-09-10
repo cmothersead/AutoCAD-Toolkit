@@ -207,6 +207,12 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        [CommandMethod("SETTYPE")]
+        public static void SetType()
+        {
+            Select.Symbol(Editor);
+        }
+
         #region Project
 
         [CommandMethod("CURRENTPROJECT")]
