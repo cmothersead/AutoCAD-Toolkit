@@ -5,16 +5,14 @@ using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.IO;
 using ICA.Schematic;
 using System;
-using System.Collections.Generic;
 
 namespace ICA.AutoCAD.Adapter
 {
     public class SchematicSymbolRecord
     {
-
         #region Private Fields
 
-        private BlockTableRecord _blockTableRecord;
+        private readonly BlockTableRecord _blockTableRecord;
 
         #endregion
 
@@ -42,6 +40,7 @@ namespace ICA.AutoCAD.Adapter
             BlockReference blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
 
             blockReference.Insert(transaction, Database);
+            blockReference.SetLayer(transaction, ElectricalLayers.SymbolLayer);
 
             if (blockReference.Position == Point3d.Origin)
             {
