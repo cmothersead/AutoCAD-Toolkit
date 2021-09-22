@@ -165,8 +165,6 @@ namespace ICA.AutoCAD.IO
             {
                 return null;
             }
-
-
         }
 
         public static string FindPanel(string name)
@@ -181,7 +179,13 @@ namespace ICA.AutoCAD.IO
             {
                 return null;
             }
-            
+        }
+
+        public static string GetRelativePath(string relativeTo, string path)
+        {
+            Uri relativeUri = new Uri(Path.GetFullPath(relativeTo));
+            Uri pathUri = new Uri(Path.GetFullPath(path));
+            return relativeUri.MakeRelativeUri(pathUri).LocalPath;
         }
 
         #endregion

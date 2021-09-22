@@ -221,6 +221,10 @@ namespace ICA.AutoCAD.Adapter
             Project test = CurrentProject();
             if (test != null)
             {
+                test.AddPage(Project.DrawingType.Schematic);
+                test.AddPage(Project.DrawingType.Schematic);
+                test.AddPage(Project.DrawingType.Panel);
+                test.AddPage(Project.DrawingType.Panel, "panelpage");
                 Editor.WriteMessage(test.Name);
             }
             else
@@ -231,9 +235,28 @@ namespace ICA.AutoCAD.Adapter
 
         public static Project CurrentProject()
         {
-            if (!CurrentDocument.IsNamedDrawing)
-                return null;
-            return CurrentDocument.Database.GetProject();
+            return new Project()
+            {
+                DirectoryUri = new Uri(@"C:\Users\cmotherseadicacontro\OneDrive - icacontrol.com\Desktop\Test Project"),
+                Job = new Job()
+                {
+                    Id = 43,
+                    Name = "TJ20 Left Gantry",
+                    Customer = new Customer()
+                    {
+                        Id = 8,
+                        Name = "NTN"
+                    }
+                },
+                Settings = new ProjectSettings()
+            };
+        }
+
+        [CommandMethod("READPROJECT")]
+        public static void ReadProject()
+        {
+            Project test = Project.Open(@"C:\Users\cmotherseadicacontro\OneDrive - icacontrol.com\Desktop\Test Project");
+            var test2 = 1;
         }
 
         [CommandMethod("EXPORTCURRENTPROJECT")]
@@ -260,13 +283,13 @@ namespace ICA.AutoCAD.Adapter
             switch (result.StringResult)
             {
                 case "Schematic":
-                    currentProject.AddPage(Project.DrawingType.Schematic, "newschematic.dwg");
+                    currentProject.AddPage(Project.DrawingType.Schematic, "1");
                     break;
                 case "Panel":
-                    currentProject.AddPage(Project.DrawingType.Panel, "test.dwg");
+                    currentProject.AddPage(Project.DrawingType.Panel, "2");
                     break;
                 case "Reference":
-                    currentProject.AddPage(Project.DrawingType.Reference, "test.dwg");
+                    currentProject.AddPage(Project.DrawingType.Reference, "3");
                     break;
                 default:
                     return;

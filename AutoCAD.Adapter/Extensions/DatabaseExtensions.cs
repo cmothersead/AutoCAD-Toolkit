@@ -9,7 +9,7 @@ namespace ICA.AutoCAD.Adapter
     {
         #region Public Extension Methods
 
-        #region Document Properties
+        #region Document Settings
 
         public static DrawingSettings ElectricalSetting(this Database database)
         {
@@ -23,6 +23,14 @@ namespace ICA.AutoCAD.Adapter
         public static string GetSheetNumber(this Database database) => database.GetCustomProperty("Sheet");
 
         public static void SetSheetNumber(this Database database, string value) => database.SetCustomProperty("Sheet", value);
+
+        public static List<string> GetDescription(this Database database) => database.GetAllCustomProperties()
+                                                                                     .Where(prop => prop.Key.Contains("Description"))
+                                                                                     .OrderBy(prop => prop.Key)
+                                                                                     .Select(prop => prop.Value)
+                                                                                     .ToList();
+
+        public static void SetDescription(this Database database, List<string> description) => database.SetCustomProperties(description.ToDictionary(item => $"Description{description.IndexOf(item) + 1}"));
 
         #endregion
 
@@ -80,7 +88,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName));
+        public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName)); // ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
 
         #endregion
 

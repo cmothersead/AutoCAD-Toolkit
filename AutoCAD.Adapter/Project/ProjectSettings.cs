@@ -6,9 +6,9 @@ namespace ICA.AutoCAD.Adapter
 {
     public class ProjectSettings
     {
-        public string SchematicTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwg";
-        public string PanelTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwg";
-        public string ReferenceTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwg";
+        public string SchematicTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwt";
+        public string PanelTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwt";
+        public string ReferenceTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwt";
         public string Library { get; set; } = Paths.Libraries;
         public string FileNameFormat = "%PPG%S";
         public LadderSettings Ladder { get; set; } = new LadderSettings();
