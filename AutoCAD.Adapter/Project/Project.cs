@@ -10,8 +10,10 @@ using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class Project /*: IXmlSerializable*/
+    public class Project : IDisposable
     {
+        private bool disposedValue;
+
         public enum DrawingType
         {
             Schematic,
@@ -66,10 +68,10 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public void AddPage(DrawingType type, string pageNumber = null)
+        public void AddPage(DrawingType type, string name = null)
         {
-            if (pageNumber is null)
-                pageNumber = NextDrawingName;
+            if (name is null)
+                name = NextDrawingName;
 
             string path;
             switch (type)
@@ -86,7 +88,7 @@ namespace ICA.AutoCAD.Adapter
                 default:
                     return;
             }
-            Drawings.Add(Drawing.CreateFromTemplate(this, path, pageNumber));
+            Drawings.Add(Drawing.CreateFromTemplate(this, path, name));
             Save();
         }
 
@@ -111,12 +113,12 @@ namespace ICA.AutoCAD.Adapter
             return project;
         }
 
-        //public static Project Import(string directoryPath)
-        //{
-        //    string filePath = Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault();
+        public static Project Import(string directoryPath)
+        {
+            string filePath = Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault();
 
-        //    return filePath is null ? null : WDP.Import(filePath);
-        //}
+            return filePath is null ? null : WDP.Import(filePath);
+        }
 
         public void Save()
         {
@@ -127,16 +129,32 @@ namespace ICA.AutoCAD.Adapter
             FileStream file = File.OpenWrite(FileUri.LocalPath);
             writer.Serialize(file, this, ns);
             file.Close();
-        }
-
-        public void SaveAs(string filePath)
-        {
-            throw new NotImplementedException();
+            File.SetAttributes(file.Name, File.GetAttributes(file.Name) | FileAttributes.Hidden);
         }
 
         public void Export() => WDP.Export(this, Path.ChangeExtension(FileUri.LocalPath, ".wdp"));
 
         public override string ToString() => Name;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Drawings.ForEach(drawing => drawing.Dispose());
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         //public XmlSchema GetSchema() => null;
 

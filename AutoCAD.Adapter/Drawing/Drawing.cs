@@ -7,11 +7,13 @@ using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class Drawing
+    public class Drawing : IDisposable
     {
         #region Private Properties
 
         private Database _database;
+        private bool disposedValue;
+
         private Database Database
         {
             get
@@ -22,7 +24,7 @@ namespace ICA.AutoCAD.Adapter
                 if (_database is null)
                 {
                     if (!File.Exists(FullPath))
-                        throw new FileNotFoundException();
+                        return null;
 
                     _database = new Database(false, true);
                     _database.ReadDwgFile(FullPath, FileOpenMode.OpenForReadAndAllShare, true, null);
@@ -45,6 +47,7 @@ namespace ICA.AutoCAD.Adapter
 
         [XmlAttribute]
         public string FileName { get; set; }
+        [XmlIgnore]
         public List<string> Description
         {
             get => Database?.GetDescription();
@@ -70,13 +73,47 @@ namespace ICA.AutoCAD.Adapter
 
         #region Methods
 
+        public bool AddDescription(string value)
+        {
+            if (Database is null)
+                return false;
+
+            List<string> description = Description;
+            description.Add(value);
+            Description = description;
+            return true;
+        }
+
+        public bool RemoveDescription(string value)
+        {
+            if (Database is null)
+                return false;
+
+            List<string> description = Description;
+            description.Remove(value);
+            Description = description;
+            return true;
+        }
+
+        public bool RemoveDescriptionAt(int index)
+        {
+            if (Database is null)
+                return false;
+
+            List<string> description = Description;
+            description.RemoveAt(index);
+            Description = description;
+            return true;
+        }
+
         public static Drawing CreateFromTemplate(Project project, string templatePath, string fileName)
         {
             CloneDatabase(templatePath, $"{project.DirectoryUri.LocalPath}\\{fileName}.dwg");
             return new Drawing()
             {
                 Project = project,
-                FileName = fileName
+                FileName = fileName,
+                PageNumber = $"{project.Drawings.Count + 1}"
             };
         }
 
@@ -91,6 +128,25 @@ namespace ICA.AutoCAD.Adapter
         }
 
         public override string ToString() => FileName;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Database.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         #endregion
     }

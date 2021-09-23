@@ -17,9 +17,6 @@ namespace ICA.AutoCAD
         /// <returns>A strongly typed dictionary containing the entries.</returns>
         public static Dictionary<string, string> GetAllCustomProperties(this Database database)
         {
-            if (database is null)
-                return null;
-
             Dictionary<string, string> result = new Dictionary<string, string>();
             IDictionaryEnumerator dictEnum = database.SummaryInfo.CustomProperties;
             while (dictEnum.MoveNext())

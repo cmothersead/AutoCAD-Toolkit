@@ -11,6 +11,7 @@ using System.IO;
 using System;
 using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
+using Autodesk.AutoCAD.Windows;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -215,21 +216,22 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        [CommandMethod("CURRENTPROJECT")]
+        [CommandMethod("IMPORTPROJECT")]
         public static void PrintCurrentProject()
         {
-            Project test = CurrentProject();
-            if (test != null)
+            OpenFileDialog test = new OpenFileDialog("Load Project File", "Default", "wdp", "DialogName", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly | OpenFileDialog.OpenFileDialogFlags.AllowAnyExtension);
+            test.ShowDialog();
+            if(test.Filename != "")
             {
-                test.AddPage(Project.DrawingType.Schematic);
-                test.AddPage(Project.DrawingType.Schematic);
-                test.AddPage(Project.DrawingType.Panel);
-                test.AddPage(Project.DrawingType.Panel, "panelpage");
-                Editor.WriteMessage(test.Name);
-            }
-            else
-            {
-                Editor.WriteMessage("Current document does not belong to a project.");
+                using (Project project = Project.Import(test.Filename))
+                {
+                    if (project is null)
+                        return;
+
+                    project.Drawings.ForEach(drawing => drawing.RemoveDescription(project.Job.Name.ToUpper()));
+                    project.Drawings.ForEach(drawing => drawing.RemoveDescription(""));
+                    project.Save();
+                }
             }
         }
 

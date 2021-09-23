@@ -88,47 +88,50 @@ namespace ICA.AutoCAD.Adapter
             {76, "WNUM_GAP" },
         };
 
-        //public static Project Import(string filePath)
-        //{
-        //    Project output = new Project
-        //    {
-        //        Drawings = new List<Drawing>(),
-        //        //Name = Path.GetFileNameWithoutExtension(filePath),
-        //        Uri = new Uri(Path.ChangeExtension(filePath, ".xml"))
-        //    };
-        //    string[] test = File.ReadAllLines(filePath);
-        //    Drawing drawing = new Drawing();
-        //    Dictionary<string, string> settings = new Dictionary<string, string>();
-        //    foreach (string line in test)
-        //    {
-        //        if (line.StartsWith("+"))
-        //            continue;
-        //        else if (line.StartsWith("?"))
-        //        {
-        //            Setting setting = new Setting(line);
-        //            if(setting.WDMName != null)
-        //                settings.Add(setting.WDMName, setting.Value);
-        //        } 
-        //        else if (line.StartsWith("===="))
-        //            continue;
-        //        else if (line.StartsWith("==="))
-        //        {
-        //            if (line != "===")
-        //                drawing.Description.Add(line.Substring(3));
-        //        }
-        //        else if (line.StartsWith("=="))
-        //            continue;
-        //        else
-        //        {
-        //            drawing.Uri = new Uri(output.Uri, line);
-        //            drawing.Project = output;
-        //            output.Drawings.Add(drawing);
-        //            drawing = new Drawing();
-        //        }
-        //    }
-        //    output.Settings = new ProjectSettings(settings);
-        //    return output;
-        //}
+        public static Project Import(string filePath)
+        {
+            Project output = new Project
+            {
+                DirectoryUri = new Uri(Path.GetDirectoryName(filePath)),
+                Drawings = new List<Drawing>(),
+                Job = new Job(Path.GetFileNameWithoutExtension(filePath))
+            };
+            string[] test = File.ReadAllLines(filePath);
+            Drawing drawing = new Drawing()
+            {
+                Description = new List<string>()
+            };
+            Dictionary<string, string> settings = new Dictionary<string, string>();
+            foreach (string line in test)
+            {
+                if (line.StartsWith("+"))
+                    continue;
+                else if (line.StartsWith("?"))
+                {
+                    Setting setting = new Setting(line);
+                    if (setting.WDMName != null)
+                        settings.Add(setting.WDMName, setting.Value);
+                }
+                else if (line.StartsWith("===="))
+                    continue;
+                else if (line.StartsWith("==="))
+                    continue;
+                else if (line.StartsWith("=="))
+                    continue;
+                else
+                {
+                    drawing.FileName = Path.GetFileNameWithoutExtension(line);
+                    drawing.Project = output;
+                    output.Drawings.Add(drawing);
+                    drawing = new Drawing()
+                    {
+                        Description = new List<string>()
+                    };
+                }
+            }
+            output.Settings = new ProjectSettings(settings);
+            return output;
+        }
 
         public static void Export(Project input, string savePath)
         {

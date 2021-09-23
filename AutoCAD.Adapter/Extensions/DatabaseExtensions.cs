@@ -30,7 +30,18 @@ namespace ICA.AutoCAD.Adapter
                                                                                      .Select(prop => prop.Value)
                                                                                      .ToList();
 
-        public static void SetDescription(this Database database, List<string> description) => database.SetCustomProperties(description.ToDictionary(item => $"Description{description.IndexOf(item) + 1}"));
+        public static void SetDescription(this Database database, List<string> values)
+        {
+            Dictionary<string, string> descriptions = database.GetAllCustomProperties()
+                                                              .Where(prop => prop.Key.Contains("Description"))
+                                                              .ToDictionary(x => x.Key, y => y.Value);
+            if (values == descriptions.Select(desc => desc.Value).ToList())
+                return;
+
+            database.RemoveCustomProperties(descriptions.Select(prop => prop.Key));
+            database.SetCustomProperties(values.ToDictionary(item => $"Description {values.IndexOf(item) + 1}"));
+            database.SaveAs(database.Filename, DwgVersion.Current);
+        }
 
         #endregion
 
