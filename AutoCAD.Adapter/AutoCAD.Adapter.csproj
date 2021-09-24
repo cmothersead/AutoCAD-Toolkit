@@ -110,14 +110,14 @@
     <Compile Include="Config\Enums\WireGapStyle.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\TitleBlockSettings.cs" />
-    <Compile Include="Import\WDM.cs" />
+    <Compile Include="ImportExport\WDM.cs" />
     <Compile Include="Config\WireSettings.cs" />
     <Compile Include="Drawing\Drawing.cs" />
     <Compile Include="Extensions\DatabaseExtensions.cs" />
     <Compile Include="Drawing\DrawingSettings.cs" />
     <Compile Include="Extensions\LayerTableRecordExtensions.cs" />
     <Compile Include="Extensions\LineExtensions.cs" />
-    <Compile Include="Import\WDP.cs" />
+    <Compile Include="ImportExport\WDP.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="Insertable.cs" />
     <Compile Include="Ladder\Ladder.cs" />

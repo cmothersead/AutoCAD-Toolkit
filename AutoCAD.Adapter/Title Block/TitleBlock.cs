@@ -35,7 +35,13 @@ namespace ICA.AutoCAD.Adapter
         public bool IsLoaded => _blockTableRecord != null;
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
         public Database Database => _blockTableRecord.Database;
-        public List<string> Attributes => _blockTableRecord.AttributeDefinitions().Select(definition => definition.Tag).ToList();
+        public Dictionary<string, string> Attributes
+        {
+            get => Reference?.GetAttributeReferences()
+                             .ToDictionary(def => def.Tag, def => def.TextString);
+            set => Reference?.SetAttributeValues(value);
+        }
+            
         public bool IsInserted => _blockTableRecord.GetBlockReferenceIds(true, false).Count != 0;
         public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
         public bool Spare

@@ -1,7 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -40,13 +43,15 @@ namespace ICA.AutoCAD.Adapter
         #region Public Properties
 
         [XmlIgnore]
-        public Uri FileUri => new Uri(Project.FileUri, $"{FileName}.dwg");
+        public Uri FileUri => new Uri(Project.FileUri, $"{Name}.dwg");
         [XmlIgnore]
         public Project Project { get; set; }
         public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
+        [XmlIgnore]
+        public Dictionary<string, string> TitleBlockAttributes { get; set; }
 
         [XmlAttribute]
-        public string FileName { get; set; }
+        public string Name { get; set; }
         [XmlIgnore]
         public List<string> Description
         {
@@ -60,6 +65,9 @@ namespace ICA.AutoCAD.Adapter
             set => Database?.SetSheetNumber(value);
         }
 
+        [XmlAttribute, DefaultValue(false)]
+        public bool Spare { get; set; }
+
         [XmlIgnore]
         public DrawingSettings Settings { get; set; }
 
@@ -67,11 +75,46 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructor
 
-        public Drawing() { }
+        public Drawing()
+        {
+            TitleBlockAttributes = new Dictionary<string, string>()
+            {
+                { "DWGNO", "Project.Job.Code" },
+                { "SHTS", "Project.Drawings.Count" },
+                { "TITLE1", "Project.Job.Name" },
+                { "TITLE2", "Name" },
+                { "SHT", "PageNumber" },
+                { "CUST", "Project.Job.Customer.Name" }
+            };
+        }
 
         #endregion
 
         #region Methods
+
+        public void UpdateTitleBlock()
+        {
+            TitleBlock test = Database.GetTitleBlock();
+            Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Key, pair => GetPropertyValue(pair.Value).ToUpper());
+            test.Attributes = dict;
+            Save();
+        }
+
+        public string GetPropertyValue(string name)
+        {
+            PropertyInfo currentProperty;
+            object currentObject = this;
+            List<string> names = name.Split('.').ToList();
+            foreach (string propertyName in names)
+            {
+                currentProperty = currentObject.GetType().GetProperty(propertyName);
+                if (currentProperty is null)
+                    return null;
+
+                currentObject = currentProperty.GetValue(currentObject);
+            }
+            return currentObject.ToString();
+        }
 
         public bool AddDescription(string value)
         {
@@ -112,7 +155,7 @@ namespace ICA.AutoCAD.Adapter
             return new Drawing()
             {
                 Project = project,
-                FileName = fileName,
+                Name = fileName,
                 PageNumber = $"{project.Drawings.Count + 1}"
             };
         }
@@ -127,7 +170,9 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public override string ToString() => FileName;
+        public void Save() => Database.SaveFile();
+
+        #region IDisposable
 
         protected virtual void Dispose(bool disposing)
         {
@@ -147,6 +192,10 @@ namespace ICA.AutoCAD.Adapter
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion
+
+        public override string ToString() => Name;
 
         #endregion
     }

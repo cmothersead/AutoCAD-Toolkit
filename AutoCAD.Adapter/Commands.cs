@@ -219,7 +219,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("IMPORTPROJECT")]
         public static void PrintCurrentProject()
         {
-            OpenFileDialog test = new OpenFileDialog("Load Project File", "Default", "wdp", "DialogName", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly | OpenFileDialog.OpenFileDialogFlags.AllowAnyExtension);
+            OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
             test.ShowDialog();
             if(test.Filename != "")
             {
@@ -230,6 +230,23 @@ namespace ICA.AutoCAD.Adapter
 
                     project.Drawings.ForEach(drawing => drawing.RemoveDescription(project.Job.Name.ToUpper()));
                     project.Drawings.ForEach(drawing => drawing.RemoveDescription(""));
+                    project.Save();
+                }
+            }
+        }
+
+        [CommandMethod("TESTREFLECTION")]
+        public static void TestReflection()
+        {
+            OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
+            test.ShowDialog();
+            if (test.Filename != "")
+            {
+                using (Project project = Project.Open(test.Filename))
+                {
+                    if (project is null)
+                        return;
+
                     project.Save();
                 }
             }
@@ -359,7 +376,6 @@ namespace ICA.AutoCAD.Adapter
         {
             TitleBlock titleBlock = TitleBlock.Select();
             Project project = CurrentDocument.Database.GetProject();
-            project.Run(AddTitleBlock, new TitleBlock(titleBlock.FileUri));
         }
 
         public static void AddTitleBlock(Database database, TitleBlock titleBlock)

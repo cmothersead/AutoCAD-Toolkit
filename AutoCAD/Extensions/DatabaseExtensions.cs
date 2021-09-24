@@ -97,6 +97,8 @@ namespace ICA.AutoCAD
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
+        public static void SaveFile(this Database database) => database.SaveAs(database.OriginalFileName, DwgVersion.Current);
+
         #endregion
 
         #region Public Extension Methods

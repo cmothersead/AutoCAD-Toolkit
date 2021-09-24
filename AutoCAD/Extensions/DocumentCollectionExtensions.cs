@@ -13,5 +13,14 @@ namespace ICA.AutoCAD
 
             return false;
         }
+
+        public static Document Get(this DocumentCollection collection, string name)
+        {
+            foreach (Document document in collection)
+                if (document.Name == name)
+                    return document;
+
+            return null;
+        }
     }
 }

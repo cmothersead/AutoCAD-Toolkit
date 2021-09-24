@@ -120,7 +120,7 @@ namespace ICA.AutoCAD.Adapter
                     continue;
                 else
                 {
-                    drawing.FileName = Path.GetFileNameWithoutExtension(line);
+                    drawing.Name = Path.GetFileNameWithoutExtension(line);
                     drawing.Project = output;
                     output.Drawings.Add(drawing);
                     drawing = new Drawing()

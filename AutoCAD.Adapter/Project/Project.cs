@@ -4,35 +4,31 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
-using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
     public class Project : IDisposable
     {
+        #region Private Fields
+
         private bool disposedValue;
 
-        public enum DrawingType
-        {
-            Schematic,
-            Panel,
-            Reference
-        }
+        #endregion
+
+        #region Properties
 
         #region Public Properties
 
         [XmlIgnore]
         public Uri DirectoryUri { get; set; }
-        [XmlIgnore]
-        public Uri FileUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
-
-        [XmlAttribute]
-        public string Name => $"{Job}";
         public Job Job { get; set; }
         public List<Drawing> Drawings { get; set; } = new List<Drawing>();
 
+        [XmlIgnore]
+        public Uri FileUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
+        public string Name => $"{Job}";
+        
         [XmlIgnore]
         public ProjectSettings Settings { get; set; }
 
@@ -44,29 +40,15 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #endregion
+
         #region Constructors
 
         public Project() { }
 
         #endregion
 
-        public void Run<TArgument>(Action<Database, TArgument> action, TArgument value)
-        {
-            foreach(Drawing drawing in Drawings)
-            {
-                Database database = Commands.LoadDatabase(drawing.FileUri);
-                if(Application.DocumentManager.Contains(drawing.FileUri))
-                {
-                    using (DocumentLock doclock = Application.DocumentManager.GetDocument(database).LockDocument())
-                        action(database, value);
-                }
-                else
-                {
-                    action(database, value);
-                    database.SaveAs(database.OriginalFileName, DwgVersion.Current);
-                }
-            }
-        }
+        #region Methods
 
         public void AddPage(DrawingType type, string name = null)
         {
@@ -92,6 +74,8 @@ namespace ICA.AutoCAD.Adapter
             Save();
         }
 
+        #region File IO
+
         public string GetFilePath(string fileName)
         {
             return $"{DirectoryUri.LocalPath}\\{fileName}.dwg";
@@ -113,13 +97,6 @@ namespace ICA.AutoCAD.Adapter
             return project;
         }
 
-        public static Project Import(string directoryPath)
-        {
-            string filePath = Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault();
-
-            return filePath is null ? null : WDP.Import(filePath);
-        }
-
         public void Save()
         {
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
@@ -127,14 +104,24 @@ namespace ICA.AutoCAD.Adapter
 
             XmlSerializer writer = new XmlSerializer(typeof(Project));
             FileStream file = File.OpenWrite(FileUri.LocalPath);
+            file.SetLength(0);
             writer.Serialize(file, this, ns);
             file.Close();
             File.SetAttributes(file.Name, File.GetAttributes(file.Name) | FileAttributes.Hidden);
         }
 
+        public static Project Import(string directoryPath)
+        {
+            string filePath = Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault();
+
+            return filePath is null ? null : WDP.Import(filePath);
+        }
+
         public void Export() => WDP.Export(this, Path.ChangeExtension(FileUri.LocalPath, ".wdp"));
 
-        public override string ToString() => Name;
+        #endregion
+
+        #region IDisposable
 
         protected virtual void Dispose(bool disposing)
         {
@@ -155,6 +142,23 @@ namespace ICA.AutoCAD.Adapter
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion
+
+        public override string ToString() => Name;
+
+        #endregion
+
+        #region Enums
+
+        public enum DrawingType
+        {
+            Schematic,
+            Panel,
+            Reference
+        }
+
+        #endregion
 
         //public XmlSchema GetSchema() => null;
 
