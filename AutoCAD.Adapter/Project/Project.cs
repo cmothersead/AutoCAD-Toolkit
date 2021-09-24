@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,9 +29,9 @@ namespace ICA.AutoCAD.Adapter
         [XmlIgnore]
         public Uri FileUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
         public string Name => $"{Job}";
-        
+
         [XmlIgnore]
-        public ProjectSettings Settings { get; set; }
+        public ProjectSettings Settings { get; set; } = new ProjectSettings();
 
         #endregion
 
@@ -50,8 +51,11 @@ namespace ICA.AutoCAD.Adapter
 
         #region Methods
 
-        public void AddPage(DrawingType type, string name = null)
+        public void AddPage(DrawingType? type, string name = null)
         {
+            if (type is null)
+                return;
+
             if (name is null)
                 name = NextDrawingName;
 
@@ -76,10 +80,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region File IO
 
-        public string GetFilePath(string fileName)
-        {
-            return $"{DirectoryUri.LocalPath}\\{fileName}.dwg";
-        }
+        public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";
 
         public static Project Open(string directoryPath)
         {
@@ -110,12 +111,7 @@ namespace ICA.AutoCAD.Adapter
             File.SetAttributes(file.Name, File.GetAttributes(file.Name) | FileAttributes.Hidden);
         }
 
-        public static Project Import(string directoryPath)
-        {
-            string filePath = Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault();
-
-            return filePath is null ? null : WDP.Import(filePath);
-        }
+        public static Project Import(string directoryPath) => WDP.Import(Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault());
 
         public void Export() => WDP.Export(this, Path.ChangeExtension(FileUri.LocalPath, ".wdp"));
 
@@ -147,6 +143,33 @@ namespace ICA.AutoCAD.Adapter
 
         public override string ToString() => Name;
 
+        #region Public Static Methods
+
+        public static DrawingType? PromptDrawingType(Editor editor)
+        {
+            PromptKeywordOptions options = new PromptKeywordOptions("\nChoose page type: ");
+            options.Keywords.Add("Schematic");
+            options.Keywords.Add("Panel");
+            options.Keywords.Add("Reference");
+            options.Keywords.Default = "Schematic";
+
+            PromptResult result = editor.GetKeywords(options);
+            if (result.Status != PromptStatus.OK)
+                return null;
+
+            switch (result.StringResult)
+            {
+                default:
+                    return DrawingType.Schematic;
+                case "Panel":
+                    return DrawingType.Panel;
+                case "Reference":
+                    return DrawingType.Reference;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Enums
@@ -159,56 +182,5 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
-
-        //public XmlSchema GetSchema() => null;
-
-        //public void ReadXml(XmlReader reader)
-        //{
-        //    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-        //    ns.Add("", "");
-
-        //    reader.ReadStartElement();
-        //    if(reader.Name == "Job")
-        //    {
-        //        XmlSerializer jobSerializer = new XmlSerializer(typeof(Job));
-        //        Job = jobSerializer.Deserialize(reader) as Job;
-        //    }
-        //    if(reader.Name == "Drawings")
-        //    {
-        //        reader.ReadStartElement();
-        //        Drawings = new List<Drawing>();
-        //        while(reader.Name == "Drawing")
-        //        {
-        //            bool empty = reader.IsEmptyElement;
-        //            Drawings.Add(new Drawing(this, reader.GetAttribute("FileName")));
-        //            reader.ReadStartElement();
-        //            if (!empty)
-        //            {
-        //                reader.ReadStartElement();
-        //                reader.ReadEndElement();
-        //            }
-        //        }
-        //        reader.ReadEndElement();
-        //    }
-        //    reader.ReadEndElement();
-        //}
-
-        //public void WriteXml(XmlWriter writer)
-        //{
-        //    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-        //    ns.Add("", "");
-
-        //    writer.WriteAttributeString("Name", Name);
-
-        //    XmlSerializer jobSerializer = new XmlSerializer(typeof(Job));
-        //    jobSerializer.Serialize(writer, Job, ns);
-
-        //    writer.WriteStartElement("Drawings");
-
-        //    XmlSerializer drawingSerializer = new XmlSerializer(typeof(Drawing));
-        //    Drawings.ForEach(drawing => drawingSerializer.Serialize(writer, drawing, ns));
-
-        //    writer.WriteEndElement();
-        //}
     }
 }

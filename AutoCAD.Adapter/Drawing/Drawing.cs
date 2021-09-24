@@ -12,6 +12,8 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Drawing : IDisposable
     {
+        #region Properties
+
         #region Private Properties
 
         private Database _database;
@@ -52,12 +54,14 @@ namespace ICA.AutoCAD.Adapter
 
         [XmlAttribute]
         public string Name { get; set; }
+
         [XmlIgnore]
         public List<string> Description
         {
             get => Database?.GetDescription();
             set => Database?.SetDescription(value);
         }
+
         [XmlAttribute]
         public string PageNumber
         {
@@ -70,6 +74,8 @@ namespace ICA.AutoCAD.Adapter
 
         [XmlIgnore]
         public DrawingSettings Settings { get; set; }
+
+        #endregion
 
         #endregion
 
@@ -116,6 +122,8 @@ namespace ICA.AutoCAD.Adapter
             return currentObject.ToString();
         }
 
+        #region Description
+
         public bool AddDescription(string value)
         {
             if (Database is null)
@@ -148,6 +156,8 @@ namespace ICA.AutoCAD.Adapter
             Description = description;
             return true;
         }
+
+        #endregion
 
         public static Drawing CreateFromTemplate(Project project, string templatePath, string fileName)
         {

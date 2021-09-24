@@ -90,6 +90,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static Project Import(string filePath)
         {
+            if (filePath is null)
+                return null;
+
             Project output = new Project
             {
                 DirectoryUri = new Uri(Path.GetDirectoryName(filePath)),

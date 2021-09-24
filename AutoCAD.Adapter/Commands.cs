@@ -216,8 +216,10 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
+        public static Project CurrentProject => CurrentDocument.Database.GetProject();
+
         [CommandMethod("IMPORTPROJECT")]
-        public static void PrintCurrentProject()
+        public static void ImportProject()
         {
             OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
             test.ShowDialog();
@@ -235,85 +237,15 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        [CommandMethod("TESTREFLECTION")]
-        public static void TestReflection()
-        {
-            OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
-            test.ShowDialog();
-            if (test.Filename != "")
-            {
-                using (Project project = Project.Open(test.Filename))
-                {
-                    if (project is null)
-                        return;
-
-                    project.Save();
-                }
-            }
-        }
-
-        public static Project CurrentProject()
-        {
-            return new Project()
-            {
-                DirectoryUri = new Uri(@"C:\Users\cmotherseadicacontro\OneDrive - icacontrol.com\Desktop\Test Project"),
-                Job = new Job()
-                {
-                    Id = 43,
-                    Name = "TJ20 Left Gantry",
-                    Customer = new Customer()
-                    {
-                        Id = 8,
-                        Name = "NTN"
-                    }
-                },
-                Settings = new ProjectSettings()
-            };
-        }
-
-        [CommandMethod("READPROJECT")]
-        public static void ReadProject()
-        {
-            Project test = Project.Open(@"C:\Users\cmotherseadicacontro\OneDrive - icacontrol.com\Desktop\Test Project");
-            var test2 = 1;
-        }
-
         [CommandMethod("EXPORTCURRENTPROJECT")]
         public static void ExportCurrentProject()
         {
-            Project project = CurrentProject();
+            Project project = CurrentProject;
             WDP.Export(project, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
         }
 
         [CommandMethod("ADDPAGE")]
-        public static void ProjectAddPage()
-        {
-            Project currentProject = CurrentProject();
-            PromptKeywordOptions options = new PromptKeywordOptions("\nChoose page type: ");
-            options.Keywords.Add("Schematic");
-            options.Keywords.Add("Panel");
-            options.Keywords.Add("Reference");
-            options.Keywords.Default = "Schematic";
-
-            PromptResult result = Editor.GetKeywords(options);
-            if (result.Status != PromptStatus.OK)
-                return;
-
-            switch (result.StringResult)
-            {
-                case "Schematic":
-                    currentProject.AddPage(Project.DrawingType.Schematic, "1");
-                    break;
-                case "Panel":
-                    currentProject.AddPage(Project.DrawingType.Panel, "2");
-                    break;
-                case "Reference":
-                    currentProject.AddPage(Project.DrawingType.Reference, "3");
-                    break;
-                default:
-                    return;
-            }
-        }
+        public static void ProjectAddPage() => CurrentProject.AddPage(Project.PromptDrawingType(Editor));
 
         #endregion
 
