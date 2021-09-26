@@ -247,6 +247,23 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("ADDPAGE")]
         public static void ProjectAddPage() => CurrentProject.AddPage(Project.PromptDrawingType(Editor));
 
+        [CommandMethod("TESTCOMPONENTS")]
+        public static void TestComponents()
+        {
+            OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
+            test.ShowDialog();
+            if (test.Filename != "")
+            {
+                using (Project project = Project.Open(test.Filename))
+                {
+                    if (project is null)
+                        return;
+
+                    var test1 = project.GetParentSymbols();
+                }
+            }
+        }
+
         #endregion
 
         #region Ladder

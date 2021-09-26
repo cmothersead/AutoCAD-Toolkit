@@ -122,6 +122,14 @@ namespace ICA.AutoCAD.Adapter
             return currentObject.ToString();
         }
 
+        public List<ParentSymbol> GetSymbols() => Database.GetObjectIds()
+                                                          .Where(id => id.Open() is BlockReference)
+                                                          .Select(id => id.Open() as BlockReference)
+                                                          .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name)
+                                                          .Where(reference => reference.HasAttributeReference("TAG1"))
+                                                          .Select(reference => new ParentSymbol(reference))
+                                                          .ToList();
+
         #region Description
 
         public bool AddDescription(string value)

@@ -194,6 +194,8 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public override string ToString() => Tag;
+
         #endregion
     }
 }

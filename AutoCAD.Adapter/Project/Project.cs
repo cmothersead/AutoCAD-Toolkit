@@ -51,6 +51,8 @@ namespace ICA.AutoCAD.Adapter
 
         #region Methods
 
+        public List<ParentSymbol> GetParentSymbols() => Drawings.SelectMany(drawing => drawing.GetSymbols()).ToList();
+
         public void AddPage(DrawingType? type, string name = null)
         {
             if (type is null)
