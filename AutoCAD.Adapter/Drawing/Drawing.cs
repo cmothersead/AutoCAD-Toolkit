@@ -75,6 +75,14 @@ namespace ICA.AutoCAD.Adapter
         [XmlIgnore]
         public DrawingSettings Settings { get; set; }
 
+        [XmlIgnore]
+        public List<ParentSymbol> Components => Database.GetObjectIds()
+                                                        .Where(id => id.Open() is BlockReference)
+                                                        .Select(id => id.Open() as BlockReference)
+                                                        .Where(reference => reference.HasAttributeReference("TAG1"))
+                                                        .Select(reference => new ParentSymbol(reference))
+                                                        .ToList();
+
         #endregion
 
         #endregion

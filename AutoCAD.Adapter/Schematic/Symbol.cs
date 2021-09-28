@@ -1,10 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using System;
+using Autodesk.AutoCAD.EditorInput;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -16,13 +12,11 @@ namespace ICA.AutoCAD.Adapter
 
         #region Properties
 
-        #region Private
-
-        
+        #region Private Properties
 
         #endregion
 
-        #region Protected
+        #region Protected Properties
 
         protected BlockReference BlockReference { get; }
 
@@ -54,7 +48,7 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
-        #region Public
+        #region Public Properties
 
         public string Family
         {
@@ -63,6 +57,8 @@ namespace ICA.AutoCAD.Adapter
         }
 
         public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
+
+        public string SheetNumber => BlockReference.Database.GetSheetNumber();
 
         #endregion
 
@@ -86,7 +82,22 @@ namespace ICA.AutoCAD.Adapter
 
         #region Methods
 
-        #region Public
+        #region Public Methods
+
+
+        #endregion
+
+        #region Public Static Methods
+
+        public static string PromptSymbolName(Editor editor)
+        {
+            PromptStringOptions options = new PromptStringOptions("Enter symbol name: ")
+            {
+                AllowSpaces = true
+            };
+            PromptResult result = editor.GetString(options);
+            return result.StringResult;
+        }
 
         #endregion
 

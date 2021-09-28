@@ -1,6 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.EditorInput;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,9 +9,13 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Project : IDisposable
     {
+        #region Fields
+
         #region Private Fields
 
         private bool disposedValue;
+
+        #endregion
 
         #endregion
 
@@ -33,6 +35,10 @@ namespace ICA.AutoCAD.Adapter
         [XmlIgnore]
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
 
+        [XmlIgnore]
+        public List<ParentSymbol> Components => Drawings.SelectMany(drawing => drawing.Components)
+                                                        .ToList();
+
         #endregion
 
         #region Private Properties
@@ -51,7 +57,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Methods
 
-        public List<ParentSymbol> GetParentSymbols() => Drawings.SelectMany(drawing => drawing.GetSymbols()).ToList();
+        #region Public Methods
 
         public void AddPage(DrawingType? type, string name = null)
         {
@@ -143,7 +149,13 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #endregion
+
+        #region Public Override Methods
+
         public override string ToString() => Name;
+
+        #endregion
 
         #region Public Static Methods
 

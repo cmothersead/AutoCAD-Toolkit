@@ -143,12 +143,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="ListToStringConverter.cs" />
     <Compile Include="Models\TitleBlockFile.cs" />
     <Compile Include="ViewModels\ChildSymbolEditViewModel.cs" />
+    <Compile Include="ViewModels\ComponentsListViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockSettingsViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockViewModel.cs" />
     <Compile Include="Views\ChildSymbolEditView.xaml.cs">
       <DependentUpon>ChildSymbolEditView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ComponentsListView.xaml.cs">
+      <DependentUpon>ComponentsListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TitleBlockSettingsView.xaml.cs">
       <DependentUpon>TitleBlockSettingsView.xaml</DependentUpon>
@@ -161,6 +167,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ChildSymbolEditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ComponentsListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

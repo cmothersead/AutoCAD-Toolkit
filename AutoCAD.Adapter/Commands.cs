@@ -12,6 +12,7 @@ using System;
 using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
 using Autodesk.AutoCAD.Windows;
+using ICA.AutoCAD.Adapter.Windows.ViewModels;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -19,6 +20,7 @@ namespace ICA.AutoCAD.Adapter
     {
         public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
         public static Editor Editor => CurrentDocument.Editor;
+        public static Project CurrentProject => CurrentDocument.Database.GetProject();
 
         private static bool? _mountMode;
         public static bool? MountMode
@@ -118,30 +120,17 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("INSERTCOMPONENT")]
-        public static void InsertSymbol() => InsertSymbol(PromptSymbolName());
+        public static void InsertSymbol() => InsertSymbol(Symbol.PromptSymbolName(Editor));
 
         public static void InsertSymbol(string symbolName) => SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol();
-
-        public static string PromptSymbolName()
-        {
-            PromptStringOptions options = new PromptStringOptions("Enter symbol name: ")
-            {
-                AllowSpaces = true
-            };
-            PromptResult result = Editor.GetString(options);
-            return result.StringResult;
-        }
 
         [CommandMethod("ASSIGNLAYERS")]
         public static void AssignLayers() => Select.Symbol(Editor)?.AssignLayers();
 
         [CommandMethod("UPDATETAGS")]
-        public static void UpdateTag()
-        {
-            foreach (ISymbol symbol in Select.Symbols(Editor))
-                if (symbol is ParentSymbol parent)
-                    parent.UpdateTag($"%F%N1");
-        }
+        public static void UpdateTag() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
+                                                                .ToList()
+                                                                .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag("%F%N1"));
 
         [CommandMethod("UPDATETAG2")]
         public static void UpdateTag2()
@@ -166,10 +155,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("UPDATELAYERS")]
-        public static void UpdateLayers()
-        {
-            ElectricalLayers.Update(CurrentDocument.Database);
-        }
+        public static void UpdateLayers() => ElectricalLayers.Update(CurrentDocument.Database);
 
         [CommandMethod("FINDPARENT")]
         public static void FindParent()
@@ -216,8 +202,6 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Project CurrentProject => CurrentDocument.Database.GetProject();
-
         [CommandMethod("IMPORTPROJECT")]
         public static void ImportProject()
         {
@@ -238,17 +222,13 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("EXPORTCURRENTPROJECT")]
-        public static void ExportCurrentProject()
-        {
-            Project project = CurrentProject;
-            WDP.Export(project, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
-        }
+        public static void ExportCurrentProject() => WDP.Export(CurrentProject, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
 
         [CommandMethod("ADDPAGE")]
         public static void ProjectAddPage() => CurrentProject.AddPage(Project.PromptDrawingType(Editor));
 
-        [CommandMethod("TESTCOMPONENTS")]
-        public static void TestComponents()
+        [CommandMethod("COMPONENTS")]
+        public static void Components()
         {
             OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
             test.ShowDialog();
@@ -259,7 +239,10 @@ namespace ICA.AutoCAD.Adapter
                     if (project is null)
                         return;
 
-                    var test1 = project.GetParentSymbols();
+                    var test1 = project.Components.Where(component => component.Family == "CR").ToList();
+                    var test2 = new ComponentsListView(test1);
+                    Application.ShowModalWindow(test2);
+                    var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter.Windows.Models
 {
@@ -73,6 +74,8 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
             item.Emptied -= DescriptionLine_Emptied;
             return base.Remove(item);
         }
+
+        public override string ToString() => string.Join("\n", this.Select(line => line.Value).ToArray());
 
         #endregion
 
