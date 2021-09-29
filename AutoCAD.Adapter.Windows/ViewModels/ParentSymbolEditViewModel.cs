@@ -1,15 +1,24 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using ICA.AutoCAD.Adapter.Windows.Models;
 using ICA.Schematic;
 using ICA.Schematic.Data;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
-    public class ParentSymbolEditViewModel : BaseViewModel
+    public class ParentSymbolEditViewModel : SymbolEditViewModel
     {
-        IParentSymbol _symbol;
-        public string Tag { get; set; }
+        #region Properties
+
+        #region Private Properties
+
+        private IParentSymbol ParentSymbol => (IParentSymbol)_symbol;
+
+        #endregion
+
+        #region Public Properties
+
         public DescriptionCollection Description { get; set; }
         public bool DescriptionHidden { get; set; }
         public string Installation { get; set; }
@@ -29,25 +38,56 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         public string PartNumber { get; set; }
         public bool PartInfoHidden { get; set; }
 
-        public ParentSymbolEditViewModel(IParentSymbol symbol)
+        #endregion
+
+        #endregion
+
+        #region Constructors
+
+        public ParentSymbolEditViewModel(Window view, IParentSymbol symbol) : base(view, symbol)
         {
-            _symbol = symbol;
-            Tag = _symbol.Tag;
-            Description = new DescriptionCollection(_symbol.Description);
-            DescriptionHidden = _symbol.DescriptionHidden;
-            Installation = _symbol.Enclosure;
-            Location = _symbol.Location;
-            InstallationHidden = _symbol.InstallationHidden;
+            Description = new DescriptionCollection(ParentSymbol.Description);
+            DescriptionHidden = ParentSymbol.DescriptionHidden;
+            Installation = ParentSymbol.Enclosure;
+            Location = ParentSymbol.Location;
+            InstallationHidden = ParentSymbol.InstallationHidden;
             Family = new FamilyViewModel()
             {
-                FamilyCode = _symbol.Family,
-                CurrentManufacturer = new Manufacturer() { Name = _symbol.ManufacturerName },
-                CurrentPart = new Part() { Number = _symbol.PartNumber }
+                FamilyCode = ParentSymbol.Family,
+                CurrentManufacturer = new Manufacturer() { Name = ParentSymbol.ManufacturerName },
+                CurrentPart = new Part() { Number = ParentSymbol.PartNumber }
             };
-            Manufacturer = _symbol.ManufacturerName;
-            PartNumber = _symbol.PartNumber;
-            PartInfoHidden = _symbol.PartInfoHidden;
+            Manufacturer = ParentSymbol.ManufacturerName;
+            PartNumber = ParentSymbol.PartNumber;
+            PartInfoHidden = ParentSymbol.PartInfoHidden;
+            OkCommand = new RelayCommand(UpdateAndClose);
         }
+
+        #endregion
+
+        #region Methods
+
+        #region Private Methods
+
+        private new void UpdateAndClose()
+        {
+            ParentSymbol.Description = Description.Select(d => d.Value)
+                                             .Where(v => v != null)
+                                             .ToList();
+            ParentSymbol.DescriptionHidden = DescriptionHidden;
+            ParentSymbol.Enclosure = Installation;
+            ParentSymbol.Location = Location;
+            ParentSymbol.InstallationHidden = InstallationHidden;
+            ParentSymbol.ManufacturerName = Manufacturer;
+            ParentSymbol.PartNumber = PartNumber;
+            ParentSymbol.PartInfoHidden = PartInfoHidden;
+            ParentSymbol.CollapseAttributeStack();
+            base.UpdateAndClose();
+        }
+
+        #endregion
+
+        #region Public Methods
 
         public async Task LoadFamilyDataAsync()
         {
@@ -61,18 +101,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             Family.IsLoaded = true;
         }
 
-        public void UpdateSymbol()
-        {
-            _symbol.Tag = Tag;
-            _symbol.Description = Description.Select(d => d.Value).Where(v => v != null).ToList();
-            _symbol.DescriptionHidden = DescriptionHidden;
-            _symbol.Enclosure = Installation;
-            _symbol.Location = Location;
-            _symbol.InstallationHidden = InstallationHidden;
-            _symbol.ManufacturerName = Manufacturer;
-            _symbol.PartNumber = PartNumber;
-            _symbol.PartInfoHidden = PartInfoHidden;
-            _symbol.CollapseAttributeStack();
-        }
+        #endregion
+
+        #endregion
     }
 }

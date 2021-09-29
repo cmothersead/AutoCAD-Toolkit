@@ -7,26 +7,21 @@
         xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:ChildSymbolEditViewModel}"
         mc:Ignorable="d"
         Title="Edit Component"
-        MinWidth="620"
+        MinWidth="400"
         Background="#FFE4E4E4"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Margin="10" Grid.Column="0">
-            <controls:ChildTagControl Name="TagControl" Text="{Binding Tag}"/>
-            <controls:InstallationControl Name="InstallationControl" Installation="{Binding Path=Installation, Mode=TwoWay}" Location="{Binding Path=Location, Mode=TwoWay}" IsChecked="{Binding Path=InstallationHidden, Mode=TwoWay}"/>
-        </StackPanel>
-
-        <StackPanel Margin="10" Grid.Column="1">
+        <StackPanel Margin="5" Grid.Column="0">
+            <controls:ChildTagControl Name="TagControl" Text="{Binding Tag}" Command="{Binding SelectCommand}" IsChecked="{Binding Path=TagHidden, Mode=TwoWay}"/>
             <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
-            <controls:PartControl Name="PartControl" Family="{Binding Family}" SelectedManufacturer="{Binding Family.CurrentManufacturer}" SelectedPart="{Binding Family.CurrentPart}" IsEnabled="{Binding Family.IsLoaded}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>
-            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
-                <Button Name="OK_Button" Content="OK" Click="OK_Button_Click" HorizontalAlignment="Right" Height="28" Width="65" Margin="2"/>
+            <!--<controls:PartControl Name="PartControl" Family="{Binding Family}" SelectedManufacturer="{Binding Family.CurrentManufacturer}" SelectedPart="{Binding Family.CurrentPart}" IsEnabled="{Binding Family.IsLoaded}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>-->
+            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="5" Grid.Column="1">
+                <Button Name="OK_Button" Content="OK" HorizontalAlignment="Right" Height="28" Width="65" Margin="2" Command="{Binding OkCommand}"/>
                 <Button Name="Cancel_Button" Content="Cancel" IsCancel="True" Height="28" Width="65" Margin="2"/>
             </StackPanel>
         </StackPanel>

@@ -5,11 +5,21 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
     public class FamilyViewModel
     {
-        public bool IsLoaded = false;
+        #region Properties
+
+        #region Public Properties
+
+        public bool IsLoaded { get; set; } = false;
         public string FamilyCode { get; set; }
         public ObservableCollection<Manufacturer> Manufacturers { get; set; }
         public Manufacturer CurrentManufacturer { get; set; }
         public Part CurrentPart { get; set; }
+
+        #endregion
+
+        #endregion
+
+        #region Operators
 
         public static implicit operator FamilyViewModel(Family v)
         {
@@ -29,5 +39,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
                 Manufacturers = manufacturers
             };
         }
+
+        #endregion
     }
 }

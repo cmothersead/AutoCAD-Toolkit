@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ICA.AutoCAD.Adapter.Controls
@@ -8,31 +9,64 @@ namespace ICA.AutoCAD.Adapter.Controls
     /// </summary>
     public partial class ChildTagControl : UserControl
     {
-        public ChildTagControl()
-        {
-            InitializeComponent();
-        }
+        #region Properties
+
+        #region Public Properties
 
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
                 "Text",
                 typeof(object),
-                typeof(ChildTagControl)
-                );
+                typeof(ChildTagControl));
         public object Text
         {
             get => GetValue(TextProperty);
             set => SetValue(TextProperty, value);
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register(
+                nameof(Command),
+                typeof(object),
+                typeof(ChildTagControl));
+        public object Command
         {
-            Tag_TextBox.IsEnabled = true;
+            get => GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
         }
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        public static readonly DependencyProperty IsCheckedProperty =
+            DependencyProperty.Register(
+                nameof(IsChecked),
+                typeof(bool),
+                typeof(ChildTagControl));
+        public bool? IsChecked
         {
-            Tag_TextBox.IsEnabled = false;
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
+
+        #endregion
+
+        #endregion
+
+        #region Constructors
+
+        public ChildTagControl()
+        {
+            InitializeComponent();
+        }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler Checked;
+        private void Hidden_Checkbox_Checked(object sender, RoutedEventArgs e) => Checked?.Invoke(this, e);
+
+        public event EventHandler Unchecked;
+        private void Hidden_Checkbox_Unchecked(object sender, RoutedEventArgs e) => Unchecked?.Invoke(this, e);
+
+        #endregion
     }
 }

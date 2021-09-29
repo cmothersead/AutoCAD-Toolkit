@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace ICA.AutoCAD.Adapter.Windows.Commands
+namespace ICA.AutoCAD.Adapter.Windows
 {
     public class RelayCommand : ICommand
     {

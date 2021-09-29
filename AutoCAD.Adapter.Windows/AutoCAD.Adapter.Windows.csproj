@@ -148,6 +148,7 @@
     <Compile Include="Models\TitleBlockFile.cs" />
     <Compile Include="ViewModels\ChildSymbolEditViewModel.cs" />
     <Compile Include="ViewModels\ComponentsListViewModel.cs" />
+    <Compile Include="ViewModels\SymbolEditViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockSettingsViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockViewModel.cs" />
     <Compile Include="Views\ChildSymbolEditView.xaml.cs">

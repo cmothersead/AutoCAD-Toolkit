@@ -33,16 +33,10 @@ namespace ICA.AutoCAD.Adapter.Controls
         }
 
         public event EventHandler Checked;
-        private void Description_Checkbox_Checked(object sender, RoutedEventArgs e)
-        {
-            Checked?.Invoke(this, e);
-        }
+        private void Description_Checkbox_Checked(object sender, RoutedEventArgs e) => Checked?.Invoke(this, e);
 
         public event EventHandler Unchecked;
-        private void Description_Checkbox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Unchecked?.Invoke(this, e);
-        }
+        private void Description_Checkbox_Unchecked(object sender, RoutedEventArgs e) => Unchecked?.Invoke(this, e);
 
         public DescriptionControl()
         {

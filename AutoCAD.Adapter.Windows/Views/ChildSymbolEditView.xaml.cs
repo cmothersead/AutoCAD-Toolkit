@@ -9,26 +9,10 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
     /// </summary>
     public partial class ChildSymbolEditView : Window
     {
-        private readonly ChildSymbolEditViewModel _viewModel;
-
         public ChildSymbolEditView(IChildSymbol symbol)
         {
             InitializeComponent();
-            _viewModel = new ChildSymbolEditViewModel(symbol);
-            DataContext = _viewModel;
-        }
-
-        public ChildSymbolEditView(ChildSymbolEditViewModel viewModel)
-        {
-            InitializeComponent();
-            _viewModel = viewModel;
-            DataContext = _viewModel;
-        }
-
-        private void OK_Button_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.UpdateSymbol();
-            Close();
+            DataContext = new ChildSymbolEditViewModel(this, symbol);
         }
     }
 }

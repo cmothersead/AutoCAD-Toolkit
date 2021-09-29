@@ -26,7 +26,7 @@
             <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
             <controls:TextPartControl Name="PartControl" Manufacturer="{Binding Path=Manufacturer, Mode=TwoWay}" Part="{Binding Path=PartNumber, Mode=TwoWay}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
-                <Button Name="OK_Button" Content="OK" Click="OK_Button_Click" HorizontalAlignment="Right" Height="28" Width="65" Margin="2"/>
+                <Button Name="OK_Button" Content="OK" HorizontalAlignment="Right" Height="28" Width="65" Margin="2" Command="{Binding OkCommand}"/>
                 <Button Name="Cancel_Button" Content="Cancel" IsCancel="True" Height="28" Width="65" Margin="2"/>
             </StackPanel>
         </StackPanel>

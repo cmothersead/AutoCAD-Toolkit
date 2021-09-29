@@ -1,5 +1,8 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using ICA.AutoCAD.Adapter.Windows.ViewModels;
+using ICA.AutoCAD.Adapter.Windows.Views;
 using ICA.Schematic;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +14,7 @@ namespace ICA.AutoCAD.Adapter
     {
         #region Properties
 
-        #region Private
+        #region Private Properties
 
         private AttributeReference TagAttribute => BlockReference.GetAttributeReference("TAG2");
 
@@ -83,7 +86,7 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
-        #region Public
+        #region Public Properties
 
         public Database Database => BlockReference.Database;
 
@@ -212,6 +215,18 @@ namespace ICA.AutoCAD.Adapter
                 }
                 transaction.Commit();
             }
+        }
+
+        public IParentSymbol SelectParent()
+        {
+            var components = Database.GetProject().Components
+                                 .Where(component => component.Family == Family)
+                                 .ToList();
+            var view = new ComponentsListView(components);
+            if (Application.ShowModalWindow(view) == true)
+                return ((ComponentsListViewModel)view.DataContext).SelectedComponent;
+
+            return null;
         }
 
         #endregion
