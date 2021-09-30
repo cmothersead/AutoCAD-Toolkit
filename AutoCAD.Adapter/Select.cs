@@ -10,6 +10,15 @@ namespace ICA.AutoCAD.Adapter.Prompt
     public static class Select
     {
 
+        public static Component Component(Editor editor)
+        {
+            if (SingleImplied(editor)?.Open() is BlockReference reference)
+                if (reference.HasAttributeReference("TAG1"))
+                    return new Component(new ParentSymbol(reference));
+
+            return null;
+        }
+
         /// <summary>
         /// Prompts for selection of a schematic symbol from the current drawing, or selects the implied symbol
         /// </summary>

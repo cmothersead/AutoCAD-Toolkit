@@ -36,8 +36,8 @@ namespace ICA.AutoCAD.Adapter
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
 
         [XmlIgnore]
-        public List<ParentSymbol> Components => Drawings.SelectMany(drawing => drawing.Components)
-                                                        .ToList();
+        public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
+                                                     .ToList();
 
         #endregion
 

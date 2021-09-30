@@ -88,6 +88,8 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
+        public Component Component { get; set; }
+
         public Database Database => BlockReference.Database;
 
         public string Tag
@@ -224,7 +226,7 @@ namespace ICA.AutoCAD.Adapter
                                  .ToList();
             var view = new ComponentsListView(components);
             if (Application.ShowModalWindow(view) == true)
-                return ((ComponentsListViewModel)view.DataContext).SelectedComponent;
+                return ((ComponentsListViewModel)view.DataContext).SelectedComponent.Symbol;
 
             return null;
         }

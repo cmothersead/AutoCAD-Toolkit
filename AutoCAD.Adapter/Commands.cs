@@ -200,6 +200,12 @@ namespace ICA.AutoCAD.Adapter
             Select.Symbol(Editor);
         }
 
+        [CommandMethod("SELECTCOMPONENT")]
+        public static void SelectComponent()
+        {
+            var test = Select.Component(Editor);
+        }
+
         #region Project
 
         [CommandMethod("IMPORTPROJECT")]
@@ -239,7 +245,7 @@ namespace ICA.AutoCAD.Adapter
                     if (project is null)
                         return;
 
-                    var test1 = project.Components.Where(component => component.Family == "CR").ToList();
+                    var test1 = project.Components.ToList();
                     var test2 = new ComponentsListView(test1);
                     Application.ShowModalWindow(test2);
                     var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;

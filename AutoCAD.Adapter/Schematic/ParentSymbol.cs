@@ -8,6 +8,18 @@ namespace ICA.AutoCAD.Adapter
 {
     public class ParentSymbol : Symbol, IParentSymbol
     {
+        #region Fields
+
+        #region Private Fields
+
+        private Component component;
+
+        #endregion
+
+        #endregion
+
+        #region Properties
+
         #region Private Properties
 
         private AttributeReference TagAttribute => BlockReference.GetAttributeReference("TAG1");
@@ -67,6 +79,10 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         #region Public Properties
+
+        public Component Component { get; set; }
+
+        public Database Database => BlockReference.Database;
 
         public string Tag
         {
@@ -143,6 +159,8 @@ namespace ICA.AutoCAD.Adapter
                                                                      .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
                                                                      .Select(reference => new WireConnection(reference))
                                                                      .ToList();
+
+        #endregion
 
         #endregion
 

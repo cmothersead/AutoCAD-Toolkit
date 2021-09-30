@@ -12,8 +12,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         #region Public Properties
 
-        public ObservableCollection<IParentSymbol> Components { get; set; }
-        public IParentSymbol SelectedComponent { get; set; }
+        public ObservableCollection<IComponent> Components { get; set; }
+        public IComponent SelectedComponent { get; set; }
         public ICommand SelectCommand { get; set; }
 
         #endregion
@@ -22,10 +22,10 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         #region Constructors
 
-        public ComponentsListViewModel(Window view, IEnumerable<IParentSymbol> components)
+        public ComponentsListViewModel(Window view, IEnumerable<IComponent> components)
         {
             _view = view;
-            Components = new ObservableCollection<IParentSymbol>(components);
+            Components = new ObservableCollection<IComponent>(components);
             SelectCommand = new RelayCommand(SelectAndClose);
         }
 

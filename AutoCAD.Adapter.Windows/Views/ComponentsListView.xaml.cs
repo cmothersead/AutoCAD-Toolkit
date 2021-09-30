@@ -10,7 +10,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Views
     /// </summary>
     public partial class ComponentsListView : Window
     {
-        public ComponentsListView(IEnumerable<IParentSymbol> components)
+        public ComponentsListView(IEnumerable<IComponent> components)
         {
             InitializeComponent();
             DataContext = new ComponentsListViewModel(this, components);

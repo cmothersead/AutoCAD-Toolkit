@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using ICA.Schematic;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -76,12 +77,12 @@ namespace ICA.AutoCAD.Adapter
         public DrawingSettings Settings { get; set; }
 
         [XmlIgnore]
-        public List<ParentSymbol> Components => Database.GetObjectIds()
-                                                        .Where(id => id.Open() is BlockReference)
-                                                        .Select(id => id.Open() as BlockReference)
-                                                        .Where(reference => reference.HasAttributeReference("TAG1"))
-                                                        .Select(reference => new ParentSymbol(reference))
-                                                        .ToList();
+        public List<Component> Components => Database.GetObjectIds()
+                                                     .Where(id => id.Open() is BlockReference)
+                                                     .Select(id => id.Open() as BlockReference)
+                                                     .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name & reference.HasAttributeReference("TAG1"))
+                                                     .Select(reference => new Component(new ParentSymbol(reference)))
+                                                     .ToList();
 
         #endregion
 
@@ -130,13 +131,19 @@ namespace ICA.AutoCAD.Adapter
             return currentObject.ToString();
         }
 
-        public List<ParentSymbol> GetSymbols() => Database.GetObjectIds()
-                                                          .Where(id => id.Open() is BlockReference)
-                                                          .Select(id => id.Open() as BlockReference)
-                                                          .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name)
-                                                          .Where(reference => reference.HasAttributeReference("TAG1"))
-                                                          .Select(reference => new ParentSymbol(reference))
-                                                          .ToList();
+        public List<IChildSymbol> GetChildSymbols() => Database.GetObjectIds()
+                                                              .Where(id => id.Open() is BlockReference)
+                                                              .Select(id => id.Open() as BlockReference)
+                                                              .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name && reference.HasAttributeReference("TAG2"))
+                                                              .Select(reference => new ChildSymbol(reference) as IChildSymbol)
+                                                              .ToList();
+
+        public List<IChildSymbol> GetChildSymbols(string tag) => Database.GetObjectIds()
+                                                                        .Where(id => id.Open() is BlockReference)
+                                                                        .Select(id => id.Open() as BlockReference)
+                                                                        .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name && reference.HasAttributeReference("TAG2") && reference.GetAttributeValue("TAG2") == tag)
+                                                                        .Select(reference => new ChildSymbol(reference) as IChildSymbol)
+                                                                        .ToList();
 
         #region Description
 
