@@ -186,7 +186,7 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
-        #region Construtctor
+        #region Constructor
 
         public ChildSymbol(BlockReference blockReference) : base(blockReference)
         {

@@ -142,6 +142,8 @@
     <Compile Include="Schematic\SchematicSymbolRecord.cs" />
     <Compile Include="Schematic\SignalSymbol.cs" />
     <Compile Include="Schematic\SymbolJig.cs" />
+    <Compile Include="SymbolGripOverrule.cs" />
+    <Compile Include="SymbolTranformOverrule.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
     <Compile Include="Wire\Wire.cs" />
     <Compile Include="Wire\WireConnection.cs" />

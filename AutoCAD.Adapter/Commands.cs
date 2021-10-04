@@ -206,6 +206,16 @@ namespace ICA.AutoCAD.Adapter
             var test = Select.Component(Editor);
         }
 
+        private static SymbolGripOverrule _overrule = new SymbolGripOverrule();
+
+        [CommandMethod("ENABLEOVERRULES")]
+        public static void EnableOverrule()
+        {
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SymbolTranformOverrule(), false);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), _overrule, false);
+            Overrule.Overruling = true;
+        }
+
         #region Project
 
         [CommandMethod("IMPORTPROJECT")]
