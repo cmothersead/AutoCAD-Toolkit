@@ -148,6 +148,7 @@
     <Compile Include="Models\TitleBlockFile.cs" />
     <Compile Include="ViewModels\ChildSymbolEditViewModel.cs" />
     <Compile Include="ViewModels\ComponentsListViewModel.cs" />
+    <Compile Include="ViewModels\ComponentEditViewModel.cs" />
     <Compile Include="ViewModels\SymbolEditViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockSettingsViewModel.cs" />
     <Compile Include="ViewModels\TitleBlockViewModel.cs" />
@@ -156,6 +157,9 @@
     </Compile>
     <Compile Include="Views\ComponentsListView.xaml.cs">
       <DependentUpon>ComponentsListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ComponentEditView.xaml.cs">
+      <DependentUpon>ComponentEditView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TitleBlockSettingsView.xaml.cs">
       <DependentUpon>TitleBlockSettingsView.xaml</DependentUpon>
@@ -174,6 +178,10 @@
     <Page Include="Views\ComponentsListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ComponentEditView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ParentSymbolEditView.xaml">
       <Generator>MSBuild:Compile</Generator>

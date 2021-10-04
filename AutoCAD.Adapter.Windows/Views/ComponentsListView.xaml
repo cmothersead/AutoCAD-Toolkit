@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid ItemsSource="{Binding Components}" SelectedItem="{Binding SelectedComponent}" IsReadOnly="True">
+        <DataGrid ItemsSource="{Binding Components}" SelectedItem="{Binding SelectedComponent}" IsReadOnly="True" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn x:Name="Tag" Header="Tag" Binding="{Binding Tag}" Width="Auto"/>
                 <DataGridTextColumn x:Name="Description" Header="Description" Binding="{Binding Path=Description, Converter={StaticResource ListToStringConverterKey}}" Width="*"/>
