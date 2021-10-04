@@ -37,7 +37,7 @@ namespace ICA.AutoCAD.Adapter
         protected Dictionary<string, string> Replacements => new Dictionary<string, string>()
         {
             { "%F", $"{Family}" },
-            { "%S", $"SheetNumber" },
+            { "%S", $"" }, //Fix so that sheet is not included in line number
             { "%N", $"{LineNumber}" },
             { "%X", "1" } //suffix character for reference based tagging
         };

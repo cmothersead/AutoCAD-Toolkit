@@ -36,16 +36,23 @@ namespace ICA.AutoCAD.Adapter
         }
 
         public IParentSymbol Symbol { get; }
-        public List<IChildSymbol> Children => Project.Drawings.SelectMany(drawing => drawing.GetChildSymbols(Tag))
-                                                             .ToList();
+        public List<IChildSymbol> Children { get; }
 
         public Project Project => ((ParentSymbol)Symbol).Database.GetProject();
 
         public Component(ParentSymbol parent)
         {
             Symbol = parent;
+            Children = Project.Drawings.SelectMany(drawing => drawing.GetChildSymbols(Tag))
+                                       .ToList();
         }
 
         public override string ToString() => Tag;
+
+        public void UpdateTag()
+        {
+            ((ParentSymbol)Symbol).UpdateTag(Project.Settings.Component.Format);
+            //Children.ForEach(child => child.Tag = Tag);
+        }
     }
 }
