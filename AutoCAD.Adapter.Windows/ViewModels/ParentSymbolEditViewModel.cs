@@ -71,6 +71,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         private new void UpdateAndClose()
         {
+            base.UpdateAndClose();
             ParentSymbol.Description = Description.Select(d => d.Value)
                                              .Where(v => v != null)
                                              .ToList();
@@ -81,8 +82,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             ParentSymbol.ManufacturerName = Manufacturer;
             ParentSymbol.PartNumber = PartNumber;
             ParentSymbol.PartInfoHidden = PartInfoHidden;
+            ParentSymbol.UpdateTag("%N%F");
             ParentSymbol.CollapseAttributeStack();
-            base.UpdateAndClose();
         }
 
         #endregion

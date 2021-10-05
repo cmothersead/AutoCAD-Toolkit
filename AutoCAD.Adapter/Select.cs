@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using ICA.Schematic;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ namespace ICA.AutoCAD.Adapter.Prompt
 {
     public static class Select
     {
-
         public static Component Component(Editor editor)
         {
             if (SingleImplied(editor)?.Open() is BlockReference reference)
@@ -76,7 +76,7 @@ namespace ICA.AutoCAD.Adapter.Prompt
             return null;
         }
 
-        public static ObjectId? SingleImplied(Editor editor)
+        public static ObjectId? SingleImplied(Editor editor, string message = null)
         {
             PromptSelectionResult selectionResult = editor.SelectImplied();
             if (selectionResult.Status == PromptStatus.Error)
@@ -93,12 +93,23 @@ namespace ICA.AutoCAD.Adapter.Prompt
             return selectionResult.Status == PromptStatus.OK ? (ObjectId?)selectionResult.Value.GetObjectIds()[0] : null;
         }
 
-        public static List<DBObject> Multiple(Editor editor)
+        public static List<DBObject> Multiple(Editor editor, string message = null)
         {
             PromptSelectionResult selectionResult = editor.GetSelection();
 
             if (selectionResult.Status == PromptStatus.OK)
                 return selectionResult.Value.GetObjectIds().Select(id => id.Open()).ToList();
+
+            return null;
+        }
+
+        public static Point2d? Point(Editor editor, string message = null)
+        {
+            PromptPointOptions options = new PromptPointOptions(message);
+            PromptPointResult pointResult = editor.GetPoint(options);
+
+            if (pointResult.Status == PromptStatus.OK)
+                return pointResult.Value.ToPoint2D();
 
             return null;
         }

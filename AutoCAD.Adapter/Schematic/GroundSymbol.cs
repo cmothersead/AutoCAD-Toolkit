@@ -12,9 +12,13 @@ namespace ICA.AutoCAD.Adapter
 {
     public class GroundSymbol
     {
+        #region Properties
+
         #region Private Properties
 
         private BlockReference BlockReference { get; }
+
+        private static string SymbolName => "VGD";
 
         #endregion
 
@@ -31,6 +35,8 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #endregion
+
         #region Constructors
 
         public GroundSymbol(BlockReference reference)
@@ -39,6 +45,8 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        #region Methods
 
         #region Public Methods
 
@@ -56,13 +64,11 @@ namespace ICA.AutoCAD.Adapter
 
         public static GroundSymbol Insert(Transaction transaction, Database database, Point2d location)
         {
-            string name = "VGD2";
             BlockTable blockTable = database.GetBlockTable();
-
-            BlockTableRecord record = blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
+            BlockTableRecord record = blockTable.Has(SymbolName) ? blockTable.GetRecord(SymbolName) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(SymbolName));
 
             if (record is null)
-                throw new ArgumentException($"Ground symbol \"VGD2\" missing from library");
+                throw new ArgumentException($"Ground symbol \"{SymbolName}\" missing from library.");
 
             BlockReference blockReference = new BlockReference(location.ToPoint3d(), record.ObjectId);
             blockReference.Insert(transaction, database);
@@ -72,13 +78,12 @@ namespace ICA.AutoCAD.Adapter
 
         public static GroundSymbol Insert(Transaction transaction, Document document)
         {
-            string name = "VGD2";
             BlockTable blockTable = document.Database.GetBlockTable();
 
-            BlockTableRecord record = blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
+            BlockTableRecord record = blockTable.Has(SymbolName) ? blockTable.GetRecord(SymbolName) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(SymbolName));
 
             if (record is null)
-                throw new ArgumentException($"Ground symbol \"VGD2\" missing from library");
+                throw new ArgumentException($"Ground symbol \"{SymbolName}\" missing from library.");
 
             BlockReference blockReference = new BlockReference(new Point3d(), record.ObjectId);
 
@@ -115,6 +120,8 @@ namespace ICA.AutoCAD.Adapter
                 return symbol;
             }
         }
+
+        #endregion
 
         #endregion
     }

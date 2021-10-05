@@ -160,9 +160,9 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("FINDPARENT")]
         public static void FindParent()
         {
-            if(Select.Symbol(Editor) is ChildSymbol symbol)
+            if (Select.Symbol(Editor) is ChildSymbol symbol)
             {
-                foreach(BlockReference reference in symbol.Database.GetLayer("SYMS").GetEntities().Where(entity => entity is BlockReference))
+                foreach (BlockReference reference in symbol.Database.GetLayer("SYMS").GetEntities().Where(entity => entity is BlockReference))
                 {
                     ParentSymbol parent = new ParentSymbol(reference);
                     if (parent.Tag == symbol.Tag)
@@ -175,7 +175,7 @@ namespace ICA.AutoCAD.Adapter
         public static void SetParent()
         {
             if (Select.Symbol(Editor) is ParentSymbol parent)
-                foreach(ChildSymbol child in Select.Symbols(Editor))
+                foreach (ChildSymbol child in Select.Symbols(Editor))
                     if (parent.Family == child.Family)
                     {
                         child.Tag = parent.Tag;
@@ -206,14 +206,13 @@ namespace ICA.AutoCAD.Adapter
             var test = Select.Component(Editor);
         }
 
-        private static SymbolGripOverrule _overrule = new SymbolGripOverrule();
-
-        [CommandMethod("ENABLEOVERRULES")]
+        [CommandMethod("TOGGLEOVERRULES")]
         public static void EnableOverrule()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SymbolTranformOverrule(), false);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), _overrule, false);
-            Overrule.Overruling = true;
+            Overrule.Overruling = false;
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), new SymbolTranformOverrule());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), new SymbolGripOverrule());
+            Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
         }
 
         #region Project
@@ -223,7 +222,7 @@ namespace ICA.AutoCAD.Adapter
         {
             OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
             test.ShowDialog();
-            if(test.Filename != "")
+            if (test.Filename != "")
             {
                 using (Project project = Project.Import(test.Filename))
                 {
@@ -237,8 +236,8 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        [CommandMethod("EXPORTCURRENTPROJECT")]
-        public static void ExportCurrentProject() => WDP.Export(CurrentProject, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
+        //[CommandMethod("EXPORTCURRENTPROJECT")]
+        //public static void ExportCurrentProject() => WDP.Export(CurrentProject, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
 
         [CommandMethod("ADDPAGE")]
         public static void ProjectAddPage() => CurrentProject.AddPage(Project.PromptDrawingType(Editor));
@@ -261,6 +260,34 @@ namespace ICA.AutoCAD.Adapter
                     var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
                 }
             }
+        }
+
+        [CommandMethod("NEXTDRAWING", CommandFlags.Session)]
+        public static void Next()
+        {
+            int nextIndex = CurrentProject.Drawings.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name) + 1;
+            if (nextIndex > CurrentProject.Drawings.Count)
+            {
+                Editor.WriteMessage("Project contains no more drawings.");
+                return;
+            }
+            Drawing next = CurrentProject.Drawings[nextIndex];
+            CurrentDocument.CloseAndSave(CurrentDocument.Name);
+            Application.DocumentManager.Open(next.FullPath, false);
+        }
+
+        [CommandMethod("PREVIOUSDRAWING", CommandFlags.Session)]
+        public static void Previous()
+        {
+            int previousIndex = CurrentProject.Drawings.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name) - 1;
+            if (previousIndex < 0)
+            {
+                Editor.WriteMessage("No previous drawing.");
+                return;
+            }
+            Drawing next = CurrentProject.Drawings[previousIndex];
+            CurrentDocument.CloseAndSave(CurrentDocument.Name);
+            Application.DocumentManager.Open(next.FullPath, false);
         }
 
         #endregion
@@ -391,22 +418,29 @@ namespace ICA.AutoCAD.Adapter
                 if (selectedLine.Layer == ElectricalLayers.WireLayer.Name)
                 {
                     LayerTableRecord wireLayer = selectedLine.Database.GetLayer(selectedLine.Layer);
-                    List<Line> potentialLines = wireLayer.GetEntities().Where(entity => entity is Line).Select(entity => entity as Line).ToList();
-                    Wire test = new Wire()
+                    List<Line> potentialLines = wireLayer.GetEntities()
+                                                         .OfType<Line>()
+                                                         .ToList();
+                    Wire wire = new Wire()
                     {
                         Lines = selectedLine.GetConnected(potentialLines)
                     };
-                    test.Highlight();
+                    wire.Highlight();
                 }
         }
 
         [CommandMethod("DRAWWIRE")]
-        public static void DrawWire()
-        {
-            Wire.Draw(CurrentDocument);
-        }
+        public static void DrawWire() => Wire.Draw(CurrentDocument);
 
         #endregion
+
+        [CommandMethod("INSERTSIGNAL")]
+        public static void InsertSignal()
+        {
+            //snap signal to nearest wire end as jig...
+
+            //then insert
+        }
 
         [CommandMethod("GROUND")]
         public static void InsertGround() => GroundSymbol.Insert(CurrentDocument)

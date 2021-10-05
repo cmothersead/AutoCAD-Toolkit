@@ -62,6 +62,11 @@ namespace ICA.AutoCAD.Adapter
             "INST"
         };
 
+        private List<string> Exclude => new List<string>
+        {
+            "TERMDESC"
+        };
+
         private List<string> RequiredAttributes => new List<string>
         {
             "TAG1",
@@ -166,14 +171,11 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructor
 
-        public ParentSymbol(BlockReference blockReference) : base(blockReference)
-        {
-            Stack.Add(BlockReference.GetAttributeReferences()
-                                    .Select(att => att.Tag)
-                                    .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
-                                    .Union(RequiredAttributes)
-                                    .ToList());
-        }
+        public ParentSymbol(BlockReference blockReference) : base(blockReference) => Stack.Add(BlockReference.GetAttributeReferences()
+                                                                                                             .Select(att => att.Tag)
+                                                                                                             .Where(tag => AttributeNames.Any(att => tag.Contains(att)) && !Exclude.Any(att => tag.Contains(att)))
+                                                                                                             .Union(RequiredAttributes)
+                                                                                                             .ToList());
 
         #endregion
 

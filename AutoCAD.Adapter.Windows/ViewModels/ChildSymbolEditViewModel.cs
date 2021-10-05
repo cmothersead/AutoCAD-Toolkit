@@ -45,7 +45,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             base.UpdateAndClose();
         }
 
-        private void SelectParent() => Tag = ChildSymbol.SelectParent().Tag;
+        private void SelectParent() => Tag = ChildSymbol?.SelectParent().Tag;
 
         #endregion
     }

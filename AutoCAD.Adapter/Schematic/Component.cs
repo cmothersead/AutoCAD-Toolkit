@@ -43,8 +43,8 @@ namespace ICA.AutoCAD.Adapter
         public Component(ParentSymbol parent)
         {
             Symbol = parent;
-            Children = Project.Drawings.SelectMany(drawing => drawing.GetChildSymbols(Tag))
-                                       .ToList();
+            //Children = Project.Drawings.SelectMany(drawing => drawing.GetChildSymbols(Tag))
+            //                           .ToList();
         }
 
         public override string ToString() => Tag;

@@ -1,10 +1,17 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using ICA.AutoCAD.IO;
 using ICA.Schematic;
+using System;
 
 namespace ICA.AutoCAD.Adapter
 {
     public class SignalSymbol : IReference
     {
+        #region Properties
+
         #region Private Properties
 
         private BlockReference BlockReference { get; }
@@ -59,11 +66,15 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #endregion
+
         #region Constructors
 
         public SignalSymbol(BlockReference blockReference) => BlockReference = blockReference;
 
         #endregion
+
+        #region Methods
 
         #region Public Methods
 
@@ -75,6 +86,71 @@ namespace ICA.AutoCAD.Adapter
             referenceSymbol.XrefLine = Line;
             referenceSymbol.SignalCode = SignalCode;
         }
+
+        #endregion
+
+        #region Public Static Methods
+
+        public static SignalSymbol Insert(Transaction transaction, Database database, Point2d location, string name)
+        {
+            BlockTable blockTable = database.GetBlockTable();
+            BlockTableRecord record = blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
+
+            if (record is null)
+                throw new ArgumentException($"Symbol \"{name}\" not found in library.");
+
+            BlockReference blockReference = new BlockReference(location.ToPoint3d(), record.ObjectId);
+            blockReference.Insert(transaction, database);
+
+            return new SignalSymbol(blockReference);
+        }
+
+        public static SignalSymbol Insert(Transaction transaction, Document document, string name)
+        {
+            BlockTable blockTable = document.Database.GetBlockTable();
+
+            BlockTableRecord record = blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
+
+            if (record is null)
+                throw new ArgumentException($"Symbol \"{name}\" not found in library.");
+
+            BlockReference blockReference = new BlockReference(new Point3d(), record.ObjectId);
+
+            blockReference.Insert(transaction, document.Database);
+
+            if (blockReference.Position == new Point3d())
+            {
+                Document currentDocument = Application.DocumentManager.MdiActiveDocument;
+                SymbolJig jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, blockReference);
+
+                if (jig.Run() != PromptStatus.OK)
+                    return null;
+            }
+
+            return new SignalSymbol(blockReference);
+        }
+
+        public static SignalSymbol Insert(Database database, Point2d location, string name)
+        {
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                SignalSymbol symbol = Insert(transaction, database, location, name);
+                transaction.Commit();
+                return symbol;
+            }
+        }
+
+        public static SignalSymbol Insert(Document document, string name)
+        {
+            using (Transaction transaction = document.Database.TransactionManager.StartTransaction())
+            {
+                SignalSymbol symbol = Insert(transaction, document, name);
+                transaction.Commit();
+                return symbol;
+            }
+        }
+
+        #endregion
 
         #endregion
     }

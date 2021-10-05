@@ -121,6 +121,8 @@ namespace ICA.AutoCAD.Adapter
                     continue;
                 else if (line.StartsWith("=="))
                     continue;
+                else if (line.StartsWith("="))
+                    continue;
                 else
                 {
                     drawing.Name = Path.GetFileNameWithoutExtension(line);

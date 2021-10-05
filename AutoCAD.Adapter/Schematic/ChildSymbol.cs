@@ -201,7 +201,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Methods
 
-        #region Public
+        #region Public Methods
 
         public void CollapseAttributeStack() => Stack.Collapse();
 

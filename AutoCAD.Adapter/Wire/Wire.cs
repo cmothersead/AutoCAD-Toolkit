@@ -10,6 +10,8 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Wire
     {
+        #region Properties
+
         #region Public Properties
 
         public List<Line> Lines { get; set; } = new List<Line>();
@@ -18,6 +20,8 @@ namespace ICA.AutoCAD.Adapter
         {
             set => Lines.ForEach(line => line.SetLayer(value));
         }
+        #endregion
+
         #endregion
 
         #region Constructors
@@ -41,6 +45,8 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        #region Methods
 
         #region Public Methods
 
@@ -88,9 +94,10 @@ namespace ICA.AutoCAD.Adapter
 
         public static List<Line> GetAllSegments(Database database) => database.GetLayer(ElectricalLayers.WireLayer)
                                                                               .GetEntities()
-                                                                              .Where(entity => entity is Line)
-                                                                              .Select(entity => entity as Line)
+                                                                              .OfType<Line>()
                                                                               .ToList();
+
+        #endregion
 
         #endregion
     }
