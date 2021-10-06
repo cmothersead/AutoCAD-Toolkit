@@ -10,7 +10,7 @@ namespace ICA.AutoCAD.Adapter.Prompt
 {
     public static class Select
     {
-        public static Component Component(Editor editor)
+        public static Component Component(Editor editor, string message = null)
         {
             if (SingleImplied(editor)?.Open() is BlockReference reference)
                 if (reference.HasAttributeReference("TAG1"))
@@ -23,9 +23,9 @@ namespace ICA.AutoCAD.Adapter.Prompt
         /// Prompts for selection of a schematic symbol from the current drawing, or selects the implied symbol
         /// </summary>
         /// <returns></returns>
-        public static ISymbol Symbol(Editor editor)
+        public static ISymbol Symbol(Editor editor, string message = null)
         {
-            if (SingleImplied(editor)?.Open() is BlockReference reference)
+            if (SingleImplied(editor, message)?.Open() is BlockReference reference)
                 return FromReference(editor, reference);
 
             return null;
@@ -59,9 +59,9 @@ namespace ICA.AutoCAD.Adapter.Prompt
             return null;
         }
 
-        public static List<ISymbol> Symbols(Editor editor)
+        public static List<ISymbol> Symbols(Editor editor, string message = null)
         {
-            List<ISymbol> list = Multiple(editor)?.Where(obj => obj is BlockReference)
+            List<ISymbol> list = Multiple(editor, message)?.Where(obj => obj is BlockReference)
                                            .Select(reference => FromReference(editor, (BlockReference)reference))
                                            .ToList();
             return list;
@@ -81,9 +81,10 @@ namespace ICA.AutoCAD.Adapter.Prompt
             PromptSelectionResult selectionResult = editor.SelectImplied();
             if (selectionResult.Status == PromptStatus.Error)
             {
-                PromptSelectionOptions selectionOptions = new PromptSelectionOptions
+                PromptSelectionOptions selectionOptions = new PromptSelectionOptions()
                 {
-                    SingleOnly = true,
+                    MessageForAdding = message,
+                    SingleOnly = true
                 };
                 selectionResult = editor.GetSelection(selectionOptions);
             }
@@ -95,7 +96,8 @@ namespace ICA.AutoCAD.Adapter.Prompt
 
         public static List<DBObject> Multiple(Editor editor, string message = null)
         {
-            PromptSelectionResult selectionResult = editor.GetSelection();
+            PromptSelectionOptions options = new PromptSelectionOptions { MessageForAdding = message };
+            PromptSelectionResult selectionResult = editor.GetSelection(options);
 
             if (selectionResult.Status == PromptStatus.OK)
                 return selectionResult.Value.GetObjectIds().Select(id => id.Open()).ToList();

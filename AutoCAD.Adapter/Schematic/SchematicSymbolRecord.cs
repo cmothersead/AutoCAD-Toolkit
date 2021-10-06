@@ -10,17 +10,25 @@ namespace ICA.AutoCAD.Adapter
 {
     public class SchematicSymbolRecord
     {
+        #region Fields
+
         #region Private Fields
 
         private readonly BlockTableRecord _blockTableRecord;
 
         #endregion
 
+        #endregion
+
+        #region Properties
+
         #region Public Properties
 
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
 
         public Database Database => _blockTableRecord.Database;
+
+        #endregion
 
         #endregion
 
@@ -32,6 +40,8 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        #region Methods
 
         #region Public Methods
 
@@ -117,6 +127,8 @@ namespace ICA.AutoCAD.Adapter
 
             return new SchematicSymbolRecord(record);
         }
+
+        #endregion
 
         #endregion
     }

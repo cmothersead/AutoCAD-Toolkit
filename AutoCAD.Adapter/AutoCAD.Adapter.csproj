@@ -134,6 +134,7 @@
     <Compile Include="Schematic\Component.cs" />
     <Compile Include="Schematic\GroundSymbol.cs" />
     <Compile Include="Schematic\Symbol.cs" />
+    <Compile Include="Schematic\SignalJig.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="SchematicTemplate.cs" />
     <Compile Include="Schematic\ChildSymbol.cs" />

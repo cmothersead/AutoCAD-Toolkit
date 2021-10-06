@@ -179,23 +179,9 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Methods
+
         #region Public Methods
-
-        public void AssignLayers()
-        {
-            using(Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
-            {
-                foreach (AttributeReference reference in BlockReference.GetAttributeReferences(transaction))
-                {
-                    KeyValuePair<string, LayerTableRecord> match = AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
-                    if (match.Key != null)
-                        reference.SetLayer(transaction, match.Value);
-                }
-                transaction.Commit();
-            }
-        }
-
-        public void CollapseAttributeStack() => Stack.Collapse();
 
         public void UpdateTag(string format) => Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
 
@@ -213,6 +199,8 @@ namespace ICA.AutoCAD.Adapter
                     reference.SetValue(term8.TextString);
             }
         }
+
+        #endregion
 
         #endregion
     }

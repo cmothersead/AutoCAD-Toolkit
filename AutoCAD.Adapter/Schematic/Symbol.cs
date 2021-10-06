@@ -1,6 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Windows;
+using ICA.AutoCAD.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -84,6 +88,21 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
+        public void CollapseAttributeStack() => Stack.Collapse();
+
+        public void AssignLayers()
+        {
+            using (Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
+            {
+                foreach (AttributeReference reference in BlockReference.GetAttributeReferences(transaction))
+                {
+                    KeyValuePair<string, LayerTableRecord> match = AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
+                    if (match.Key != null)
+                        reference.SetLayer(transaction, match.Value);
+                }
+                transaction.Commit();
+            }
+        }
 
         #endregion
 
@@ -91,6 +110,11 @@ namespace ICA.AutoCAD.Adapter
 
         public static string PromptSymbolName(Editor editor)
         {
+            OpenFileDialog fileDialog = new OpenFileDialog("Open Symbol", "", "dwg", "", 0);
+            fileDialog.ShowDialog();
+            if (fileDialog.Filename != "")
+                return Paths.GetRelativePath(Paths.SchematicLibrary, fileDialog.Filename);
+
             PromptStringOptions options = new PromptStringOptions("Enter symbol name: ")
             {
                 AllowSpaces = true

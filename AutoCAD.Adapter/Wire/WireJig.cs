@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static ICA.AutoCAD.Adapter.WireConnection;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -38,12 +39,37 @@ namespace ICA.AutoCAD.Adapter
         protected override bool Update()
         {
             Line line = Entity as Line;
-            if(_startPoints != null)
-                line.StartPoint = _position.Closest(_startPoints.Select(wc => wc.Location).ToList()).ToPoint3d();
-            if (Math.Abs(line.StartPoint.X - _position.X) > Math.Abs(line.StartPoint.Y - _position.Y))
-                line.EndPoint = new Point3d(_position.X, line.StartPoint.Y, line.StartPoint.Z);
-            else
-                line.EndPoint = new Point3d(line.StartPoint.X, _position.Y, line.StartPoint.Z);
+            if (_startPoints != null)
+            {
+                WireConnection closest = _startPoints.Aggregate((wc1, wc2) => _position.GetDistanceTo(wc1.Location) < _position.GetDistanceTo(wc2.Location) ? wc1 : wc2);
+                line.StartPoint = closest.Location.ToPoint3d();
+                double dX = _position.X - line.StartPoint.X;
+                double dY = _position.Y - line.StartPoint.Y;
+
+                if (dX < 0 && !closest.WireDirection.HasFlag(Orientation.Left))
+                    _position = new Point2d(line.StartPoint.X, _position.Y);
+                if (dX > 0 && !closest.WireDirection.HasFlag(Orientation.Right))
+                    _position = new Point2d(line.StartPoint.X, _position.Y);
+                if (dY < 0 && !closest.WireDirection.HasFlag(Orientation.Down))
+                    _position = new Point2d(_position.X, line.StartPoint.Y);
+                if (dY > 0 && !closest.WireDirection.HasFlag(Orientation.Up))
+                    _position = new Point2d(_position.X, line.StartPoint.Y);
+
+                dX = _position.X - line.StartPoint.X;
+                dY = _position.Y - line.StartPoint.Y;
+
+
+                if (Math.Abs(dX) > Math.Abs(dY))
+                    if (closest.WireDirection.HasFlag(Orientation.Left) | closest.WireDirection.HasFlag(Orientation.Right))
+                        line.EndPoint = new Point3d(_position.X, line.StartPoint.Y, 0);
+                    else
+                        line.EndPoint = line.StartPoint;
+                else
+                    if (closest.WireDirection.HasFlag(Orientation.Down) | closest.WireDirection.HasFlag(Orientation.Up))
+                    line.EndPoint = new Point3d(line.StartPoint.X, _position.Y, 0);
+                else
+                    line.EndPoint = line.StartPoint;
+            }
             return true;
         }
 

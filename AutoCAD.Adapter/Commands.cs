@@ -122,7 +122,14 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("INSERTCOMPONENT")]
         public static void InsertSymbol() => InsertSymbol(Symbol.PromptSymbolName(Editor));
 
-        public static void InsertSymbol(string symbolName) => SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol();
+        public static void InsertSymbol(string symbolName)
+        {
+            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol() as Symbol;
+            symbol.AssignLayers();
+            if (symbol is ParentSymbol parent)
+                parent.UpdateTag(CurrentProject.Settings.Component.Format);
+            symbol.CollapseAttributeStack();
+        }
 
         [CommandMethod("ASSIGNLAYERS")]
         public static void AssignLayers() => Select.Symbol(Editor)?.AssignLayers();
@@ -174,14 +181,25 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("SETPARENT")]
         public static void SetParent()
         {
-            if (Select.Symbol(Editor) is ParentSymbol parent)
-                foreach (ChildSymbol child in Select.Symbols(Editor))
+            if (Select.Symbol(Editor, "Select parent:") is ParentSymbol parent)
+                foreach (ChildSymbol child in Select.Symbols(Editor, "Select children:"))
                     if (parent.Family == child.Family)
                     {
                         child.Tag = parent.Tag;
                         child.Xref = parent.LineNumber;
                         child.Description = parent.Description;
                     }
+        }
+
+        [CommandMethod("LINK")]
+        public static void Link()
+        {
+            List<Symbol> symbols = Select.Symbols(Editor, "Select symbols:")
+                                         .OfType<Symbol>()
+                                         .ToList();
+
+            List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
+            ordered.OfType<ChildSymbol>().ToList().ForEach(child => child.TagHidden = true);
         }
 
         [CommandMethod("HIDETAG")]
@@ -417,10 +435,10 @@ namespace ICA.AutoCAD.Adapter
             if (Select.SingleImplied(Editor)?.Open() is Line selectedLine)
                 if (selectedLine.Layer == ElectricalLayers.WireLayer.Name)
                 {
-                    LayerTableRecord wireLayer = selectedLine.Database.GetLayer(selectedLine.Layer);
-                    List<Line> potentialLines = wireLayer.GetEntities()
-                                                         .OfType<Line>()
-                                                         .ToList();
+                    List<Line> potentialLines = selectedLine.Database.GetEntities()
+                                                                     .OfType<Line>()
+                                                                     .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
+                                                                     .ToList();
                     Wire wire = new Wire()
                     {
                         Lines = selectedLine.GetConnected(potentialLines)
@@ -437,6 +455,21 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("INSERTSIGNAL")]
         public static void InsertSignal()
         {
+            PromptPointOptions options = new PromptPointOptions("Select a point");
+            PromptPointResult result = Editor.GetPoint(options);
+
+            if (result.Status != PromptStatus.OK)
+                return;
+
+            Point3d point = result.Value;
+            var entity = CurrentDocument.Database.GetEntities()
+                                                 .OfType<Line>()
+                                                 .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
+                                                 .Select(line => new { Line = line, Dist = line.GetClosestPointTo(point, false).DistanceTo(point) })
+                                                 .Aggregate((l1, l2) => l1.Dist < l2.Dist ? l1 : l2);
+
+            if(entity != null)
+                entity.Line.Highlight();
             //snap signal to nearest wire end as jig...
 
             //then insert

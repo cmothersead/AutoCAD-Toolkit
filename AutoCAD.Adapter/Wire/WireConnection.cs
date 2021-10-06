@@ -30,22 +30,22 @@ namespace ICA.AutoCAD.Adapter
             Location = reference.GetPosition();
         }
 
-        public WireConnection(Line line)
+        public WireConnection(Point2d location, double entryAngle)
         {
-            Location = line.EndPoint.ToPoint2D();
-            switch(line.GetAngle2d())
+            Location = location;
+            switch(entryAngle)
             {
                 case 0:
-                    WireDirection = Orientation.All ^ Orientation.Right;
-                    break;
-                case Math.PI / 2:
-                    WireDirection = Orientation.All ^ Orientation.Up;
-                    break;
-                case Math.PI:
                     WireDirection = Orientation.All ^ Orientation.Left;
                     break;
-                case Math.PI * 3 / 2:
+                case Math.PI / 2:
                     WireDirection = Orientation.All ^ Orientation.Down;
+                    break;
+                case Math.PI:
+                    WireDirection = Orientation.All ^ Orientation.Right;
+                    break;
+                case Math.PI * 3 / 2:
+                    WireDirection = Orientation.All ^ Orientation.Up;
                     break;
             }
         }

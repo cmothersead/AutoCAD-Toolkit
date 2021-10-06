@@ -50,11 +50,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public void Highlight()
-        {
-            foreach (Line line in Lines)
-                line.Highlight();
-        }
+        public void Highlight() => Lines.ForEach(line => line.Highlight());
 
         public static void Draw(Document document)
         {
@@ -63,17 +59,29 @@ namespace ICA.AutoCAD.Adapter
             ParentSymbol symbol = Select.Symbol(document.Editor) as ParentSymbol;
             List<WireConnection> currentPoints = symbol.WireConnections;
 
+            Line previousLine = null, newLine;
+
             do
             {
-                Line line = DrawSegment(currentPoints);
+                newLine = DrawSegment(currentPoints);
 
-                if (line is null)
+                if (newLine is null)
                     break;
 
-                currentPoints = new List<WireConnection>() { new WireConnection(line) };
-                line.Insert(document.Database);
-                line.SetLayer(ElectricalLayers.WireLayer);
+                if (newLine.GetAngle2d() == previousLine?.GetAngle2d())
+                    using(Transaction transaction = document.Database.TransactionManager.StartTransaction())
+                    {
+                        previousLine.GetForWrite(transaction).EndPoint = newLine.EndPoint;
+                        transaction.Commit();
+                    }
+                else
+                {
+                    currentPoints = new List<WireConnection>() { new WireConnection(newLine.EndPoint.ToPoint2D(), newLine.GetAngle2d()) };
+                    newLine.Insert(document.Database);
+                    newLine.SetLayer(ElectricalLayers.WireLayer);
 
+                    previousLine = newLine;
+                }
             } while (true);
         }
 

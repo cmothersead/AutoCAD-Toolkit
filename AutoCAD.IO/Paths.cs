@@ -183,9 +183,11 @@ namespace ICA.AutoCAD.IO
 
         public static string GetRelativePath(string relativeTo, string path)
         {
-            Uri relativeUri = new Uri(Path.GetFullPath(relativeTo));
-            Uri pathUri = new Uri(Path.GetFullPath(path));
-            return relativeUri.MakeRelativeUri(pathUri).LocalPath;
+            relativeTo = Path.GetFullPath(relativeTo);
+            path = Path.GetFullPath(path);
+            if (path.Contains(relativeTo))
+                path = path.Replace(relativeTo + "\\", "");
+            return path;
         }
 
         #endregion
