@@ -39,7 +39,8 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             database.RemoveCustomProperties(descriptions.Select(prop => prop.Key));
-            database.SetCustomProperties(values.ToDictionary(item => $"Description {values.IndexOf(item) + 1}"));
+            database.SetCustomProperties(values.Select((value, index) => (value, index))
+                                               .ToDictionary(item => $"Description {item.index + 1}", item => item.value));
             database.SaveAs(database.Filename, DwgVersion.Current);
         }
 

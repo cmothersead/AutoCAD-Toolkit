@@ -7,10 +7,20 @@ namespace ICA.AutoCAD.Adapter
 {
     public class SignalJig : EntityJig
     {
+        #region Fields
+
+        #region Private Fields
+
         private Editor _editor;
         private Matrix3d _ucs;
         private Point3d _position;
         private Transaction _transaction;
+
+        #endregion
+
+        #endregion
+
+        #region Constructors
 
         public SignalJig(Editor editor, Matrix3d ucs, Transaction transaction, BlockReference blockReference) : base(blockReference)
         {
@@ -19,6 +29,12 @@ namespace ICA.AutoCAD.Adapter
             _position = blockReference.Position;
             _transaction = transaction;
         }
+
+        #endregion
+
+        #region Methods
+
+        #region Protected Methods
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
@@ -45,6 +61,10 @@ namespace ICA.AutoCAD.Adapter
             return true;
         }
 
+        #endregion
+
+        #region Public Methods
+
         public PromptStatus Run()
         {
             Document document = Application.DocumentManager.MdiActiveDocument;
@@ -53,5 +73,9 @@ namespace ICA.AutoCAD.Adapter
 
             return document.Editor.Drag(this).Status;
         }
+
+        #endregion
+
+        #endregion
     }
 }

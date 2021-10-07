@@ -13,6 +13,7 @@ using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
+using static ICA.AutoCAD.Adapter.ConnectionPoint;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -125,10 +126,47 @@ namespace ICA.AutoCAD.Adapter
         public static void InsertSymbol(string symbolName)
         {
             Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol() as Symbol;
-            symbol.AssignLayers();
+            if (symbol is null)
+                return;
+
             if (symbol is ParentSymbol parent)
-                parent.UpdateTag(CurrentProject.Settings.Component.Format);
+                parent.UpdateTag();
+            symbol.AssignLayers();
             symbol.CollapseAttributeStack();
+        }
+
+        [CommandMethod("INSERTMULTIPOLE")]
+        public static void InsertMultipole()
+        {
+            string name = Symbol.PromptSymbolName(Editor);
+            PromptStringOptions options = new PromptStringOptions("Number of poles:");
+            PromptResult result = Editor.GetString(options);
+            if (result.Status != PromptStatus.OK)
+                return;
+            if (int.TryParse(result.StringResult, out int poles))
+            {
+                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, name);
+                if (record is null)
+                    return;
+
+                ParentSymbol parent = record.InsertSymbol(new Point2d(), Symbol.Type.Parent) as ParentSymbol;
+                if (parent is null)
+                    return;
+
+                List<Symbol> symbols = new List<Symbol> { parent };
+                for (int i = 1; i < poles; i++)
+                {
+                    symbols.Add(record.InsertSymbol(new Point2d(symbols.Last().Position.X, symbols.Last().Position.Y - CurrentDocument.Database.GetLadder().LineHeight), Symbol.Type.Child) as ChildSymbol);
+                }
+                parent.UpdateTag();
+                symbols.ForEach(symbol =>
+                { 
+                    symbol.AssignLayers(); 
+                    symbol.CollapseAttributeStack();
+                });
+                symbols.OfType<ChildSymbol>().ToList().ForEach(child => child.SetParent(parent));
+                Symbol.Link(symbols);
+            }
         }
 
         [CommandMethod("ASSIGNLAYERS")]
@@ -137,14 +175,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("UPDATETAGS")]
         public static void UpdateTag() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
                                                                 .ToList()
-                                                                .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag("%F%N1"));
-
-        [CommandMethod("UPDATETAG2")]
-        public static void UpdateTag2()
-        {
-            if (Select.Symbol(Editor) is ParentSymbol symbol)
-                symbol.UpdateTag($"%N%F");
-        }
+                                                                .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag());
 
         [CommandMethod("MATCHWIRES")]
         public static void Matchwires()
@@ -192,15 +223,9 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("LINK")]
-        public static void Link()
-        {
-            List<Symbol> symbols = Select.Symbols(Editor, "Select symbols:")
-                                         .OfType<Symbol>()
-                                         .ToList();
-
-            List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
-            ordered.OfType<ChildSymbol>().ToList().ForEach(child => child.TagHidden = true);
-        }
+        public static void Link() => Symbol.Link(Select.Symbols(Editor, "Select symbols:")
+                                                       .OfType<Symbol>()
+                                                       .ToList());
 
         [CommandMethod("HIDETAG")]
         public static void HideTags()
@@ -227,9 +252,8 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TOGGLEOVERRULES")]
         public static void EnableOverrule()
         {
-            Overrule.Overruling = false;
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), new SymbolTranformOverrule());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), new SymbolGripOverrule());
+            Overrule.Overruling = true;
+            //Overrule.AddOverrule(RXObject.GetClass(typeof(Group)), new SymbolGripOverrule(), false);
             Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
         }
 
@@ -284,14 +308,12 @@ namespace ICA.AutoCAD.Adapter
         public static void Next()
         {
             int nextIndex = CurrentProject.Drawings.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name) + 1;
-            if (nextIndex > CurrentProject.Drawings.Count)
+            if (nextIndex >= CurrentProject.Drawings.Count)
             {
-                Editor.WriteMessage("Project contains no more drawings.");
+                Editor.WriteMessage("\nProject contains no more drawings.");
                 return;
             }
-            Drawing next = CurrentProject.Drawings[nextIndex];
-            CurrentDocument.CloseAndSave(CurrentDocument.Name);
-            Application.DocumentManager.Open(next.FullPath, false);
+            ChangeDrawing(CurrentProject.Drawings[nextIndex]);
         }
 
         [CommandMethod("PREVIOUSDRAWING", CommandFlags.Session)]
@@ -300,12 +322,22 @@ namespace ICA.AutoCAD.Adapter
             int previousIndex = CurrentProject.Drawings.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name) - 1;
             if (previousIndex < 0)
             {
-                Editor.WriteMessage("No previous drawing.");
+                Editor.WriteMessage("\nNo previous drawing.");
                 return;
             }
-            Drawing next = CurrentProject.Drawings[previousIndex];
+            ChangeDrawing(CurrentProject.Drawings[previousIndex]);
+        }
+
+        [CommandMethod("FIRSTDRAWING", CommandFlags.Session)]
+        public static void First() => ChangeDrawing(CurrentProject.Drawings.First());
+
+        [CommandMethod("LASTDRAWING", CommandFlags.Session)]
+        public static void Last() => ChangeDrawing(CurrentProject.Drawings.Last());
+
+        public static void ChangeDrawing(Drawing changeTo)
+        {
             CurrentDocument.CloseAndSave(CurrentDocument.Name);
-            Application.DocumentManager.Open(next.FullPath, false);
+            Application.DocumentManager.Open(changeTo.FullPath, false);
         }
 
         #endregion
@@ -468,7 +500,7 @@ namespace ICA.AutoCAD.Adapter
                                                  .Select(line => new { Line = line, Dist = line.GetClosestPointTo(point, false).DistanceTo(point) })
                                                  .Aggregate((l1, l2) => l1.Dist < l2.Dist ? l1 : l2);
 
-            if(entity != null)
+            if (entity != null)
                 entity.Line.Highlight();
             //snap signal to nearest wire end as jig...
 

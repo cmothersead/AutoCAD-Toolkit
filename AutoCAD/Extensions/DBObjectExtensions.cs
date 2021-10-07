@@ -87,6 +87,25 @@ namespace ICA.AutoCAD
             }
         }
 
+        public static void Transact<TDBObject, TArgument1, TArgument2, TArgument3>(this TDBObject obj, Action<TDBObject, Transaction, TArgument1, TArgument2, TArgument3> action, TArgument1 value1, TArgument2 value2, TArgument3 value3) where TDBObject : DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                action(obj, transaction, value1, value2, value3);
+                transaction.Commit();
+            }
+        }
+
+        public static TResult Transact<TDBObject, TArgument1, TArgument2, TArgument3, TResult>(this TDBObject obj, Func<TDBObject, Transaction, TArgument1, TArgument2, TArgument3, TResult> function, TArgument1 value1, TArgument2 value2, TArgument3 value3) where TDBObject : DBObject
+        {
+            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            {
+                TResult result = function(obj, transaction, value1, value2, value3);
+                transaction.Commit();
+                return result;
+            }
+        }
+
         #endregion
     }
 }

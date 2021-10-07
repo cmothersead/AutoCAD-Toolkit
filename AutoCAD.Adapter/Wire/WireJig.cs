@@ -5,7 +5,7 @@ using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static ICA.AutoCAD.Adapter.WireConnection;
+using static ICA.AutoCAD.Adapter.ConnectionPoint;
 
 namespace ICA.AutoCAD.Adapter
 {

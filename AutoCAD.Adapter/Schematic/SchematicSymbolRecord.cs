@@ -45,12 +45,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public ISymbol InsertSymbol(Transaction transaction, Point2d location = new Point2d())
+        public ISymbol InsertSymbol(Transaction transaction, Point2d location = new Point2d(), Symbol.Type? type = null)
         {
             BlockReference blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
-
-            blockReference.Insert(transaction, Database);
-            blockReference.SetLayer(transaction, ElectricalLayers.SymbolLayer);
 
             if (blockReference.Position == Point3d.Origin)
             {
@@ -61,46 +58,47 @@ namespace ICA.AutoCAD.Adapter
                     return null;
             }
 
-            if (_blockTableRecord.HasAttribute("TAG1"))
+            if (type is null)
             {
-                if (blockReference.Database.HasLadder())
-                    blockReference.SetAttributeValue("TAG1", $"{blockReference.Database.GetLadder().ClosestLineNumber(blockReference.Position)}{blockReference.GetAttributeValue("FAMILY")}");
-
-                return new ParentSymbol(blockReference);
-            }  
-            else if (_blockTableRecord.HasAttribute("TAG2"))
-            {
-                return new ChildSymbol(blockReference);
-            }
-            else
-            {
-                PromptKeywordOptions options = new PromptKeywordOptions("\nSymbol type: ");
-                options.Keywords.Add("Parent");
-                options.Keywords.Add("Child");
-                options.Keywords.Default = "Parent";
-
-                PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(options);
-                if (result.Status != PromptStatus.OK)
-                    return null;
-
-                switch (result.StringResult)
+                if (_blockTableRecord.HasAttribute("TAG1"))
+                    type = Symbol.Type.Parent;
+                else if (_blockTableRecord.HasAttribute("TAG2"))
+                    type = Symbol.Type.Child;
+                else
                 {
-                    case "Parent":
-                        return new ParentSymbol(blockReference);
-                    case "Child":
-                        return new ChildSymbol(blockReference);
+                    PromptKeywordOptions options = new PromptKeywordOptions("\nSymbol type: ");
+                    options.Keywords.Add("Parent");
+                    options.Keywords.Add("Child");
+                    options.Keywords.Default = "Parent";
+
+                    PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(options);
+                    if (result.Status != PromptStatus.OK)
+                        return null;
+
+                    if (Enum.TryParse(result.StringResult, out Symbol.Type parsed))
+                        type = parsed;
                 }
             }
 
-            return null;
+            blockReference.Insert(transaction, Database, ElectricalLayers.SymbolLayer);
+
+            switch (type)
+            {
+                case Symbol.Type.Parent:
+                    return new ParentSymbol(blockReference);
+                case Symbol.Type.Child:
+                    return new ChildSymbol(blockReference);
+                default:
+                    return null;
+            }
         }
 
-        public ISymbol InsertSymbol(Point2d location = new Point2d())
+        public ISymbol InsertSymbol(Point2d location = new Point2d(), Symbol.Type? type = null)
         {
             ISymbol symbol;
             using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
             {
-                symbol = InsertSymbol(transaction, location);
+                symbol = InsertSymbol(transaction, location, type);
                 transaction.Commit();
             }
             return symbol;

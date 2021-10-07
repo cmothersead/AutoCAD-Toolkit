@@ -82,7 +82,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             ParentSymbol.ManufacturerName = Manufacturer;
             ParentSymbol.PartNumber = PartNumber;
             ParentSymbol.PartInfoHidden = PartInfoHidden;
-            ParentSymbol.UpdateTag("%N%F");
+            ParentSymbol.UpdateTag();
             ParentSymbol.CollapseAttributeStack();
         }
 

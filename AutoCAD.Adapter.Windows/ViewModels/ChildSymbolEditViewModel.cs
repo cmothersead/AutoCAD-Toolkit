@@ -37,6 +37,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         #region Methods
 
+        #region Private Methods
+
         private void UpdateSymbol()
         {
             ChildSymbol.Description = Description.Select(d => d.Value).Where(v => v != null).ToList();
@@ -46,6 +48,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         }
 
         private void SelectParent() => Tag = ChildSymbol?.SelectParent().Tag;
+
+        #endregion
 
         #endregion
     }

@@ -127,12 +127,14 @@
     <Compile Include="Ladder\LadderTemplate.cs" />
     <Compile Include="Config\LadderSettings.cs" />
     <Compile Include="Project\Customer.cs" />
+    <Compile Include="Project\FamilyMapping.cs" />
     <Compile Include="Project\Job.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Project\ProjectSettings.cs" />
     <Compile Include="Schematic\AttributeStack.cs" />
     <Compile Include="Schematic\Component.cs" />
     <Compile Include="Schematic\GroundSymbol.cs" />
+    <Compile Include="Wire\LinkConnection.cs" />
     <Compile Include="Schematic\Symbol.cs" />
     <Compile Include="Schematic\SignalJig.cs" />
     <Compile Include="Select.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="SymbolGripOverrule.cs" />
     <Compile Include="SymbolTranformOverrule.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
+    <Compile Include="Wire\ConnectionPoint.cs" />
     <Compile Include="Wire\Wire.cs" />
     <Compile Include="Wire\WireConnection.cs" />
     <Compile Include="Wire\WireJig.cs" />

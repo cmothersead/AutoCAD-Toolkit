@@ -22,31 +22,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Private Properties
 
-        private AttributeReference TagAttribute => BlockReference.GetAttributeReference("TAG1");
-
         private AttributeReference MfgAttribute => BlockReference.GetAttributeReference("MFG");
 
         private AttributeReference CatAttribute => BlockReference.GetAttributeReference("CAT");
-
-        private List<AttributeReference> DescAttributes
-        {
-            get
-            {
-                int index = 1;
-                List<AttributeReference> list = new List<AttributeReference>();
-                AttributeReference attributeReference;
-                do
-                {
-                    attributeReference = BlockReference.GetAttributeReference($"DESC{index}");
-                    if (attributeReference != null)
-                    {
-                        list.Add(attributeReference);
-                        index++;
-                    }
-                } while (attributeReference != null);
-                return list;
-            }
-        }
 
         private AttributeReference InstAttribute => BlockReference.GetAttributeReference("INST");
 
@@ -83,17 +61,17 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Protected Properties
+
+        protected override AttributeReference TagAttribute => BlockReference.GetAttributeReference("TAG1");
+
+        #endregion
+
         #region Public Properties
 
         public Component Component { get; set; }
 
         public Database Database => BlockReference.Database;
-
-        public string Tag
-        {
-            get => TagAttribute?.TextString;
-            set => TagAttribute?.SetValue(value);
-        }
 
         public string ManufacturerName
         {
@@ -119,35 +97,6 @@ namespace ICA.AutoCAD.Adapter
             set => LocAttribute?.SetValue(value);
         }
 
-        public List<string> Description
-        {
-            get => DescAttributes.Select(a => a.TextString).ToList();
-            set
-            {
-                if (value.Count == 0)
-                    value.Add("");
-
-                while (DescAttributes.Count != value.Count)
-                {
-                    if (DescAttributes.Count > value.Count)
-                        Stack.Remove($"DESC{DescAttributes.Count}");
-                    else
-                        Stack.Add($"DESC{DescAttributes.Count + 1}");
-                }
-                int position = 0;
-                foreach (string val in value)
-                {
-                    DescAttributes[position++].SetValue(val);
-                }
-            }
-        }
-
-        public bool DescriptionHidden
-        {
-            get => DescAttributes.Count != 0 && DescAttributes[0].Invisible;
-            set => DescAttributes.ForEach(a => a?.SetVisibility(!value));
-        }
-
         public bool InstallationHidden
         {
             get => InstAttribute != null && InstAttribute.Invisible;
@@ -159,11 +108,6 @@ namespace ICA.AutoCAD.Adapter
             get => MfgAttribute != null && MfgAttribute.Invisible;
             set => PartAttributes.ForEach(a => a?.SetVisibility(!value));
         }
-
-        public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
-                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
-                                                                     .Select(reference => new WireConnection(reference))
-                                                                     .ToList();
 
         #endregion
 
@@ -183,7 +127,13 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public void UpdateTag(string format) => Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
+        public void UpdateTag(string format = null)
+        {
+            if (format is null)
+                format = Database.GetProject().Settings.Component.Format;
+            Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
+        } 
+            
 
         public void MatchWireNumbers()
         {

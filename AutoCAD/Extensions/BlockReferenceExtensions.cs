@@ -112,7 +112,7 @@ namespace ICA.AutoCAD
             return blockReference.Database.GetBlockTable(transaction).GetRecord(transaction, blockReference.BlockTableRecord) as BlockTableRecord;
         }
 
-        public static void Insert(this BlockReference blockReference, Transaction transaction, Database database) => blockReference.Insert(transaction, database, null);
+        public static void Insert(this BlockReference blockReference, Transaction transaction, Database database, LayerTableRecord layer = null) => blockReference.Insert(transaction, database, null, layer);
 
         /// <summary>
         /// Adds reference to the passed <see cref="Database"/> within passed transaction.
@@ -120,7 +120,7 @@ namespace ICA.AutoCAD
         /// <param name="blockReference"></param>
         /// <param name="database">Database to append the reference to</param>
         /// <param name="transaction">Transaction dependency for the operation</param>
-        public static void Insert(this BlockReference blockReference, Transaction transaction, Database database, Dictionary<string, string> attributes)
+        public static void Insert(this BlockReference blockReference, Transaction transaction, Database database, Dictionary<string, string> attributes, LayerTableRecord layer = null)
         {
             BlockTableRecord modelSpace = transaction.GetObject(database.GetModelSpace().ObjectId, OpenMode.ForWrite) as BlockTableRecord;
             modelSpace.AppendEntity(blockReference);
@@ -146,6 +146,8 @@ namespace ICA.AutoCAD
                     }
                 }
             }
+            if(layer != null)
+                blockReference.SetLayer(transaction, layer);
         }
 
         #endregion
@@ -172,9 +174,9 @@ namespace ICA.AutoCAD
 
         public static BlockTableRecord GetBlockTableRecord(this BlockReference blockReference) => blockReference.Transact(GetBlockTableRecord);
 
-        public static void Insert(this BlockReference blockReference, Database database) => blockReference.Transact(Insert, database);
+        public static void Insert(this BlockReference blockReference, Database database, LayerTableRecord layer = null) => blockReference.Transact(Insert, database, layer);
 
-        public static void Insert(this BlockReference blockReference, Database database, Dictionary<string, string> attributes) => blockReference.Transact(Insert, database, attributes);
+        public static void Insert(this BlockReference blockReference, Database database, Dictionary<string, string> attributes, LayerTableRecord layer) => blockReference.Transact(Insert, database, attributes, layer);
 
         #endregion
     }

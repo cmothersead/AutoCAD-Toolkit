@@ -51,7 +51,7 @@ namespace ICA.AutoCAD.Adapter
 
         public void UpdateTag()
         {
-            ((ParentSymbol)Symbol).UpdateTag(Project.Settings.Component.Format);
+            ((ParentSymbol)Symbol).UpdateTag();
             //Children.ForEach(child => child.Tag = Tag);
         }
     }

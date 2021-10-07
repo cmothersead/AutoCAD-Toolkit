@@ -5,20 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class WireConnection
+    public class WireConnection : ConnectionPoint
     {
-        public Point2d Location { get; set; }
-        public Orientation WireDirection { get; set; }
-        
-        [Flags]
-        public enum Orientation
-        {
-            Right = 1,
-            Up = 2,
-            Left = 4,
-            Down = 8,
-            All = 15
-        }
+        #region Constructors
 
         public WireConnection(AttributeReference reference)
         {
@@ -49,5 +38,7 @@ namespace ICA.AutoCAD.Adapter
                     break;
             }
         }
+
+        #endregion
     }
 }

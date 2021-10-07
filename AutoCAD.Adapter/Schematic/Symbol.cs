@@ -1,10 +1,12 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.IO;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using static ICA.AutoCAD.Adapter.ConnectionPoint;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -18,11 +20,35 @@ namespace ICA.AutoCAD.Adapter
 
         #region Private Properties
 
+        private AttributeReference FamilyAttribute => BlockReference.GetAttributeReference("FAMILY");
+
         #endregion
 
         #region Protected Properties
 
         protected BlockReference BlockReference { get; }
+
+        protected virtual AttributeReference TagAttribute { get; }
+
+        protected List<AttributeReference> DescAttributes
+        {
+            get
+            {
+                int index = 1;
+                List<AttributeReference> list = new List<AttributeReference>();
+                AttributeReference attributeReference;
+                do
+                {
+                    attributeReference = BlockReference.GetAttributeReference($"DESC{index}");
+                    if (attributeReference != null)
+                    {
+                        list.Add(attributeReference);
+                        index++;
+                    }
+                } while (attributeReference != null);
+                return list;
+            }
+        }
 
         protected static Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
         {
@@ -46,8 +72,6 @@ namespace ICA.AutoCAD.Adapter
             { "%X", "1" } //suffix character for reference based tagging
         };
 
-        private AttributeReference FamilyAttribute => BlockReference.GetAttributeReference("FAMILY");
-
         protected AttributeStack Stack { get; }
 
         #endregion
@@ -60,9 +84,63 @@ namespace ICA.AutoCAD.Adapter
             set => FamilyAttribute?.SetValue(value);
         }
 
+        public string Tag
+        {
+            get => TagAttribute?.TextString;
+            set => TagAttribute?.SetValue(value);
+        }
+
+        public bool TagHidden
+        {
+            get => TagAttribute != null && TagAttribute.Invisible;
+            set => TagAttribute?.SetVisibility(!value);
+        }
+
+        public List<string> Description
+        {
+            get => DescAttributes.Select(a => a.TextString)
+                                 .ToList();
+            set
+            {
+                if (value.Count == 0)
+                    value.Add("");
+
+                while (DescAttributes.Count != value.Count)
+                {
+                    if (DescAttributes.Count > value.Count)
+                        Stack.Remove($"DESC{DescAttributes.Count}");
+                    else
+                        Stack.Add($"DESC{DescAttributes.Count + 1}");
+                }
+                int position = 0;
+                foreach (string val in value)
+                {
+                    DescAttributes[position++].SetValue(val);
+                }
+            }
+        }
+
+        public bool DescriptionHidden
+        {
+            get => DescAttributes.Count != 0 && DescAttributes[0].Invisible;
+            set => DescAttributes.ForEach(a => a?.SetVisibility(!value));
+        }
+
+        public Point2d Position => BlockReference.Position.ToPoint2D();
+
         public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
 
         public string SheetNumber => BlockReference.Database.GetSheetNumber();
+
+        public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
+                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
+                                                                     .Select(reference => new WireConnection(reference))
+                                                                     .ToList();
+
+        public List<LinkConnection> LinkConnections => BlockReference.GetAttributeReferences()
+                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]LINK"))
+                                                                     .Select(reference => new LinkConnection(reference))
+                                                                     .ToList();
 
         #endregion
 
@@ -123,7 +201,57 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
+        public static void Link(List<Symbol> symbols)
+        {
+            List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
+            ordered.OfType<ChildSymbol>().ToList().ForEach(child => 
+            { 
+                child.TagHidden = true;
+                child.SetParent(ordered.First() as ParentSymbol);
+            });
+            LinkConnection top = null, bottom = null;
+
+            foreach (Symbol symbol in ordered)
+            {
+                top = symbol.LinkConnections.Where(connection => connection.WireDirection == Orientation.Up)
+                                            .Aggregate((next, highest) => next.Location.Y > highest.Location.Y ? next : highest);
+                if (top != null && bottom != null)
+                {
+                    if (top.Location.X == bottom.Location.X)
+                    {
+                        Line link = new Line(top.Location.ToPoint3d(), bottom.Location.ToPoint3d());
+                        link.Insert();
+                        link.SetLayer(ElectricalLayers.LinkLayer);
+                    }
+                    else
+                    {
+                        Polyline link = new Polyline();
+                        link.AddVertexAt(0, top.Location, 0, 0, 0);
+                        link.AddVertexAt(1, new Point2d(top.Location.X, (top.Location.Y + bottom.Location.Y) / 2), 0, 0, 0);
+                        link.AddVertexAt(2, new Point2d(bottom.Location.X, (top.Location.Y + bottom.Location.Y) / 2), 0, 0, 0);
+                        link.AddVertexAt(3, bottom.Location, 0, 0, 0);
+                        link.Insert();
+                        link.SetLayer(ElectricalLayers.LinkLayer);
+                    }
+                    top = null;
+                    bottom = null;
+                }
+                bottom = symbol.LinkConnections.Where(connection => connection.WireDirection == Orientation.Down)
+                                               .Aggregate((next, lowest) => next.Location.Y < lowest.Location.Y ? next : lowest);
+            }
+        }
+
         #endregion
+
+        #endregion
+
+        #region Enums
+
+        public enum Type
+        {
+            Parent,
+            Child
+        }
 
         #endregion
     }

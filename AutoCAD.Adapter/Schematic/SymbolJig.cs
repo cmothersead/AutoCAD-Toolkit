@@ -39,7 +39,7 @@ namespace ICA.AutoCAD.Adapter
         protected override bool Update()
         {
             BlockReference blockReference = Entity as BlockReference;
-            blockReference.MoveTo(_transaction, _position);
+            blockReference.Position = _position;
             return true;
         }
 
