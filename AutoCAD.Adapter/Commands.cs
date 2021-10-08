@@ -13,7 +13,6 @@ using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
-using static ICA.AutoCAD.Adapter.ConnectionPoint;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -58,39 +57,42 @@ namespace ICA.AutoCAD.Adapter
         private static bool PreviousGridSnap;
         public static ObjectSnap PreviousObjectSnap;
 
+        #region Mounting
+
         /// <summary>
         /// Toggles between layer states to help with manual mounting of panel components
         /// </summary>
         [CommandMethod("MOUNT")]
         public static void ToggleMountingLayers() => MountMode ^= true;
 
-        private static List<string> MountingLayers => new List<string>
+        private static List<LayerTableRecord> MountingLayers => CurrentDocument.Database.GetLayers(new List<LayerTableRecord>
         {
-            "MOUNTING",
-            "BOUNDS",
-            "CLEARANCE"
-        };
-        private static List<string> ViewingLayers => new List<string>
+            ElectricalLayers.MountingLayer,
+            ElectricalLayers.BoundsLayer,
+            ElectricalLayers.ClearanceLayer
+        });
+
+        private static List<LayerTableRecord> ViewingLayers => CurrentDocument.Database.GetLayers(new List<LayerTableRecord>
         {
-            "COMPONENTS",
-            "WIPEOUT"
-        };
+            ElectricalLayers.ComponentsLayer,
+            ElectricalLayers.WipeoutLayer
+        });
 
         public static void HideMountingLayers()
         {
-            foreach (string layerName in MountingLayers)
-                CurrentDocument.Database.GetLayer(layerName).Freeze();
-            foreach (string layerName in ViewingLayers)
-                CurrentDocument.Database.GetLayer(layerName).Thaw();
+            MountingLayers.ForEach(layer => layer.Freeze());
+            ViewingLayers.ForEach(layer => layer.Thaw());
         }
 
         public static void ShowMountingLayers()
         {
-            foreach (string layerName in MountingLayers)
-                CurrentDocument.Database.GetLayer(layerName).Thaw();
-            foreach (string layerName in ViewingLayers)
-                CurrentDocument.Database.GetLayer(layerName).Freeze();
+            MountingLayers.ForEach(layer => layer.Thaw());
+            ViewingLayers.ForEach(layer => layer.Freeze());
         }
+
+        #endregion
+
+        #region Components
 
         [CommandMethod("EDITCOMPONENT", CommandFlags.UsePickSet)]
         public static void EditSymbol(BlockReference reference = null)
@@ -118,21 +120,6 @@ namespace ICA.AutoCAD.Adapter
                     return;
             }
             symbol.AssignLayers();
-        }
-
-        [CommandMethod("INSERTCOMPONENT")]
-        public static void InsertSymbol() => InsertSymbol(Symbol.PromptSymbolName(Editor));
-
-        public static void InsertSymbol(string symbolName)
-        {
-            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol() as Symbol;
-            if (symbol is null)
-                return;
-
-            if (symbol is ParentSymbol parent)
-                parent.UpdateTag();
-            symbol.AssignLayers();
-            symbol.CollapseAttributeStack();
         }
 
         [CommandMethod("INSERTMULTIPOLE")]
@@ -169,8 +156,20 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        [CommandMethod("ASSIGNLAYERS")]
-        public static void AssignLayers() => Select.Symbol(Editor)?.AssignLayers();
+        [CommandMethod("INSERTCOMPONENT")]
+        public static void InsertSymbol() => InsertSymbol(Symbol.PromptSymbolName(Editor));
+
+        public static void InsertSymbol(string symbolName)
+        {
+            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol() as Symbol;
+            if (symbol is null)
+                return;
+
+            if (symbol is ParentSymbol parent)
+                parent.UpdateTag();
+            symbol.AssignLayers();
+            symbol.CollapseAttributeStack();
+        }
 
         [CommandMethod("UPDATETAGS")]
         public static void UpdateTag() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
@@ -227,35 +226,7 @@ namespace ICA.AutoCAD.Adapter
                                                        .OfType<Symbol>()
                                                        .ToList());
 
-        [CommandMethod("HIDETAG")]
-        public static void HideTags()
-        {
-            foreach (ChildSymbol symbol in Select.Symbols(Editor))
-            {
-                symbol.TagHidden ^= true;
-                symbol.CollapseAttributeStack();
-            }
-        }
-
-        [CommandMethod("SETTYPE")]
-        public static void SetType()
-        {
-            Select.Symbol(Editor);
-        }
-
-        [CommandMethod("SELECTCOMPONENT")]
-        public static void SelectComponent()
-        {
-            var test = Select.Component(Editor);
-        }
-
-        [CommandMethod("TOGGLEOVERRULES")]
-        public static void EnableOverrule()
-        {
-            Overrule.Overruling = true;
-            //Overrule.AddOverrule(RXObject.GetClass(typeof(Group)), new SymbolGripOverrule(), false);
-            Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
-        }
+        #endregion
 
         #region Project
 
@@ -505,6 +476,14 @@ namespace ICA.AutoCAD.Adapter
             //snap signal to nearest wire end as jig...
 
             //then insert
+        }
+
+        [CommandMethod("TOGGLEOVERRULES")]
+        public static void EnableOverrule()
+        {
+            Overrule.Overruling = true;
+            //Overrule.AddOverrule(RXObject.GetClass(typeof(Group)), new SymbolGripOverrule(), false);
+            Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
         }
 
         [CommandMethod("GROUND")]

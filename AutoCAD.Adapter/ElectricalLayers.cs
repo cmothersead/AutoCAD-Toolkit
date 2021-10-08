@@ -138,6 +138,39 @@ namespace ICA.AutoCAD.Adapter
             Description = "Ground wires layer"
         };
 
+        public static LayerTableRecord MountingLayer => new LayerTableRecord()
+        {
+            Name = "MOUNTING",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 1),
+            Description = "Markings for DIN rail alignment and screw holes/knockouts"
+        };
+
+        public static LayerTableRecord BoundsLayer => new LayerTableRecord()
+        {
+            Name = "BOUNDS",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 82),
+            Description = "Bounding boxes for panel symbols"
+        };
+
+        public static LayerTableRecord ClearanceLayer => new LayerTableRecord()
+        {
+            Name = "CLEARANCE",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 30),
+            Description = "Necessary thermal and wiring clearances for panel symbols"
+        };
+
+        public static LayerTableRecord ComponentsLayer => new LayerTableRecord()
+        {
+            Name = "COMPONENTS",
+            Description = "Panel component details & appearance"
+        };
+
+        public static LayerTableRecord WipeoutLayer => new LayerTableRecord()
+        {
+            Name = "WIPEOUT",
+            Description = "Wipeouts"
+        };
+
         #endregion
 
         #region Methods

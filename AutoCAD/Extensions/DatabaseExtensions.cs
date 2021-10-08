@@ -45,14 +45,7 @@ namespace ICA.AutoCAD
         /// </summary>
         /// <param name="database">Instance this method applies to.</param>
         /// <param name="properties">Property key-value pairs.</param>
-        public static void SetCustomProperties(this Database database, Dictionary<string, string> properties)
-        {
-            if (properties is null)
-                return;
-
-            foreach (var entry in properties)
-                database.SetCustomProperty(entry.Key, entry.Value);
-        }
+        public static void SetCustomProperties(this Database database, Dictionary<string, string> properties) => properties?.ToList().ForEach(prop => database.SetCustomProperty(prop));
 
         /// <summary>
         /// Sets a property value
@@ -71,6 +64,13 @@ namespace ICA.AutoCAD
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
+        /// <summary>
+        /// Sets a property value
+        /// </summary>
+        /// <param name="database">Instance this method applies to.</param>
+        /// <param name="pair">Property key/value pair.</param>
+        public static void SetCustomProperty(this Database database, KeyValuePair<string, string> pair) => database.SetCustomProperty(pair.Key, pair.Value);
+
         public static void RemoveCustomProperty(this Database database, string key)
         {
             DatabaseSummaryInfoBuilder infoBuilder = new DatabaseSummaryInfoBuilder(database.SummaryInfo);
@@ -81,8 +81,8 @@ namespace ICA.AutoCAD
         public static void RemoveCustomProperties(this Database database, IEnumerable<string> keys)
         {
             DatabaseSummaryInfoBuilder infoBuilder = new DatabaseSummaryInfoBuilder(database.SummaryInfo);
-            foreach(string key in keys)
-                infoBuilder.CustomPropertyTable.Remove(key);
+            keys.ToList()
+                .ForEach(key => infoBuilder.CustomPropertyTable.Remove(key));
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
@@ -108,7 +108,8 @@ namespace ICA.AutoCAD
         /// </summary>
         /// <param name="database">Instance for this method to be applied to.</param>
         /// <returns><see cref="BlockTableRecord"/> representing the model space of the database.</returns>
-        public static BlockTableRecord GetModelSpace(this Database database, Transaction transaction) => database.GetBlockTable(transaction).GetRecord(BlockTableRecord.ModelSpace);
+        public static BlockTableRecord GetModelSpace(this Database database, Transaction transaction) =>
+            database.GetBlockTable(transaction).GetRecord(BlockTableRecord.ModelSpace);
 
         public static List<ObjectId> GetObjectIds(this Database database, Transaction transaction)
         {
@@ -118,11 +119,17 @@ namespace ICA.AutoCAD
             return output;
         }
 
-        public static List<Entity> GetEntities(this Database database, Transaction transaction) => database.GetObjectIds(transaction).Select(id => id.Open(transaction) as Entity).ToList();
+        public static List<Entity> GetEntities(this Database database, Transaction transaction) => 
+            database.GetObjectIds(transaction)
+                    .Select(id => id.Open(transaction) as Entity)
+                    .ToList();
 
-        public static bool HasLayer(this Database database, Transaction transaction, string name) => database.GetLayerTable(transaction).Has(name);
+        public static bool HasLayer(this Database database, Transaction transaction, string name) => 
+            database.GetLayerTable(transaction)
+            .Has(name);
 
-        public static bool HasLayer(this Database database, Transaction transaction, LayerTableRecord layer) => database.HasLayer(transaction, layer.Name);
+        public static bool HasLayer(this Database database, Transaction transaction, LayerTableRecord layer) =>
+            database.HasLayer(transaction, layer.Name);
 
         /// <summary>
         /// Gets <see cref="LayerTableRecord"/> of the layer with the given name from the database, if it exists.
@@ -130,13 +137,8 @@ namespace ICA.AutoCAD
         /// <param name="database">Instance this method applies to.</param>
         /// <param name="layerName">Name of the desired layer.</param>
         /// <returns><see cref="LayerTableRecord"/> of the layer if it exists. Else null</returns>
-        public static LayerTableRecord GetLayer(this Database database, Transaction transaction, string name)
-        {
-            if (database.HasLayer(transaction, name))
-                return database.GetLayerTable(transaction).GetRecord(name);
-
-            return null;
-        }
+        public static LayerTableRecord GetLayer(this Database database, Transaction transaction, string name) =>
+            database.HasLayer(transaction, name) ? database.GetLayerTable(transaction).GetRecord(name) : null;
 
         /// <summary>
         /// Gets <see cref="LayerTableRecord"/> of the layer with the given name from the database, if it exists.
@@ -153,9 +155,12 @@ namespace ICA.AutoCAD
                 return database.GetLayer(transaction, layer.Name);
 
             database.AddLayer(layer);
-
             return database.GetLayer(layer.Name);
         }
+
+        public static List<LayerTableRecord> GetLayers(this Database database, Transaction transaction, List<LayerTableRecord> layers) =>
+            layers.Select(layer => database.GetLayer(layer))
+                  .ToList();
 
         public static void AddLayer(this Database database, Transaction transaction, LayerTableRecord layer)
         {
@@ -182,6 +187,8 @@ namespace ICA.AutoCAD
         public static LayerTableRecord GetLayer(this Database database, string name) => database.Transact(GetLayer, name);
 
         public static LayerTableRecord GetLayer(this Database database, LayerTableRecord layer) => database.Transact(GetLayer, layer);
+
+        public static List<LayerTableRecord> GetLayers(this Database database, List<LayerTableRecord> layers) => database.Transact(GetLayers, layers);
 
         public static void AddLayer(this Database database, LayerTableRecord layer) => database.Transact(AddLayer, layer);
 
