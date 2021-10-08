@@ -56,7 +56,7 @@ namespace ICA.AutoCAD.Adapter
         {
             //PromptPointResult result = document.Editor.GetPoint("\nSelect wire start point:");
             //Point3d currentPoint = result.Value;
-            ParentSymbol symbol = Select.Symbol(document.Editor) as ParentSymbol;
+            Symbol symbol = Select.Symbol(document.Editor) as Symbol;
             List<WireConnection> currentPoints = symbol.WireConnections;
 
             Line previousLine = null, newLine;

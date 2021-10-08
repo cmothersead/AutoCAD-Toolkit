@@ -41,6 +41,17 @@ namespace ICA.AutoCAD.Adapter.Controls
             set => SetValue(IsCheckedProperty, value);
         }
 
+        public static readonly DependencyProperty CharacterCasingProperty =
+            DependencyProperty.Register(
+                nameof(CharacterCasing),
+                typeof(CharacterCasing),
+                typeof(InstallationControl));
+        public CharacterCasing CharacterCasing
+        {
+            get => (CharacterCasing)GetValue(CharacterCasingProperty);
+            set => SetValue(CharacterCasingProperty, value);
+        }
+
         public InstallationControl()
         {
             InitializeComponent();

@@ -14,7 +14,6 @@ namespace ICA.AutoCAD.Adapter.Controls
                 nameof(Manufacturer),
                 typeof(string),
                 typeof(TextPartControl));
-
         public string Manufacturer
         {
             get => (string)GetValue(ManufacturerProperty);
@@ -26,7 +25,6 @@ namespace ICA.AutoCAD.Adapter.Controls
                 nameof(Part),
                 typeof(string),
                 typeof(TextPartControl));
-
         public string Part
         {
             get => (string)GetValue(PartProperty);
@@ -49,6 +47,18 @@ namespace ICA.AutoCAD.Adapter.Controls
             get => (bool)GetValue(IsCheckedProperty);
             set => SetValue(IsCheckedProperty, value);
         }
+
+        public static readonly DependencyProperty CharacterCasingProperty =
+            DependencyProperty.Register(
+                nameof(CharacterCasing),
+                typeof(CharacterCasing),
+                typeof(TextPartControl));
+        public CharacterCasing CharacterCasing
+        {
+            get => (CharacterCasing)GetValue(CharacterCasingProperty);
+            set => SetValue(CharacterCasingProperty, value);
+        }
+
         public TextPartControl()
         {
             InitializeComponent();

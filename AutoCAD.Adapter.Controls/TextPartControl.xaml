@@ -5,11 +5,26 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              mc:Ignorable="d">
-    <GroupBox ToolTip="Catalog information" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TextPartControl}}">
+    
+    <!--Styling Resources-->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/CheckBox.xaml"/>
+                <ResourceDictionary Source="Style/TextBox.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <!--Content-->
+    <GroupBox ToolTip="Catalog information"
+              DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TextPartControl}}">
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Part Data"/>
-                <CheckBox Name="PartNumber_Checkbox" Content="Hide" VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding IsChecked}">
+                <CheckBox Name="PartNumber_Checkbox"
+                          Content="Hide"
+                          IsChecked="{Binding IsChecked}">
                     <CheckBox.LayoutTransform>
                         <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
                     </CheckBox.LayoutTransform>
@@ -30,11 +45,25 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="5"/>
                 </Grid.ColumnDefinitions>
-                <Label Name="Manufacturer_Label" Content="Manufacturer" Grid.Column="0" Grid.Row="0"/>
-                <TextBox Name="Manufacturer_TextBox" Text="{Binding Manufacturer}" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="2"/>
+                
+                <Label Name="Manufacturer_Label"
+                       Content="Manufacturer"
+                       Grid.Column="0"
+                       Grid.Row="0"/>
+                <TextBox Name="Manufacturer_TextBox"
+                         Text="{Binding Manufacturer}"
+                         Grid.Column="1"
+                         Grid.Row="0"/>
 
-                <Label Name="Part_Label" Content="Part Number" Grid.Row="1" Grid.Column="0"/>
-                <TextBox Name="Part_TextBox" Text="{Binding Part}" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"/>
+                <Label Name="Part_Label"
+                       Content="Part Number"
+                       Grid.Row="1"
+                       Grid.Column="0"/>
+                <TextBox Name="Part_TextBox"
+                         Text="{Binding Part}"
+                         Grid.Column="1"
+                         Grid.Row="1"
+                         Grid.ColumnSpan="2"/>
             </Grid>
         </StackPanel>
     </GroupBox>

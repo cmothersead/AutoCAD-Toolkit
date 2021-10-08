@@ -6,27 +6,39 @@
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d">
+    
+    <!--Styling Resources-->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/CheckBox.xaml"/>
                 <ResourceDictionary Source="Style/TextBox.xaml"/>
+                <ResourceDictionary Source="Style/Button.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <GroupBox Header="Tag" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TagControl}}">
+    
+    <!--Content-->
+    <GroupBox ToolTip="Component tag information"
+              DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TagControl}}">
+        <GroupBox.Header>
+            <Label Content="Tag"/>
+        </GroupBox.Header>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox Name="Tag_TextBox" Style="{StaticResource Default}" Grid.Column="0" Text="{Binding Text}" IsEnabled="False"/>
-            <CheckBox Content="Manual" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="1" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">
-                <CheckBox.LayoutTransform>
-                    <ScaleTransform ScaleX="0.75" ScaleY="0.75"/>
-                </CheckBox.LayoutTransform>
+            <TextBox Text="{Binding Text}"
+                     Grid.Column="0"
+                     IsEnabled="False"/>
+            <CheckBox Content="Manual"
+                      Grid.Column="1"
+                      Checked="CheckBox_Checked"
+                      Unchecked="CheckBox_Unchecked">
             </CheckBox>
-            <Button Margin="2" Width="24" Grid.Column="2">
+            <Button Margin="2" Width="24" Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}" Grid.Column="2">
                 <Button.Content>
                     <fa:FontAwesome Icon="Cog" Foreground="DimGray"/>
                 </Button.Content>

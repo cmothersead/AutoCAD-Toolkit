@@ -5,21 +5,26 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              mc:Ignorable="d">
+    
+    <!--Styling Resources-->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/CheckBox.xaml"/>
                 <ResourceDictionary Source="Style/TextBox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <GroupBox ToolTip="Enclosure, installation, and location information" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:InstallationControl}}">
+    
+    <!--Content-->
+    <GroupBox ToolTip="Enclosure, installation, and location information"
+              DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:InstallationControl}}">
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Install Info"/>
-                <CheckBox Name="Installation_Checkbox" Content="Hide" VerticalAlignment="Center" IsChecked="{Binding IsChecked}">
-                    <CheckBox.LayoutTransform>
-                        <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
-                    </CheckBox.LayoutTransform>
+                <CheckBox Name="Installation_Checkbox"
+                          Content="Hide"
+                          IsChecked="{Binding IsChecked}">
                 </CheckBox>
             </StackPanel>
         </GroupBox.Header>
@@ -32,11 +37,20 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Name="Installation_Label" Content="Enclosure" Grid.Row="0" Grid.Column="0"/>
-            <TextBox Name="Installation_TextBox" Grid.Row="0" Grid.Column="1" Style="{StaticResource Default}" Text="{Binding Installation}"/>
+            
+            <Label Content="Enclosure"
+                   Grid.Row="0"
+                   Grid.Column="0"/>
+            <TextBox Text="{Binding Installation}"
+                     Grid.Row="0"
+                     Grid.Column="1"/>
 
-            <Label Name="Location_Label" Content="Location" Grid.Row="1" Grid.Column="0"/>
-            <TextBox Name="Location_TextBox" Grid.Row="1" Grid.Column="1" Style="{StaticResource Default}" Text="{Binding Location}"/>
+            <Label Content="Location"
+                   Grid.Row="1"
+                   Grid.Column="0"/>
+            <TextBox Text="{Binding Location}"
+                     Grid.Row="1"
+                     Grid.Column="1"/>
         </Grid>
     </GroupBox>
 </UserControl>

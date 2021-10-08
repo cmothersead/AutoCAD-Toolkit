@@ -5,29 +5,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Controls"
              mc:Ignorable="d">
+    
+    <!--Styling Resources-->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/CheckBox.xaml"/>
                 <ResourceDictionary Source="Style/TextBox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <GroupBox DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:DescriptionControl}}">
+    
+    <!--Content-->
+    <GroupBox ToolTip="Description information"
+              DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:DescriptionControl}}">
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Description"/>
-                <CheckBox Name="Description_Checkbox" VerticalContentAlignment="Center" Content="Hide" Checked="Description_Checkbox_Checked" Unchecked="Description_Checkbox_Unchecked" IsChecked="{Binding IsChecked}">
-                    <CheckBox.LayoutTransform>
-                        <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
-                    </CheckBox.LayoutTransform>
+                <CheckBox Name="Description_Checkbox"
+                          Content="Hide"
+                          Checked="Description_Checkbox_Checked"
+                          Unchecked="Description_Checkbox_Unchecked"
+                          IsChecked="{Binding IsChecked}">
                 </CheckBox>
             </StackPanel>
         </GroupBox.Header>
-        <ItemsControl Name="Description_ItemsControl" ItemsSource="{Binding ItemsSource}">
+        <ItemsControl Name="Description_ItemsControl"
+                      ItemsSource="{Binding ItemsSource}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBox Name="Value_TextBox" Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource UppercaseDefault}"/>
+                        <TextBox Name="Value_TextBox"
+                                 Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

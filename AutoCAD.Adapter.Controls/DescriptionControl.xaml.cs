@@ -32,6 +32,17 @@ namespace ICA.AutoCAD.Adapter.Controls
             set => SetValue(IsCheckedProperty, value);
         }
 
+        public static readonly DependencyProperty CharacterCasingProperty =
+            DependencyProperty.Register(
+                nameof(CharacterCasing),
+                typeof(CharacterCasing),
+                typeof(DescriptionControl));
+        public CharacterCasing CharacterCasing
+        {
+            get => (CharacterCasing)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
+        }
+
         public event EventHandler Checked;
         private void Description_Checkbox_Checked(object sender, RoutedEventArgs e) => Checked?.Invoke(this, e);
 
