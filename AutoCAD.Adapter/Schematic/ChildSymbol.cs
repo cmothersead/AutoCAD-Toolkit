@@ -38,10 +38,6 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
-        public Component Component { get; set; }
-
-        public Database Database => BlockReference.Database;
-
         public string Xref
         {
             get => XrefAttribute?.TextString;

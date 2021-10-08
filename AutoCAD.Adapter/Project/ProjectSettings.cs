@@ -1,6 +1,6 @@
 ﻿using ICA.AutoCAD.IO;
-using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -11,7 +11,8 @@ namespace ICA.AutoCAD.Adapter
         public string ReferenceTemplatePath { get; set; } = $"{Paths.Templates}\\ICA 11X17 Title Block.dwt";
         public string Library { get; set; } = Paths.Libraries;
         public string FileNameFormat = "%PPG%S";
-        public List<FamilyMapping> FamilyMap = new List<FamilyMapping> { new FamilyMapping { Code = "MO", Value = "MOT" } };
+        [XmlArrayItem("Family")]
+        public List<FamilyCode> FamilyCodes { get; set; }
         public LadderSettings Ladder { get; set; } = new LadderSettings();
         public ComponentSettings Component { get; set; } = new ComponentSettings();
         public WireSettings Wire { get; set; } = new WireSettings();

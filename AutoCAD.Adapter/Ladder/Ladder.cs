@@ -10,6 +10,8 @@ namespace ICA.AutoCAD.Adapter
 {
     public class Ladder : ILadder
     {
+        #region Properties
+
         #region Private Properties
 
         private string _sheetNumber;
@@ -80,6 +82,8 @@ namespace ICA.AutoCAD.Adapter
                 return _lineNumbers;
             }
         }
+
+        #endregion
 
         #endregion
 

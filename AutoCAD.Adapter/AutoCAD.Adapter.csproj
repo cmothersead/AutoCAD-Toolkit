@@ -127,7 +127,7 @@
     <Compile Include="Ladder\LadderTemplate.cs" />
     <Compile Include="Config\LadderSettings.cs" />
     <Compile Include="Project\Customer.cs" />
-    <Compile Include="Project\FamilyMapping.cs" />
+    <Compile Include="Project\FamilyCode.cs" />
     <Compile Include="Project\Job.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Project\ProjectSettings.cs" />

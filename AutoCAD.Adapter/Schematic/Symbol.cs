@@ -66,7 +66,7 @@ namespace ICA.AutoCAD.Adapter
 
         protected Dictionary<string, string> Replacements => new Dictionary<string, string>()
         {
-            { "%F", $"{Family}" },
+            { "%F", $"{FamilyView}" },
             { "%S", $"" }, //Fix so that sheet is not included in line number
             { "%N", $"{LineNumber}" },
             { "%X", "1" } //suffix character for reference based tagging
@@ -78,11 +78,20 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
+        public Component Component { get; set; }
+
+        public Database Database => BlockReference.Database;
+
+        public Project Project => Database.GetProject();
+
         public string Family
         {
             get => FamilyAttribute?.TextString;
             set => FamilyAttribute?.SetValue(value);
         }
+
+        public string FamilyView => Project.Settings.FamilyCodes.Select(family => family.Replace)
+                                                                .Contains(Family) ? Project.Settings.FamilyCodes.Single(family => family.Replace == Family).Code : Family;
 
         public string Tag
         {
@@ -141,6 +150,8 @@ namespace ICA.AutoCAD.Adapter
                                                                      .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]LINK"))
                                                                      .Select(reference => new LinkConnection(reference))
                                                                      .ToList();
+
+        
 
         #endregion
 

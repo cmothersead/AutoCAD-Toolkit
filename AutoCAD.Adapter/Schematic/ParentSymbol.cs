@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
 
@@ -68,10 +67,6 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         #region Public Properties
-
-        public Component Component { get; set; }
-
-        public Database Database => BlockReference.Database;
 
         public string ManufacturerName
         {
