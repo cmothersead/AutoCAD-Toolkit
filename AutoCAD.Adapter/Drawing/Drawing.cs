@@ -106,9 +106,12 @@ namespace ICA.AutoCAD.Adapter
 
         public void UpdateTitleBlock()
         {
-            TitleBlock test = Database.GetTitleBlock();
+            TitleBlock titleBlock = Database.GetTitleBlock();
+            if (titleBlock is null)
+                return;
+
             Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Key, pair => GetPropertyValue(pair.Value).ToUpper());
-            test.Attributes = dict;
+            titleBlock.Attributes = dict;
             Save();
         }
 
