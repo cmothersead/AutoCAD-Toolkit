@@ -42,20 +42,21 @@ namespace ICA.AutoCAD
                 {
                     action(obj, transaction, value);
                     transaction.Commit();
+                    return;
                 }
             }
-            else if(value is Database database)
+            
+            if(value is Database database)
             {
                 using (Transaction transaction = database.TransactionManager.StartTransaction())
                 {
                     action(obj, transaction, value);
                     transaction.Commit();
+                    return;
                 }
             }
-            else
-            {
-                throw new ArgumentException("DBObject is not yet a database resident, and no database was provided");
-            }
+
+            throw new ArgumentException("DBObject is not yet a database resident, and no database argument was provided");
         }
 
         public static TResult Transact<TDBObject, TArgument, TResult>(this TDBObject obj, Func<TDBObject, Transaction, TArgument, TResult> function, TArgument value) where TDBObject : DBObject
@@ -70,11 +71,36 @@ namespace ICA.AutoCAD
 
         public static void Transact<TDBObject, TArgument1, TArgument2>(this TDBObject obj, Action<TDBObject, Transaction, TArgument1, TArgument2> action, TArgument1 value1, TArgument2 value2) where TDBObject : DBObject
         {
-            using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+            if(obj.Database != null)
             {
-                action(obj, transaction, value1, value2);
-                transaction.Commit();
+                using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
+                {
+                    action(obj, transaction, value1, value2);
+                    transaction.Commit();
+                    return;
+                }
             }
+            
+            if(value1 is Database database1)
+            {
+                using (Transaction transaction = database1.TransactionManager.StartTransaction())
+                {
+                    action(obj, transaction, value1, value2);
+                    transaction.Commit();
+                    return;
+                }
+            }
+            
+            if(value2 is Database database2){
+                using (Transaction transaction = database2.TransactionManager.StartTransaction())
+                {
+                    action(obj, transaction, value1, value2);
+                    transaction.Commit();
+                    return;
+                }
+            }
+
+            throw new ArgumentException("DBObject is not yet a database resident, and no database argument was provided");
         }
 
         public static TResult Transact<TDBObject, TArgument1, TArgument2, TResult>(this TDBObject obj, Func<TDBObject, Transaction, TArgument1, TArgument2, TResult> function, TArgument1 value1, TArgument2 value2) where TDBObject : DBObject
