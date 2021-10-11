@@ -22,6 +22,8 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Properties
+
         #region Private Properties
 
         private AttributeDefinition SpareAttribute => _blockTableRecord.AttributeDefinitions().First(d => d.Tag == "SPARE");
@@ -53,6 +55,8 @@ namespace ICA.AutoCAD.Adapter
                 Reference.RecordGraphicsModified(true);
             }
         }
+
+        #endregion
 
         #endregion
 
@@ -113,8 +117,7 @@ namespace ICA.AutoCAD.Adapter
             if (IsInserted)
                 return;
 
-            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId).Insert(Database);
-            Reference.SetLayer(ElectricalLayers.TitleBlockLayer);
+            new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId).Insert(Database, ElectricalLayers.TitleBlockLayer);
             _blockTableRecord.Database.Limmax = Reference.GeometricExtents.MaxPoint.ToPoint2D();
             _blockTableRecord.Database.Limmin = Reference.GeometricExtents.MinPoint.ToPoint2D();
             SystemVariables.GridDisplay &= ~GridDisplay.BeyondLimits;

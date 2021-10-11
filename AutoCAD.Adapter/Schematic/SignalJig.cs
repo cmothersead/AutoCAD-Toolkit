@@ -13,7 +13,7 @@ namespace ICA.AutoCAD.Adapter
 
         private Editor _editor;
         private Matrix3d _ucs;
-        private Point3d _position;
+        private Point2d _position;
         private Transaction _transaction;
 
         #endregion
@@ -26,7 +26,7 @@ namespace ICA.AutoCAD.Adapter
         {
             _editor = editor;
             _ucs = ucs;
-            _position = blockReference.Position;
+            _position = blockReference.Position.ToPoint2D();
             _transaction = transaction;
         }
 
@@ -44,7 +44,7 @@ namespace ICA.AutoCAD.Adapter
             };
 
             PromptPointResult result = prompts.AcquirePoint(options);
-            Point3d ucsPoint = result.Value.TransformBy(_ucs.Inverse());
+            Point2d ucsPoint = result.Value.TransformBy(_ucs.Inverse()).ToPoint2D();
 
 
             if (_position == ucsPoint)
@@ -57,7 +57,7 @@ namespace ICA.AutoCAD.Adapter
         protected override bool Update()
         {
             BlockReference blockReference = Entity as BlockReference;
-            blockReference.MoveTo(_transaction, _position);
+            
             return true;
         }
 
@@ -65,14 +65,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public PromptStatus Run()
-        {
-            Document document = Application.DocumentManager.MdiActiveDocument;
-            if (document == null)
-                return PromptStatus.Error;
-
-            return document.Editor.Drag(this).Status;
-        }
+        public PromptStatus Run() => _editor?.Drag(this).Status ?? PromptStatus.Error;
 
         #endregion
 

@@ -11,14 +11,30 @@ namespace ICA.AutoCAD.Adapter
 {
     public class WireJig : EntityJig
     {
+        #region Fields
+
+        #region Private Fields
+
         private Point2d _position;
         private List<WireConnection> _startPoints;
+
+        #endregion
+
+        #endregion
+
+        #region Constructors
 
         public WireJig(Line line, List<WireConnection> startPoints) : base(line)
         {
             _position = line.EndPoint.ToPoint2D();
             _startPoints = startPoints;
         }
+
+        #endregion
+
+        #region Methods
+
+        #region Protected Methods
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
@@ -73,6 +89,10 @@ namespace ICA.AutoCAD.Adapter
             return true;
         }
 
+        #endregion
+
+        #region Public Methods
+
         public PromptStatus Run()
         {
             Document document = Application.DocumentManager.MdiActiveDocument;
@@ -81,5 +101,9 @@ namespace ICA.AutoCAD.Adapter
 
             return document.Editor.Drag(this).Status;
         }
+
+        #endregion
+
+        #endregion
     }
 }

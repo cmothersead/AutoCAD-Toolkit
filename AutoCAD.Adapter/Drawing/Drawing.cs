@@ -51,7 +51,15 @@ namespace ICA.AutoCAD.Adapter
         public Project Project { get; set; }
         public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
         [XmlIgnore]
-        public Dictionary<string, string> TitleBlockAttributes { get; set; }
+        public Dictionary<string, string> TitleBlockAttributes { get; set; } = new Dictionary<string, string>()
+            {
+                { "DWGNO", "Project.Job.Code" },
+                { "SHTS", "Project.Drawings.Count" },
+                { "TITLE1", "Project.Job.Name" },
+                { "TITLE2", "Name" },
+                { "SHT", "PageNumber" },
+                { "CUST", "Project.Job.Customer.Name" }
+            };
 
         [XmlAttribute]
         public string Name { get; set; }
@@ -90,18 +98,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructor
 
-        public Drawing()
-        {
-            TitleBlockAttributes = new Dictionary<string, string>()
-            {
-                { "DWGNO", "Project.Job.Code" },
-                { "SHTS", "Project.Drawings.Count" },
-                { "TITLE1", "Project.Job.Name" },
-                { "TITLE2", "Name" },
-                { "SHT", "PageNumber" },
-                { "CUST", "Project.Job.Customer.Name" }
-            };
-        }
+        public Drawing() { }
 
         #endregion
 

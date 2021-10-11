@@ -18,11 +18,28 @@ namespace ICA.AutoCAD.Adapter
 {
     public static class Commands
     {
+        #region Fields
+
+        #region Private Fields
+
+        private static bool? _mountMode;
+        private static bool PreviousGridSnap;
+        public static ObjectSnap PreviousObjectSnap;
+
+        #endregion
+
+        #endregion
+
+        #region Properties
+
+        #region Public Properties
+
+        #region Public Static Properties
+
         public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
         public static Editor Editor => CurrentDocument.Editor;
         public static Project CurrentProject => CurrentDocument.Database.GetProject();
 
-        private static bool? _mountMode;
         public static bool? MountMode
         {
             get
@@ -54,8 +71,14 @@ namespace ICA.AutoCAD.Adapter
                 Editor.Regen();
             }
         }
-        private static bool PreviousGridSnap;
-        public static ObjectSnap PreviousObjectSnap;
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Methods
 
         #region Mounting
 
@@ -371,7 +394,21 @@ namespace ICA.AutoCAD.Adapter
         public static void ProjectTitleBlock()
         {
             TitleBlock titleBlock = TitleBlock.Select();
-            Project project = CurrentDocument.Database.GetProject();
+            Project project = CurrentProject;
+            foreach (Drawing drawing in project.Drawings)
+            {
+                if (!Application.DocumentManager.Contains(drawing.FileUri))
+                {
+                    try
+                    {
+                        drawing.UpdateTitleBlock();
+                    }
+                    catch(Autodesk.AutoCAD.Runtime.Exception ex)
+                    {
+                        var test = ex;
+                    }
+                }
+            }
         }
 
         public static void AddTitleBlock(Database database, TitleBlock titleBlock)
@@ -507,5 +544,7 @@ namespace ICA.AutoCAD.Adapter
                 document.Editor.SetCurrentView(view);
             }
         }
+
+        #endregion
     }
 }
