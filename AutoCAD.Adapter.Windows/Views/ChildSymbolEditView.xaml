@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Controls;assembly=AutoCAD.Adapter.Controls"
+        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
         xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:ChildSymbolEditViewModel}"
         mc:Ignorable="d"
         Title="Edit Component"
@@ -17,8 +17,8 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Margin="5" Grid.Column="0">
-            <controls:ChildTagControl Name="TagControl" Text="{Binding Tag}" Command="{Binding SelectCommand}" IsChecked="{Binding Path=TagHidden, Mode=TwoWay}"/>
-            <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
+            <controls:ChildTagControl x:Name="TagControl" Text="{Binding Tag}" Command="{Binding SelectCommand}" IsChecked="{Binding Path=TagHidden, Mode=TwoWay}"/>
+            <controls:DescriptionControl x:Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
             <!--<controls:PartControl Name="PartControl" Family="{Binding Family}" SelectedManufacturer="{Binding Family.CurrentManufacturer}" SelectedPart="{Binding Family.CurrentPart}" IsEnabled="{Binding Family.IsLoaded}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>-->
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="5" Grid.Column="1">
                 <Button Name="OK_Button" Content="OK" HorizontalAlignment="Right" Height="28" Width="65" Margin="2" Command="{Binding OkCommand}"/>

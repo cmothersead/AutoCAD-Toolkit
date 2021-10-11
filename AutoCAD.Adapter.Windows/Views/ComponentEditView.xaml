@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Controls;assembly=AutoCAD.Adapter.Controls"
+        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
         xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:ParentSymbolEditViewModel}"
         mc:Ignorable="d"
         Title="Edit Component"
@@ -18,12 +18,12 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Margin="10" Grid.Column="0">
-            <controls:TagControl Name="TagControl" Text="{Binding Tag}"/>
+            <controls:TagControl x:Name="TagControl" Text="{Binding Tag}"/>
         </StackPanel>
 
         <StackPanel Margin="5" Grid.Column="1">
-            <controls:DescriptionControl Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
-            <controls:TextPartControl Name="PartControl" Manufacturer="{Binding Path=Manufacturer, Mode=TwoWay}" Part="{Binding Path=PartNumber, Mode=TwoWay}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>
+            <controls:DescriptionControl x:Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
+            <controls:TextPartControl x:Name="PartControl" Manufacturer="{Binding Path=Manufacturer, Mode=TwoWay}" Part="{Binding Path=PartNumber, Mode=TwoWay}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10" Grid.Column="1">
                 <Button Name="OK_Button" Content="OK" HorizontalAlignment="Right" Height="28" Width="65" Margin="2" Command="{Binding OkCommand}"/>
                 <Button Name="Cancel_Button" Content="Cancel" IsCancel="True" Height="28" Width="65" Margin="2"/>

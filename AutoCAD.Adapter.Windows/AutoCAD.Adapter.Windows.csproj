@@ -144,7 +144,29 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\RelayCommand.cs" />
-    <Compile Include="ListToStringConverter.cs" />
+    <Compile Include="Controls\ChildTagControl.xaml.cs">
+      <DependentUpon>ChildTagControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ComponentOverviewControl.xaml.cs">
+      <DependentUpon>ComponentOverviewControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DescriptionControl.xaml.cs">
+      <DependentUpon>DescriptionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\InstallationControl.xaml.cs">
+      <DependentUpon>InstallationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PartControl.xaml.cs">
+      <DependentUpon>PartControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TagControl.xaml.cs">
+      <DependentUpon>TagControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TextPartControl.xaml.cs">
+      <DependentUpon>TextPartControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Converters\ListToStringConverter.cs" />
     <Compile Include="Models\TitleBlockFile.cs" />
     <Compile Include="ViewModels\ChildSymbolEditViewModel.cs" />
     <Compile Include="ViewModels\ComponentsListViewModel.cs" />
@@ -167,6 +189,58 @@
     <Compile Include="Views\TitleBlockView.xaml.cs">
       <DependentUpon>TitleBlockView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CheckBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ChildTagControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ComponentOverviewControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\DescriptionControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\InstallationControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\PartControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TagControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TextPartControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Style\Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Style\CheckBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Style\TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\AddPartWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -241,10 +315,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoCAD.Adapter.Controls\AutoCAD.Adapter.Controls.csproj">
-      <Project>{2983aaa5-e4f4-41c3-99d0-936497def141}</Project>
-      <Name>AutoCAD.Adapter.Controls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Schematic\Schematic.csproj">
       <Project>{62E2152A-0316-4966-BA17-08D846223FD3}</Project>
       <Name>Schematic</Name>
@@ -262,5 +332,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

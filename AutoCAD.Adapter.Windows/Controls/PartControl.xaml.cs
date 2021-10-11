@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.ComponentModel;
 
-namespace ICA.AutoCAD.Adapter.Controls
+namespace ICA.AutoCAD.Adapter.Windows.Controls
 {
     /// <summary>
     /// Interaction logic for PartControl.xaml

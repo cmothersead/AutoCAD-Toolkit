@@ -3,7 +3,7 @@ using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ICA.AutoCAD.Adapter.Controls
+namespace ICA.AutoCAD.Adapter.Windows.Controls
 {
     /// <summary>
     /// Interaction logic for DescriptionControl.xaml

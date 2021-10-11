@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace ICA.AutoCAD.Adapter.Windows
+namespace ICA.AutoCAD.Adapter.Windows.Converters
 {
     [ValueConversion(typeof(List<string>), typeof(string))]
     public class ListToStringConverter : IValueConverter
