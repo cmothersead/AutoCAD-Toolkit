@@ -74,22 +74,11 @@ namespace ICA.AutoCAD
             }
         }
 
-        public static void SetAttributeValue(this BlockReference blockReference, Transaction transaction, string tag, string value)
-        {
-            AttributeReference attributeReference = blockReference.GetAttributeReference(transaction, tag);
-            if(attributeReference != null)
-            {
-                attributeReference.UpgradeOpen();
-                attributeReference.TextString = value;
-                attributeReference.DowngradeOpen();
-            }
-        }
+        public static void SetAttributeValue(this BlockReference blockReference, Transaction transaction, string tag, string value) => blockReference.GetAttributeReference(transaction, tag)
+                                                                                                                                                     .SetValue(transaction, value);
 
-        public static void SetAttributeValues(this BlockReference blockReference, Transaction transaction, Dictionary<string, string> values)
-        {
-            foreach (KeyValuePair<string, string> pair in values)
-                blockReference.SetAttributeValue(transaction, pair.Key, pair.Value);
-        }
+        public static void SetAttributeValues(this BlockReference blockReference, Transaction transaction, Dictionary<string, string> values) => values.ToList()
+                                                                                                                                                       .ForEach(pair => blockReference.SetAttributeValue(transaction, pair.Key, pair.Value));
 
         /// <summary>
         /// Moves <see cref="BlockReference"/> to given <see cref="Point3d"/> within passed transaction.
@@ -136,13 +125,12 @@ namespace ICA.AutoCAD
                     {
                         AttributeReference attributeReference = new AttributeReference();
                         attributeReference.SetAttributeFromBlock(attributeDefinition, blockReference.BlockTransform);
-                        if (attributes != null && attributes.ContainsKey(attributeDefinition.Tag))
-                            attributeReference.TextString = attributes[attributeDefinition.Tag];
-                        else
-                            attributeReference.TextString = attributeDefinition.TextString;
-                        attributeReference.AdjustAlignment(database);
                         blockReference.AttributeCollection.AppendAttribute(attributeReference);
                         transaction.AddNewlyCreatedDBObject(attributeReference, true);
+                        if (attributes != null && attributes.ContainsKey(attributeDefinition.Tag))
+                            attributeReference.SetValue(transaction, attributes[attributeDefinition.Tag]);
+                        else
+                            attributeReference.SetValue(transaction, attributeDefinition.TextString);
                     }
                 }
             }

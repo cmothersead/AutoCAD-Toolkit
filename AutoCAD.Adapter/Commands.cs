@@ -393,20 +393,13 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("PROJECTTITLEBLOCK")]
         public static void ProjectTitleBlock()
         {
-            TitleBlock titleBlock = TitleBlock.Select();
+            //TitleBlock titleBlock = TitleBlock.Select();
             Project project = CurrentProject;
             foreach (Drawing drawing in project.Drawings)
             {
                 if (!Application.DocumentManager.Contains(drawing.FileUri))
                 {
-                    try
-                    {
-                        drawing.UpdateTitleBlock();
-                    }
-                    catch(Autodesk.AutoCAD.Runtime.Exception ex)
-                    {
-                        var test = ex;
-                    }
+                    drawing.UpdateTitleBlock();
                 }
             }
         }

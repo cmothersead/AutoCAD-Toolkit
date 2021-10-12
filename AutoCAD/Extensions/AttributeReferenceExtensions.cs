@@ -24,7 +24,15 @@ namespace ICA.AutoCAD
 
         public static void SetVisibility(this AttributeReference attributeReference, Transaction transaction, bool value) => attributeReference.GetForWrite(transaction).Invisible = !value;
 
-        public static void SetValue(this AttributeReference attributeReference, Transaction transaction, string value) => attributeReference.GetForWrite(transaction).TextString = value;
+        public static void SetValue(this AttributeReference attributeReference, Transaction transaction, string value)
+        {
+            Database previousDatabase = HostApplicationServices.WorkingDatabase;
+            HostApplicationServices.WorkingDatabase = attributeReference.Database;
+            AttributeReference forWrite = attributeReference.GetForWrite(transaction);
+            forWrite.TextString = value;
+            forWrite.AdjustAlignment(attributeReference.Database);
+            HostApplicationServices.WorkingDatabase = previousDatabase;
+        }
 
         public static void SetPosition(this AttributeReference attributeReference, Transaction transaction, Point3d position)
         {

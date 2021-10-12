@@ -1,11 +1,13 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -56,9 +58,13 @@ namespace ICA.AutoCAD.Adapter
                 { "DWGNO", "Project.Job.Code" },
                 { "SHTS", "Project.Drawings.Count" },
                 { "TITLE1", "Project.Job.Name" },
-                { "TITLE2", "Name" },
+                { "TITLE2", "Description[0]" },
                 { "SHT", "PageNumber" },
-                { "CUST", "Project.Job.Customer.Name" }
+                { "CUST", "Project.Job.Customer.Name" },
+                { "NAME", "CM" },
+                { "CBN", "CM" },
+                { "ABN", "GB" },
+                { "DATE", "08-17-21" }
             };
 
         [XmlAttribute]
@@ -110,7 +116,9 @@ namespace ICA.AutoCAD.Adapter
             if (titleBlock is null)
                 return;
 
-            Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Key, pair => GetPropertyValue(pair.Value).ToUpper());
+            Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Key,
+                                                                                pair => GetPropertyValue(pair.Value)?.ToUpper()
+                                                                                        ?? pair.Value);
             titleBlock.Attributes = dict;
             Save();
         }
@@ -119,15 +127,18 @@ namespace ICA.AutoCAD.Adapter
         {
             PropertyInfo currentProperty;
             object currentObject = this;
-            List<string> names = name.Split('.').ToList();
-            foreach (string propertyName in names)
+            Regex propertyRegex = new Regex(@"(?<!\[)\w+(?!\])");
+            Regex indexRegex = new Regex(@"(?<=\[)\d+(?=\])");
+            foreach (Match match in propertyRegex.Matches(name))
             {
-                currentProperty = currentObject.GetType().GetProperty(propertyName);
+                currentProperty = currentObject.GetType().GetProperty(match.Value);
                 if (currentProperty is null)
                     return null;
 
                 currentObject = currentProperty.GetValue(currentObject);
             }
+            if (int.TryParse(indexRegex.Match(name).Value, out int index) && currentObject is IList list)
+                currentObject = list[index];
             return currentObject.ToString();
         }
 
