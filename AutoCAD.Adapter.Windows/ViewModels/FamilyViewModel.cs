@@ -1,5 +1,6 @@
 ﻿using ICA.Schematic.Data;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
@@ -21,24 +22,16 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         #region Operators
 
-        public static implicit operator FamilyViewModel(Family v)
+        public static implicit operator FamilyViewModel(Family v) => new FamilyViewModel
         {
-            var manufacturers = new ObservableCollection<Manufacturer>();
-            foreach(var item in v.Manufacturers)
+            FamilyCode = v.Code,
+            Manufacturers = new ObservableCollection<Manufacturer>(v.Manufacturers.Select(manufacturer => new Manufacturer
             {
-                manufacturers.Add(new Manufacturer
-                {
-                    Id = item.Id,
-                    Name = item.Name.ToUpper(),
-                    Parts = new ObservableCollection<Part>(item.Parts)
-                });
-            }
-            return new FamilyViewModel
-            {
-                FamilyCode = v.Code,
-                Manufacturers = manufacturers
-            };
-        }
+                Id = manufacturer.Id,
+                Name = manufacturer.Name.ToUpper(),
+                Parts = new ObservableCollection<Part>(manufacturer.Parts)
+            }))
+        };
 
         #endregion
     }

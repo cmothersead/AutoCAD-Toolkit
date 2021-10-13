@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
+using ICA.AutoCAD.Adapter.Extensions;
 using ICA.AutoCAD.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,10 +122,7 @@ namespace ICA.AutoCAD.Adapter
                         Stack.Add($"DESC{DescAttributes.Count + 1}");
                 }
                 int position = 0;
-                foreach (string val in value)
-                {
-                    DescAttributes[position++].SetValue(val);
-                }
+                value.ForEach(val => DescAttributes[position++].SetValue(val));
             }
         }
 
@@ -182,12 +180,8 @@ namespace ICA.AutoCAD.Adapter
         {
             using (Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
             {
-                foreach (AttributeReference reference in BlockReference.GetAttributeReferences(transaction))
-                {
-                    KeyValuePair<string, LayerTableRecord> match = AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key));
-                    if (match.Key != null)
-                        reference.SetLayer(transaction, match.Value);
-                }
+                BlockReference.GetAttributeReferences(transaction)
+                              .ForEach(reference => reference.SetLayer(AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key)).Value));
                 transaction.Commit();
             }
         }
@@ -211,10 +205,10 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
-        public static void Link(List<Symbol> symbols)
+        public static void Link(IEnumerable<Symbol> symbols)
         {
-            List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
-            ordered.OfType<ChildSymbol>().ToList().ForEach(child => 
+            IEnumerable<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber);
+            ordered.OfType<ChildSymbol>().ForEach(child => 
             { 
                 child.TagHidden = true;
                 child.SetParent(ordered.First() as ParentSymbol);
@@ -232,6 +226,11 @@ namespace ICA.AutoCAD.Adapter
                         Line link = new Line(top.Location.ToPoint3d(), bottom.Location.ToPoint3d());
                         link.Insert();
                         link.SetLayer(ElectricalLayers.LinkLayer);
+                        ResultBuffer buffer = new ResultBuffer();
+                        buffer.Add(new TypedValue((int)DxfCode.ExtendedDataHandle, $"{top.Reference.BlockId.Handle}"));
+                        buffer.Add(new TypedValue((int)DxfCode.ExtendedDataHandle, $"{bottom.Reference.BlockId.Handle}"));
+                        top.Reference.SetValue($"{link.Handle}");
+                        bottom.Reference.SetValue($"{link.Handle}");
                     }
                     else
                     {
@@ -242,6 +241,8 @@ namespace ICA.AutoCAD.Adapter
                         link.AddVertexAt(3, bottom.Location, 0, 0, 0);
                         link.Insert();
                         link.SetLayer(ElectricalLayers.LinkLayer);
+                        top.Reference.SetValue($"{link.Handle}");
+                        bottom.Reference.SetValue($"{link.Handle}");
                     }
                     top = null;
                     bottom = null;

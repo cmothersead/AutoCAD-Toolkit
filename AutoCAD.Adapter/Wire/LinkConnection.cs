@@ -6,6 +6,16 @@ namespace ICA.AutoCAD.Adapter
 {
     public class LinkConnection : ConnectionPoint
     {
+        #region Properties
+
+        #region Public Properies
+
+        public AttributeReference Reference { get; set; }
+
+        #endregion
+
+        #endregion
+
         #region Constructors
 
         public LinkConnection(AttributeReference reference)
@@ -16,6 +26,7 @@ namespace ICA.AutoCAD.Adapter
                 throw new ArgumentException("Attribute reference is not formatted as a valid link connection.");
             WireDirection = (Orientation)int.Parse(match.Groups[1].ToString());
             Location = reference.GetPosition();
+            Reference = reference;
         }
 
         #endregion

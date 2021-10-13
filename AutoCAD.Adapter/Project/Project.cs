@@ -38,6 +38,21 @@ namespace ICA.AutoCAD.Adapter
         public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
                                                      .ToList();
 
+        [XmlIgnore]
+        public Dictionary<string, string> TitleBlockAttributes { get; set; } = new Dictionary<string, string>()
+            {
+                { "DWGNO", "Project.Job.Code" },
+                { "SHTS", "Project.Drawings.Count" },
+                { "TITLE1", "Project.Job.Name" },
+                { "TITLE2", "Description[0]" },
+                { "SHT", "PageNumber" },
+                { "CUST", "Project.Job.Customer.Name" },
+                { "NAME", "CM" },
+                { "CBN", "CM" },
+                { "ABN", "GB" },
+                { "DATE", "08-17-21" }
+            };
+
         #endregion
 
         #region Private Properties
@@ -89,21 +104,7 @@ namespace ICA.AutoCAD.Adapter
 
         public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";
 
-        public static Project Open(string directoryPath)
-        {
-            string filePath = Directory.GetFiles(directoryPath, "*.xml").FirstOrDefault();
 
-            if (filePath is null)
-                return null;
-
-            XmlSerializer reader = new XmlSerializer(typeof(Project));
-            FileStream file = File.OpenRead(filePath);
-            Project project = reader.Deserialize(file) as Project;
-            file.Close();
-            project.DirectoryUri = new Uri(directoryPath);
-            project.Drawings.ForEach(drawing => drawing.Project = project);
-            return project;
-        }
 
         public void Save()
         {
@@ -117,8 +118,6 @@ namespace ICA.AutoCAD.Adapter
             file.Close();
             File.SetAttributes(file.Name, File.GetAttributes(file.Name) | FileAttributes.Hidden);
         }
-
-        public static Project Import(string directoryPath) => WDP.Import(Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault());
 
         public void Export() => WDP.Export(this, Path.ChangeExtension(FileUri.LocalPath, ".wdp"));
 
@@ -180,6 +179,28 @@ namespace ICA.AutoCAD.Adapter
                     return DrawingType.Reference;
             }
         }
+
+        public static Project Open(string directoryPath)
+        {
+            string filePath = Directory.GetFiles(directoryPath, "*.xml").FirstOrDefault();
+
+            if (filePath is null)
+                return null;
+
+            XmlSerializer reader = new XmlSerializer(typeof(Project));
+            FileStream file = File.OpenRead(filePath);
+            Project project = reader.Deserialize(file) as Project;
+            file.Close();
+            project.DirectoryUri = new Uri(directoryPath);
+            project.Drawings.ForEach(drawing => 
+            {
+                drawing.Project = project;
+                drawing.TitleBlockAttributes = project.TitleBlockAttributes;
+            });
+            return project;
+        }
+
+        public static Project Import(string directoryPath) => WDP.Import(Directory.GetFiles(directoryPath, "*.wdp").FirstOrDefault());
 
         #endregion
 

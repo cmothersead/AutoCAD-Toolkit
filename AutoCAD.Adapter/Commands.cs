@@ -13,6 +13,7 @@ using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
+using ICA.AutoCAD.Adapter.Extensions;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -174,7 +175,7 @@ namespace ICA.AutoCAD.Adapter
                     symbol.AssignLayers(); 
                     symbol.CollapseAttributeStack();
                 });
-                symbols.OfType<ChildSymbol>().ToList().ForEach(child => child.SetParent(parent));
+                symbols.OfType<ChildSymbol>().ForEach(child => child.SetParent(parent));
                 Symbol.Link(symbols);
             }
         }
@@ -196,7 +197,6 @@ namespace ICA.AutoCAD.Adapter
 
         [CommandMethod("UPDATETAGS")]
         public static void UpdateTag() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
-                                                                .ToList()
                                                                 .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag());
 
         [CommandMethod("MATCHWIRES")]

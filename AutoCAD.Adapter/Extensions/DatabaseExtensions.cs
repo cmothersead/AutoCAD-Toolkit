@@ -50,31 +50,17 @@ namespace ICA.AutoCAD.Adapter
 
         public static TitleBlock GetTitleBlock(this Database database)
         {
-            BlockTable blockTable = database.GetBlockTable();
-            BlockTableRecord titleBlock;
-            foreach (string name in blockTable.GetRecords().Select(r => r.Name))
-            {
-                if (!name.Contains("Title Block"))
-                    continue;
-
-                titleBlock = blockTable.GetRecord(name);
-                if (!titleBlock.HasAttribute("TB"))
-                    continue;
-
-                return new TitleBlock(titleBlock);
-            }
-            return null;
+            BlockTableRecord titleBlockRecord = database.GetBlockTable()
+                                                  .GetRecords()
+                                                  .FirstOrDefault(record => record.Name.Contains("Title Block") && record.HasAttribute("TB"));
+            return titleBlockRecord == null ? null : new TitleBlock(titleBlockRecord);
         }
 
-        public static bool ContainsTBAtrribute(this Database database)
-        {
-            foreach (ObjectId id in database.GetModelSpace())
-                if (id.Open() is AttributeDefinition definition)
-                    if (definition.Tag == "TB")
-                        return true;
-
-            return false;
-        }
+        public static bool ContainsTBAtrribute(this Database database) => database.GetModelSpace()
+                                                                                  .Cast<ObjectId>()
+                                                                                  .Select(id => id.Open())
+                                                                                  .OfType<AttributeDefinition>()
+                                                                                  .Any(definition => definition.Tag == "TB");
 
         #endregion
 

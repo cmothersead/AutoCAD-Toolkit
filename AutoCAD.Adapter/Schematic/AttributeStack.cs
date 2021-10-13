@@ -96,8 +96,7 @@ namespace ICA.AutoCAD.Adapter
         }
         public void Add(List<string> items)
         {
-            foreach (string item in items)
-                AddAttribute(item);
+            items.ForEach(item => AddAttribute(item));
             Attributes.Sort();
             Attributes.Sort((x, y) => PriorityOf(y) - PriorityOf(x));
         }

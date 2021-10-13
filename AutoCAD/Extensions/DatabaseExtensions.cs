@@ -45,7 +45,7 @@ namespace ICA.AutoCAD
         /// </summary>
         /// <param name="database">Instance this method applies to.</param>
         /// <param name="properties">Property key-value pairs.</param>
-        public static void SetCustomProperties(this Database database, Dictionary<string, string> properties) => properties?.ToList().ForEach(prop => database.SetCustomProperty(prop));
+        public static void SetCustomProperties(this Database database, Dictionary<string, string> properties) => properties?.ForEach(prop => database.SetCustomProperty(prop));
 
         /// <summary>
         /// Sets a property value
@@ -81,8 +81,7 @@ namespace ICA.AutoCAD
         public static void RemoveCustomProperties(this Database database, IEnumerable<string> keys)
         {
             DatabaseSummaryInfoBuilder infoBuilder = new DatabaseSummaryInfoBuilder(database.SummaryInfo);
-            keys.ToList()
-                .ForEach(key => infoBuilder.CustomPropertyTable.Remove(key));
+            keys.ForEach(key => infoBuilder.CustomPropertyTable.Remove(key));
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
@@ -97,7 +96,8 @@ namespace ICA.AutoCAD
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
-        public static void SaveFile(this Database database) => database.SaveAs(database.OriginalFileName, DwgVersion.Current);
+        public static void SaveFile(this Database database) => 
+            database.SaveAs(database.OriginalFileName, DwgVersion.Current);
 
         #endregion
 
@@ -111,22 +111,17 @@ namespace ICA.AutoCAD
         public static BlockTableRecord GetModelSpace(this Database database, Transaction transaction) =>
             database.GetBlockTable(transaction).GetRecord(BlockTableRecord.ModelSpace);
 
-        public static List<ObjectId> GetObjectIds(this Database database, Transaction transaction)
-        {
-            List<ObjectId> output = new List<ObjectId>();
-            foreach (ObjectId id in database.GetModelSpace(transaction))
-                output.Add(id);
-            return output;
-        }
+        public static IEnumerable<ObjectId> GetObjectIds(this Database database, Transaction transaction) =>
+            database.GetModelSpace(transaction)
+                    .Cast<ObjectId>();
 
-        public static List<Entity> GetEntities(this Database database, Transaction transaction) => 
+        public static IEnumerable<Entity> GetEntities(this Database database, Transaction transaction) =>
             database.GetObjectIds(transaction)
-                    .Select(id => id.Open(transaction) as Entity)
-                    .ToList();
+                    .Select(id => id.Open(transaction) as Entity);
 
-        public static bool HasLayer(this Database database, Transaction transaction, string name) => 
+        public static bool HasLayer(this Database database, Transaction transaction, string name) =>
             database.GetLayerTable(transaction)
-            .Has(name);
+                    .Has(name);
 
         public static bool HasLayer(this Database database, Transaction transaction, LayerTableRecord layer) =>
             database.HasLayer(transaction, layer.Name);

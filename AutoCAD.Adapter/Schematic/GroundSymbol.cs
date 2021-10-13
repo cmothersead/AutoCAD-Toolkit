@@ -50,13 +50,9 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public void GroundConnectedWires()
-        {
-            foreach(Line line in Wire.GetAllSegments(Database).Where(line => line.IntersectsWith(Position)))
-            {
-                new Wire(line).Layer = ElectricalLayers.GroundLayer;
-            }
-        }
+        public void GroundConnectedWires() => Wire.GetAllSegments(Database)
+                                                  .Where(line => line.IntersectsWith(Position))
+                                                  .ForEach(line => line.SetLayer(ElectricalLayers.GroundLayer));
 
         #endregion
 

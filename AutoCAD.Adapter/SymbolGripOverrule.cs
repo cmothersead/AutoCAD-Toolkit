@@ -32,18 +32,14 @@ namespace ICA.AutoCAD.Adapter
             if (entity is BlockReference reference)
                 if (reference.Layer == ElectricalLayers.SymbolLayer.Name)
                 {
-                    foreach (GripData grip in grips)
-                        if (grip.GripPoint != reference.Position)
-                            forRemoval.Add(grip);
-                    forRemoval.ForEach(grip => grips.Remove(grip));
+                    grips.Where(grip => grip.GripPoint != reference.Position)
+                         .ForEach(grip => grips.Remove(grip));
                     if (_prevId != null && _prevGrips != null && _prevGrips.Count == 1)
                         if (entity.Id == _prevId)
                             if (grips[0].GripPoint != _prevGrips[0].GripPoint)
                                 ReferenceMoved?.Invoke(reference, new EventArgs());
                     _prevId = entity.Id;
-                    _prevGrips = new List<GripData>();
-                    foreach (GripData grip in grips)
-                        _prevGrips.Add(grip);
+                    _prevGrips = grips.ToList();
                     reference.Highlight();
                 }
         }

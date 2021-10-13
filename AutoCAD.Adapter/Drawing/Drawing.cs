@@ -53,19 +53,7 @@ namespace ICA.AutoCAD.Adapter
         public Project Project { get; set; }
         public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
         [XmlIgnore]
-        public Dictionary<string, string> TitleBlockAttributes { get; set; } = new Dictionary<string, string>()
-            {
-                { "DWGNO", "Project.Job.Code" },
-                { "SHTS", "Project.Drawings.Count" },
-                { "TITLE1", "Project.Job.Name" },
-                { "TITLE2", "Description[0]" },
-                { "SHT", "PageNumber" },
-                { "CUST", "Project.Job.Customer.Name" },
-                { "NAME", "CM" },
-                { "CBN", "CM" },
-                { "ABN", "GB" },
-                { "DATE", "08-17-21" }
-            };
+        public Dictionary<string, string> TitleBlockAttributes { get; set; }
 
         [XmlAttribute]
         public string Name { get; set; }

@@ -99,6 +99,7 @@
   <ItemGroup>
     <Compile Include="Extensions\AttributeDefinitionExtensions.cs" />
     <Compile Include="Extensions\DocumentCollectionExtensions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\LineExtensions.cs" />
     <Compile Include="Extensions\BlockTableExtensions.cs" />
     <Compile Include="Extensions\BlockTableRecordExtensions.cs" />

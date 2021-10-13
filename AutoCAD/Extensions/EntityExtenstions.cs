@@ -11,24 +11,24 @@ namespace ICA.AutoCAD
         /// Adds entity to the current document's database within self-contained transaction.
         /// </summary>
         /// <param name="entity"></param>
-        public static void Insert(this Entity entity) => entity.Insert(Application.DocumentManager.MdiActiveDocument.Database);
+        public static void Insert(this Entity entity, LayerTableRecord layer = null) => entity.Insert(Application.DocumentManager.MdiActiveDocument.Database, layer);
 
         /// <summary>
         /// Adds entity to the passed <see cref="Database"/> within self-contained transaction.
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="database">Database to append the entity to</param>
-        public static void Insert(this Entity entity, Database database)
+        public static void Insert(this Entity entity, Database database, LayerTableRecord layer = null)
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 switch(entity)
                 {
                     case BlockReference reference:
-                        reference.Insert(transaction, database);
+                        reference.Insert(transaction, database, layer);
                         break;
                     default:
-                        entity.Insert(transaction, database);
+                        entity.Insert(transaction, database, layer);
                         break;
                 }
                 transaction.Commit();
@@ -41,15 +41,19 @@ namespace ICA.AutoCAD
         /// <param name="entity"></param>
         /// <param name="database"></param>
         /// <param name="transaction"></param>
-        public static void Insert(this Entity entity, Transaction transaction, Database database)
+        public static void Insert(this Entity entity, Transaction transaction, Database database, LayerTableRecord layer = null)
         {
             BlockTableRecord modelSpace = transaction.GetObject(database.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
             modelSpace.AppendEntity(entity);
             transaction.AddNewlyCreatedDBObject(entity, true);
+            entity.SetLayer(layer);
         }
 
         public static void SetLayer(this Entity entity, Transaction transaction, LayerTableRecord layer)
         {
+            if (layer is null)
+                return;
+
             if (!entity.Database.HasLayer(layer))
                 entity.Database.AddLayer(layer);
 

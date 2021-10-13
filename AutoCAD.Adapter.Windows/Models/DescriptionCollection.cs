@@ -34,9 +34,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
         {
             AddEmpty();
             foreach(string item in value)
-            {
                 Add(item);
-            }
         }
 
         #endregion

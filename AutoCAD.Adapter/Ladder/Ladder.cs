@@ -58,8 +58,7 @@ namespace ICA.AutoCAD.Adapter
                     return _rails;
 
                 _rails = new List<Line>();
-                foreach (Point2d origin in Origins)
-                    _rails.Add(new Rail(origin, Height));
+                Origins.ForEach(origin => _rails.Add(new Rail(origin, Height)));
                 return _rails;
             }
         }
@@ -154,23 +153,15 @@ namespace ICA.AutoCAD.Adapter
 
         public Ladder(List<Entity> entities)
         {
-            _rails = new List<Line>();
-            _lineNumbers = new List<BlockReference>();
             Database = entities[0].Database;
-            foreach (Entity entity in entities)
-            {
-                switch (entity)
-                {
-                    case Line line:
-                        _rails.Add(line);
-                        break;
-                    case BlockReference lineNumber:
-                        _lineNumbers.Add(lineNumber);
-                        break;
-                }
-            }
-            _rails = _rails.OrderBy(rail => rail.StartPoint.X).ToList();
-            _lineNumbers = _lineNumbers.OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER")).ToList();
+
+            _rails = entities.OfType<Line>()
+                             .OrderBy(rail => rail.StartPoint.X)
+                             .ToList();
+
+            _lineNumbers = entities.OfType<BlockReference>()
+                                   .OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER"))
+                                   .ToList();
 
             Origin = _rails[0].StartPoint.ToPoint2D();
             Height = _rails[0].StartPoint.Y - _rails[0].EndPoint.Y;
@@ -198,17 +189,8 @@ namespace ICA.AutoCAD.Adapter
 
         public void Insert(Transaction transaction)
         {
-            foreach (Rail rail in Rails)
-            {
-                rail.Insert(transaction, Database);
-                rail.SetLayer(ElectricalLayers.LadderLayer);
-            }
-
-            foreach (LineNumber lineNumber in LineNumbers)
-            {
-                lineNumber.Insert(transaction, Database);
-                lineNumber.SetLayer(ElectricalLayers.LadderLayer);
-            }
+            Rails.ForEach(rail => rail.Insert(transaction, Database, ElectricalLayers.LadderLayer));
+            LineNumbers.ForEach(lineNumber => lineNumber.Insert(transaction, Database, ElectricalLayers.LadderLayer));
         }
 
         public string ClosestLineNumber(Point2d position) => LineNumbers.OrderByDescending(number => number.Position.X)
@@ -274,8 +256,8 @@ namespace ICA.AutoCAD.Adapter
             ladderLayer.UnlockWithoutWarning();
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                foreach (Entity entity in ladderLayer.GetEntities())
-                    entity.GetForWrite(transaction).Erase();
+                ladderLayer.GetEntities(transaction)
+                           .ForEach(entity => entity.Erase(transaction));
                 transaction.Commit();
             }
             ladderLayer.LockWithWarning();

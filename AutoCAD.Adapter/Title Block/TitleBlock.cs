@@ -6,6 +6,7 @@ using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
 using ICA.AutoCAD.IO;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -83,17 +84,9 @@ namespace ICA.AutoCAD.Adapter
 
             Database tempDatabase = Commands.LoadDatabase(blockFileUri);
 
-            bool isTitleBlockDefinition = false;
-            foreach (ObjectId id in tempDatabase.GetModelSpace())
-            {
-                if (id.Open() is AttributeDefinition definition)
-                    if (definition.Tag == "TB")
-                    {
-                        isTitleBlockDefinition = true;
-                        break;
-                    }
-            }
-            if (!isTitleBlockDefinition)
+            if (!((IEnumerable<ObjectId>)tempDatabase.GetModelSpace()).Select(id => id.Open())
+                                                                      .OfType<AttributeDefinition>()
+                                                                      .Any(definition => definition.Tag == "TB"))
                 throw new ArgumentException($"\"{Path.GetFileName(blockFileUri.LocalPath)}\" is not a valid title block file. File must contain an attribute called \"TB\".");
         }
 
@@ -132,8 +125,8 @@ namespace ICA.AutoCAD.Adapter
             {
                 LayerTableRecord titleBlockLayer = _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer);
                 titleBlockLayer.UnlockWithoutWarning();
-                foreach (ObjectId id in _blockTableRecord.GetBlockReferenceIds(true, false))
-                    id.Erase(transaction);
+                _blockTableRecord.GetBlockReferences(transaction)
+                                 .ForEach(reference => reference.Erase(transaction));
                 titleBlockLayer.LockWithWarning();
                 SystemVariables.GridDisplay |= GridDisplay.BeyondLimits;
                 transaction.Commit();
@@ -184,10 +177,7 @@ namespace ICA.AutoCAD.Adapter
                 {
                     using (Transaction transaction = CurrentDocument.TransactionManager.StartTransaction())
                     {
-                        foreach (ObjectId id in _forDelete)
-                        {
-                            id.Erase(transaction);
-                        }
+                        _forDelete.ForEach(id => id.Erase(transaction));
                         transaction.Commit();
                     }
                 }
@@ -226,10 +216,7 @@ namespace ICA.AutoCAD.Adapter
                     if (errorList.Count == 1)
                         errorMessage = "The following file was not loaded:\n";
 
-                    foreach (var entry in errorList)
-                    {
-                        errorMessage += "\n\u2022 \"" + entry.Key + "\" : " + entry.Value;
-                    }
+                    errorList.ForEach(entry => errorMessage += "\n\u2022 \"" + entry.Key + "\" : " + entry.Value);
 
                     Application.ShowAlertDialog(errorMessage);
                 }

@@ -79,11 +79,9 @@ namespace ICA.AutoCAD.Adapter
                 BlockReference wd_m = transaction.GetObject(references[0], OpenMode.ForRead) as BlockReference;
                 Dictionary<string, string> properties = new Dictionary<string, string>();
 
-                foreach (ObjectId id in wd_m.AttributeCollection)
-                {
-                    AttributeReference reference = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
-                    properties.Add(reference.Tag, reference.TextString);
-                }
+                wd_m.AttributeCollection.Cast<ObjectId>()
+                                        .Select(id => id.Open(transaction) as AttributeReference)
+                                        .ForEach(reference => properties.Add(reference.Tag, reference.TextString));
 
                 return properties;
             }

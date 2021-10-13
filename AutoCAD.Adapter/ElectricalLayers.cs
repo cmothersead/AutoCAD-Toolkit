@@ -18,6 +18,8 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Properties
+
         #region Private Properties
 
         private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
@@ -173,21 +175,18 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #endregion
+
         #region Methods
 
         public static void HandleLocks(Database database)
         {
-            List<LayerTableRecord> lockedLayers = Layers.Select(l => l.Value).Where(l => l.IsLocked == true).ToList();
-            foreach (LayerTableRecord lockedLayer in lockedLayers)
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                if (database.HasLayer(lockedLayer))
-                {
-                    using (Transaction transaction = database.TransactionManager.StartTransaction())
-                    {
-                        DBObject layer = transaction.GetObject(database.GetLayer(lockedLayer).ObjectId, OpenMode.ForWrite);
-                        layer.Modified += UnlockWarning;
-                    }
-                }
+                Layers.Select(pair => pair.Value)
+                      .Where(layer => layer.IsLocked && database.HasLayer(layer))
+                      .ForEach(layer => layer.GetForWrite(transaction).Modified += UnlockWarning);
+                transaction.Commit();
             }
         }
 
@@ -222,17 +221,21 @@ namespace ICA.AutoCAD.Adapter
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                foreach (LayerTableRecord layer in Layers.Select(v => v.Value))
+                Layers.Select(pair => new 
                 {
-                    LayerTableRecord layerInDoc = database.GetLayer(transaction, layer).GetForWrite(transaction);
-                    layerInDoc.Color = layer.Color;
-                    layerInDoc.Description = layer.Description;
-                }
+                    Layer = pair.Value,
+                    LayerInDoc = database.GetLayer(transaction, pair.Value)
+                                         .GetForWrite(transaction)
+                })
+                      .ForEach(pair =>
+                {
+                    pair.LayerInDoc.Color = pair.Layer.Color;
+                    pair.LayerInDoc.Description = pair.Layer.Description;
+                });
                 transaction.Commit();
             }
         }
 
         #endregion
-
     }
 }

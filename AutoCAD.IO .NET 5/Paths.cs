@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ICA.AutoCAD.IO
 {
@@ -29,16 +30,11 @@ namespace ICA.AutoCAD.IO
                     return _main;
 
                 string[] files = Directory.GetFiles(@"C:\", "acad.lsp", DefaultSearch);
-                foreach(string file in files)
-                {
-                    string directory = Path.GetFullPath($"{Path.GetDirectoryName(file)}\\..\\");
-                    if (IsLibrary(directory))
-                    {
-                        _main = directory;
-                        return directory;
-                    }
-                }
-                return null;
+
+                _main = Directory.GetFiles(@"C:\", "acad.lsp", DefaultSearch)
+                                 .FirstOrDefault(file => IsLibrary(Path.GetFullPath($"{Path.GetDirectoryName(file)}\\..\\")));
+
+                return _main;
             }
         }
 
@@ -91,10 +87,7 @@ namespace ICA.AutoCAD.IO
                 "libs\\schematic",
                 "libs\\panel"
             };
-            foreach (string subfolder in subfolders)
-                if (!System.IO.Directory.Exists($"{path}\\{subfolder}"))
-                    return false;
-            return true;
+            return !subfolders.Any(subfolder => !Directory.Exists($"{path}\\{subfolder}"));
         }
 
         #endregion

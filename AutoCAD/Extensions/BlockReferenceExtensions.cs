@@ -35,15 +35,27 @@ namespace ICA.AutoCAD
         public static AttributeReference GetAttributeReference(this BlockReference blockReference, Transaction transaction, string tag) => blockReference.GetAttributeReferences(transaction)
                                                                                                                                                          .FirstOrDefault(att => att.Tag == tag);
 
-        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction) => blockReference.AttributeCollection.Cast<ObjectId>()
-                                                                                                                                                                        .Select(id => id.Open(transaction) as AttributeReference)
-                                                                                                                                                                        .ToList();
+        public static IEnumerable<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction) =>
+            blockReference.AttributeCollection.Cast<ObjectId>()
+                                              .Select(id => id.Open(transaction) as AttributeReference);
 
         public static AttributeReference AddAttributeReference(this BlockReference blockReference, Transaction transaction, AttributeReference attributeReference)
         {
-            BlockReference blockReferenceForWrite = transaction.GetObject(blockReference.Id, OpenMode.ForWrite) as BlockReference;
-            blockReferenceForWrite.AttributeCollection.AppendAttribute(attributeReference);
+            blockReference.GetForWrite(transaction).AttributeCollection
+                          .AppendAttribute(attributeReference);
             transaction.AddNewlyCreatedDBObject(attributeReference, true);
+            return attributeReference;
+        }
+
+        public static AttributeReference AddAttributeReference(this BlockReference blockReference, Transaction transaction, AttributeDefinition attributeDefinition, string value = null)
+        {
+            AttributeReference attributeReference = new AttributeReference();
+            attributeReference.SetAttributeFromBlock(attributeDefinition, blockReference.BlockTransform);
+            blockReference.GetForWrite(transaction).AttributeCollection
+                          .AppendAttribute(attributeReference);
+            transaction.AddNewlyCreatedDBObject(attributeReference, true);
+            if (value != null)
+                attributeReference.SetValue(transaction, value);
             return attributeReference;
         }
 
@@ -77,8 +89,7 @@ namespace ICA.AutoCAD
         public static void SetAttributeValue(this BlockReference blockReference, Transaction transaction, string tag, string value) => blockReference.GetAttributeReference(transaction, tag)
                                                                                                                                                      .SetValue(transaction, value);
 
-        public static void SetAttributeValues(this BlockReference blockReference, Transaction transaction, Dictionary<string, string> values) => values.ToList()
-                                                                                                                                                       .ForEach(pair => blockReference.SetAttributeValue(transaction, pair.Key, pair.Value));
+        public static void SetAttributeValues(this BlockReference blockReference, Transaction transaction, Dictionary<string, string> values) => values.ForEach(pair => blockReference.SetAttributeValue(transaction, pair.Key, pair.Value));
 
         /// <summary>
         /// Moves <see cref="BlockReference"/> to given <see cref="Point3d"/> within passed transaction.
@@ -118,23 +129,13 @@ namespace ICA.AutoCAD
             BlockTableRecord record = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
             if (record.HasAttributeDefinitions)
             {
-                foreach (ObjectId id in record)
-                {
-                    AttributeDefinition attributeDefinition = transaction.GetObject(id, OpenMode.ForRead) as AttributeDefinition;
-                    if (attributeDefinition != null && !attributeDefinition.Constant)
-                    {
-                        AttributeReference attributeReference = new AttributeReference();
-                        attributeReference.SetAttributeFromBlock(attributeDefinition, blockReference.BlockTransform);
-                        blockReference.AttributeCollection.AppendAttribute(attributeReference);
-                        transaction.AddNewlyCreatedDBObject(attributeReference, true);
-                        if (attributes != null && attributes.ContainsKey(attributeDefinition.Tag))
-                            attributeReference.SetValue(transaction, attributes[attributeDefinition.Tag]);
-                        else
-                            attributeReference.SetValue(transaction, attributeDefinition.TextString);
-                    }
-                }
+                record.GetAttributeDefinitions(transaction)
+                      .Where(definition => definition != null && !definition.Constant)
+                      .ForEach(definition => blockReference.AddAttributeReference(transaction,
+                                                                                  definition,
+                                                                                  (bool)attributes?.ContainsKey(definition.Tag) ? attributes[definition.Tag] : definition.TextString));
             }
-            if(layer != null)
+            if (layer != null)
                 blockReference.SetLayer(transaction, layer);
         }
 
@@ -146,7 +147,7 @@ namespace ICA.AutoCAD
 
         public static AttributeReference GetAttributeReference(this BlockReference blockReference, string tag) => blockReference.Transact(GetAttributeReference, tag);
 
-        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference) => blockReference.Transact(GetAttributeReferences);
+        public static IEnumerable<AttributeReference> GetAttributeReferences(this BlockReference blockReference) => blockReference.Transact(GetAttributeReferences);
 
         public static AttributeReference AddAttributeReference(this BlockReference blockReference, AttributeReference attributeReference) => blockReference.Transact(AddAttributeReference, attributeReference);
 

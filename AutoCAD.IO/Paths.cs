@@ -36,7 +36,9 @@ namespace ICA.AutoCAD.IO
                         return _main;
                 }
 
-                throw new DirectoryNotFoundException("Unable to locate ICA AutoCAD directory");
+                searchDirectories.First()
+
+                throw new DirectoryNotFoundException("Unable to locate ICA AutoCAD directory.");
             }
         }
 

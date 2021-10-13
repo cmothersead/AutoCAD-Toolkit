@@ -8,19 +8,18 @@ namespace ICA.AutoCAD
     {
         #region Public Extension Methods
 
-        public static bool HasAttribute(this BlockTableRecord record, Transaction transaction, string name) => record.AttributeDefinitions(transaction).Select(definition => definition.Tag).ToList().Contains(name);
+        public static bool HasAttribute(this BlockTableRecord record, Transaction transaction, string name) => record.GetAttributeDefinitions(transaction)
+                                                                                                                     .Any(definition => definition.Tag == name);
 
-        public static List<AttributeDefinition> AttributeDefinitions(this BlockTableRecord record, Transaction transaction)
-        {
-            List<AttributeDefinition> result = new List<AttributeDefinition>();
-            foreach(ObjectId id in record)
-            {
-                DBObject obj = transaction.GetObject(id, OpenMode.ForRead);
-                if (obj is AttributeDefinition attributeDefinition)
-                    result.Add(attributeDefinition);
-            }
-            return result;
-        }
+        public static IEnumerable<AttributeDefinition> GetAttributeDefinitions(this BlockTableRecord record, Transaction transaction) => ((IEnumerable<ObjectId>)record).Select(id => id.Open(transaction))
+                                                                                                                                                                 .OfType<AttributeDefinition>();
+
+        public static IEnumerable<Entity> GetEntities(this BlockTableRecord record, Transaction transaction) => ((IEnumerable<ObjectId>)record).Select(id => id.Open(transaction))
+                                                                                                                                        .OfType<Entity>();
+
+        public static IEnumerable<BlockReference> GetBlockReferences(this BlockTableRecord record, Transaction transaction) => record.GetBlockReferenceIds(true, false)
+                                                                                                                              .OfType<ObjectId>()
+                                                                                                                              .Select(id => id.Open(transaction) as BlockReference);
 
         #endregion
 
@@ -28,7 +27,11 @@ namespace ICA.AutoCAD
 
         public static bool HasAttribute(this BlockTableRecord record, string name) => record.Transact(HasAttribute, name);
 
-        public static List<AttributeDefinition> AttributeDefinitions(this BlockTableRecord record) => record.Transact(AttributeDefinitions);
+        public static List<AttributeDefinition> GetAttributeDefinitions(this BlockTableRecord record) => record.Transact(GetAttributeDefinitions);
+
+        public static List<Entity> GetEntities(this BlockTableRecord record) => record.Transact(GetEntities);
+
+        public static List<BlockReference> GetBlockReferences(this BlockTableRecord record) => record.Transact(GetBlockReferences);
 
         #endregion
     }

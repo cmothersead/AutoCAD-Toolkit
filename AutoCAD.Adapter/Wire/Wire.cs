@@ -33,15 +33,16 @@ namespace ICA.AutoCAD.Adapter
         public Wire(Line line)
         {
             if (line.Layer == ElectricalLayers.WireLayer.Name)
-                Lines.AddRange(line.GetConnected(GetAllSegments(line.Database)));
+                Lines = line.GetConnected(GetAllSegments(line.Database));
         }
 
         public Wire(ObjectIdCollection collection)
         {
-            foreach(ObjectId id in collection)
-                if (id.Open() is Line line)
-                    if (line.Layer == ElectricalLayers.WireLayer.Name)
-                        Lines.Add(line);
+            Lines = collection.Cast<ObjectId>()
+                              .Select(id => id.Open())
+                              .OfType<Line>()
+                              .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
+                              .ToList();
         }
 
         #endregion

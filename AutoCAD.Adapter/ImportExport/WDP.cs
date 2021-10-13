@@ -267,12 +267,11 @@ namespace ICA.AutoCAD.Adapter
 
             #endregion
 
-            foreach(Drawing drawing in input.Drawings)
+            input.Drawings.ForEach(drawing =>
             {
-                foreach (string description in drawing.Description)
-                    lines.Add($"==={description}");
+                drawing.Description.ForEach(description => lines.Add($"==={description}"));
                 lines.Add($"{input.FileUri.MakeRelativeUri(drawing.FileUri)}");
-            }
+            });
 
             File.WriteAllLines(savePath, lines.ToArray());
         }
