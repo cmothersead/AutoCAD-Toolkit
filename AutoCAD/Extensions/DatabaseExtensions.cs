@@ -171,9 +171,9 @@ namespace ICA.AutoCAD
 
         public static BlockTableRecord GetModelSpace(this Database database) => database.Transact(GetModelSpace);
 
-        public static List<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
+        public static IEnumerable<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
 
-        public static List<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
+        public static IEnumerable<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
 
         public static bool HasLayer(this Database database, string name) => database.Transact(HasLayer, name);
 

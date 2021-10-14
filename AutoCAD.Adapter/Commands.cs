@@ -13,7 +13,6 @@ using ICA.AutoCAD.Adapter.Prompt;
 using System.Linq;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
-using ICA.AutoCAD.Adapter.Extensions;
 
 namespace ICA.AutoCAD.Adapter
 {

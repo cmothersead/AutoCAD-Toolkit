@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
-using ICA.AutoCAD.Adapter.Extensions;
 using ICA.AutoCAD.IO;
 using System.Collections.Generic;
 using System.Linq;

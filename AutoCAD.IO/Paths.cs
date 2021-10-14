@@ -29,14 +29,11 @@ namespace ICA.AutoCAD.IO
                     @"C:\",
                 };
 
-                foreach (string searchDirectory in searchDirectories) 
-                {
-                    _main = FindLibrary(searchDirectory);
-                    if (_main != null)
-                        return _main;
-                }
+                _main = searchDirectories.Select(searchDirectory => FindLibrary(searchDirectory))
+                                         .FirstOrDefault(result => result != null);
 
-                searchDirectories.First()
+                if (_main != null)
+                    return _main;
 
                 throw new DirectoryNotFoundException("Unable to locate ICA AutoCAD directory.");
             }
@@ -91,20 +88,8 @@ namespace ICA.AutoCAD.IO
         /// </summary>
         /// <param name="basePath">Top level directory to start the search</param>
         /// <returns></returns>
-        private static string FindLibrary(string basePath)
-        {
-            string[] files = GetFiles(basePath, "acad.lsp");
-            foreach (string file in files)
-            {
-                string directory = Path.GetFullPath($"{Path.GetDirectoryName(file)}\\..\\");
-                if (IsLibrary(directory))
-                {
-                    _main = directory;
-                    return directory;
-                }
-            }
-            return null;
-        }
+        private static string FindLibrary(string basePath) => GetFiles(basePath, "acad.lsp").Select(file => Path.GetFullPath($"{Path.GetDirectoryName(file)}\\..\\"))
+                                                                                            .FirstOrDefault(directory => IsLibrary(directory));
 
         /// <summary>
         /// Determines if the given directory contains the elements of ICA's AutoCAD directory
@@ -121,10 +106,7 @@ namespace ICA.AutoCAD.IO
                 "libs\\schematic",
                 "libs\\panel"
             };
-            foreach (string subfolder in subfolders)
-                if (!Directory.Exists($"{path}\\{subfolder}"))
-                    return false;
-            return true;
+            return !subfolders.Any(subfolder => !Directory.Exists($"{path}\\{subfolder}"));
         }
 
         /// <summary>
@@ -133,22 +115,17 @@ namespace ICA.AutoCAD.IO
         /// <param name="path"></param>
         /// <param name="searchPattern"></param>
         /// <returns></returns>
-        private static string[] GetFiles(string path, string searchPattern)
+        private static IEnumerable<string> GetFiles(string path, string searchPattern)
         {
-            List<string> results = new List<string>();
             try
             {
-                results.AddRange(Directory.EnumerateFiles(path, searchPattern).ToList());
-                foreach (string subdirectory in Directory.EnumerateDirectories(path))
-                {
-                    if (new DirectoryInfo(subdirectory).Attributes.HasFlag(FileAttributes.System))
-                        continue;
-                    results.AddRange(GetFiles(subdirectory, searchPattern).ToList());
-                }
+                return Directory.EnumerateFiles(path, searchPattern).Union(Directory.EnumerateDirectories(path)
+                                                                                    .Where(subdirectory => !new DirectoryInfo(subdirectory).Attributes.HasFlag(FileAttributes.System))
+                                                                                    .SelectMany(subdirectory => GetFiles(subdirectory, searchPattern)));
             }
             catch (UnauthorizedAccessException) { }
             catch (DirectoryNotFoundException) { }
-            return results.ToArray();
+            return Enumerable.Empty<string>();
         }
 
         #endregion
@@ -161,7 +138,7 @@ namespace ICA.AutoCAD.IO
             {
                 if (!name.Contains(".dwg"))
                     name = $"{name}.dwg";
-                return GetFiles(Paths.SchematicLibrary, name)[0];
+                return GetFiles(Paths.SchematicLibrary, name).FirstOrDefault();
             }
             catch (IndexOutOfRangeException)
             {
@@ -175,7 +152,7 @@ namespace ICA.AutoCAD.IO
             {
                 if (!name.Contains(".dwg"))
                     name = $"{name}.dwg";
-                return GetFiles(Paths.PanelLibrary, name)[0];
+                return GetFiles(Paths.PanelLibrary, name).FirstOrDefault();
             }
             catch(IndexOutOfRangeException)
             {

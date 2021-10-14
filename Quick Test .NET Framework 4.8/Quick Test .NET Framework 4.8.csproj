@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoCAD.IO\AutoCAD.IO.csproj">
+      <Project>{68d45fa7-fbb1-4754-a8a6-0b2a56084e0e}</Project>
+      <Name>AutoCAD.IO</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

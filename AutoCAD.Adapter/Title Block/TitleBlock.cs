@@ -27,7 +27,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Private Properties
 
-        private AttributeDefinition SpareAttribute => _blockTableRecord.AttributeDefinitions().First(d => d.Tag == "SPARE");
+        private AttributeDefinition SpareAttribute => _blockTableRecord.GetAttributeDefinitions().First(d => d.Tag == "SPARE");
 
         #endregion
 

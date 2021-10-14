@@ -27,11 +27,11 @@ namespace ICA.AutoCAD
 
         public static bool HasAttribute(this BlockTableRecord record, string name) => record.Transact(HasAttribute, name);
 
-        public static List<AttributeDefinition> GetAttributeDefinitions(this BlockTableRecord record) => record.Transact(GetAttributeDefinitions);
+        public static IEnumerable<AttributeDefinition> GetAttributeDefinitions(this BlockTableRecord record) => record.Transact(GetAttributeDefinitions);
 
-        public static List<Entity> GetEntities(this BlockTableRecord record) => record.Transact(GetEntities);
+        public static IEnumerable<Entity> GetEntities(this BlockTableRecord record) => record.Transact(GetEntities);
 
-        public static List<BlockReference> GetBlockReferences(this BlockTableRecord record) => record.Transact(GetBlockReferences);
+        public static IEnumerable<BlockReference> GetBlockReferences(this BlockTableRecord record) => record.Transact(GetBlockReferences);
 
         #endregion
     }

@@ -1,12 +1,13 @@
 ﻿using ICA.AutoCAD.Adapter.Windows.Models;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
     public class TitleBlockViewModel : BaseViewModel
     {
-        public ObservableCollection<TitleBlockFile> TitleBlocks { get; set; } = new ObservableCollection<TitleBlockFile>();
+        public ObservableCollection<TitleBlockFile> TitleBlocks { get; set; }
         private TitleBlockFile _selectedTitleBlock;
         public TitleBlockFile SelectedTitleBlock
         {
@@ -20,8 +21,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         public TitleBlockViewModel(string titleBlockDirectory)
         {
-            foreach (string filePath in Directory.GetFiles(titleBlockDirectory))
-                TitleBlocks.Add(new TitleBlockFile(filePath));
+            TitleBlocks = new ObservableCollection<TitleBlockFile>(Directory.GetFiles(titleBlockDirectory)
+                                                                            .Select(filePath => new TitleBlockFile(filePath)));
         }
     }
 }
