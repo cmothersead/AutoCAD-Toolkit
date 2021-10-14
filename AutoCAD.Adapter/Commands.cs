@@ -538,6 +538,18 @@ namespace ICA.AutoCAD.Adapter
             test8.ForEach(reference => reference.Highlight());
         }
 
+        [CommandMethod("GETLINKLINE")]
+        public static void GetLinkedLine()
+        {
+            var test1 = Select.Symbol(Editor) as Symbol;
+            var test2 = test1.LinkConnections[0].Reference.XData?.Cast<TypedValue>()
+                             .Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle)
+                             .Select(value => value.Value).ToList();
+            var test3 = test2.OfType<Handle>();
+            var test4 = test3.Select(handle => CurrentDocument.Database.GetObjectId(false, handle, 0).Open() as Entity).ToList();
+            test4.ForEach(entity => entity.Highlight());
+        }
+
         public static void ZoomExtents(Document document, Extents3d extents)
         {
             using (ViewTableRecord view = document.Editor.GetCurrentView())

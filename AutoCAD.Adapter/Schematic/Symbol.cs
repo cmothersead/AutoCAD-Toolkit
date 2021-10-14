@@ -236,14 +236,24 @@ namespace ICA.AutoCAD.Adapter
                         ResultBuffer buffer = new ResultBuffer
                         {
                             new TypedValue((int)DxfCode.ExtendedDataRegAppName, "ICA"),
-                            new TypedValue((int)DxfCode.ExtendedDataHandle, $"{top.Reference.Id.Handle}"),
-                            new TypedValue((int)DxfCode.ExtendedDataHandle, $"{bottom.Reference.Id.Handle}")
+                            new TypedValue((int)DxfCode.ExtendedDataHandle, top.Reference.Id.Handle),
+                            new TypedValue((int)DxfCode.ExtendedDataHandle, bottom.Reference.Id.Handle)
                         };
                         link.XData = buffer;
                         link.Insert(database);
                         link.SetLayer(ElectricalLayers.LinkLayer);
-                        top.Reference.SetValue($"{link.Handle}");
-                        bottom.Reference.SetValue($"{link.Handle}");
+                        buffer = new ResultBuffer
+                        {
+                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, "ICA"),
+                            new TypedValue((int)DxfCode.ExtendedDataHandle, link.Handle)
+                        };
+                        using (Transaction transaction = database.TransactionManager.StartTransaction())
+                        {
+                            var forWrite = top.Reference.GetForWrite(transaction);
+                            forWrite.XData = buffer;
+                            transaction.Commit();
+                        }
+                        
                     }
                     else
                     {
