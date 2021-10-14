@@ -16,7 +16,9 @@ namespace ICA.AutoCAD
 
         public static void Thaw(this LayerTableRecord layer, Transaction transaction) => layer.GetForWrite(transaction).IsFrozen = false;
 
-        public static List<Entity> GetEntities(this LayerTableRecord layer, Transaction transaction) => layer.Database.GetEntities().Where(entity => entity.Layer == layer.Name).ToList();
+        public static ICollection<Entity> GetEntities(this LayerTableRecord layer, Transaction transaction) => layer.Database.GetEntities()
+                                                                                                                             .Where(entity => entity.Layer == layer.Name)
+                                                                                                                             .ToList();
 
         #endregion
 
@@ -30,7 +32,7 @@ namespace ICA.AutoCAD
 
         public static void Thaw(this LayerTableRecord layer) => layer.Transact(Thaw);
 
-        public static List<Entity> GetEntities(this LayerTableRecord layer) => layer.Transact(GetEntities);
+        public static ICollection<Entity> GetEntities(this LayerTableRecord layer) => layer.Transact(GetEntities);
 
         #endregion
     }

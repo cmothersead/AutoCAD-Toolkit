@@ -66,7 +66,9 @@ namespace ICA.AutoCAD
 
         public static SymbolTableRecord GetRecord(this SymbolTable symbolTable, Transaction transaction, ObjectId id) => transaction.GetObject(id, OpenMode.ForRead) as SymbolTableRecord;
 
-        public static IEnumerable<SymbolTableRecord> GetRecords(this SymbolTable symbolTable, Transaction transaction) =>((IEnumerable<ObjectId>)symbolTable).Select(id => symbolTable.GetRecord(transaction, id));
+        public static List<SymbolTableRecord> GetRecords(this SymbolTable symbolTable, Transaction transaction) => symbolTable.Cast<ObjectId>()
+                                                                                                                              .Select(id => symbolTable.GetRecord(transaction, id))
+                                                                                                                              .ToList();
 
         public static bool Has(this SymbolTable symbolTable, SymbolTableRecord record) => symbolTable.Has(record.Name);
 
@@ -197,26 +199,33 @@ namespace ICA.AutoCAD
 
         #region GetRecords
 
-        public static IEnumerable<BlockTableRecord> GetRecords(this BlockTable blockTable) => 
-            GetRecords((SymbolTable)blockTable).Cast<BlockTableRecord>();
+        public static List<BlockTableRecord> GetRecords(this BlockTable blockTable) => 
+            GetRecords((SymbolTable)blockTable).Cast<BlockTableRecord>()
+                                               .ToList();
 
-        public static IEnumerable<DimStyleTableRecord> GetRecords(this DimStyleTable dimStyleTable) => 
-            GetRecords((SymbolTable)dimStyleTable).Cast<DimStyleTableRecord>();
+        public static List<DimStyleTableRecord> GetRecords(this DimStyleTable dimStyleTable) => 
+            GetRecords((SymbolTable)dimStyleTable).Cast<DimStyleTableRecord>()
+                                                  .ToList();
 
-        public static IEnumerable<LayerTableRecord> GetRecords(this LayerTable layerTable) => 
-            GetRecords((SymbolTable)layerTable).Cast<LayerTableRecord>();
+        public static List<LayerTableRecord> GetRecords(this LayerTable layerTable) => 
+            GetRecords((SymbolTable)layerTable).Cast<LayerTableRecord>()
+                                               .ToList();
 
-        public static IEnumerable<LinetypeTableRecord> GetRecords(this LinetypeTable linetypeTable) => 
-            GetRecords((SymbolTable)linetypeTable).Cast<LinetypeTableRecord>();
+        public static List<LinetypeTableRecord> GetRecords(this LinetypeTable linetypeTable) => 
+            GetRecords((SymbolTable)linetypeTable).Cast<LinetypeTableRecord>()
+                                                  .ToList();
 
-        public static IEnumerable<RegAppTableRecord> GetRecords(this RegAppTable regAppTable) => 
-            GetRecords((SymbolTable)regAppTable).Cast<RegAppTableRecord>();
+        public static List<RegAppTableRecord> GetRecords(this RegAppTable regAppTable) => 
+            GetRecords((SymbolTable)regAppTable).Cast<RegAppTableRecord>()
+                                                .ToList();
 
-        public static IEnumerable<TextStyleTableRecord> GetRecords(this TextStyleTable textStyleTable) => 
-            GetRecords((SymbolTable)textStyleTable).Cast<TextStyleTableRecord>();
+        public static List<TextStyleTableRecord> GetRecords(this TextStyleTable textStyleTable) => 
+            GetRecords((SymbolTable)textStyleTable).Cast<TextStyleTableRecord>()
+                                                   .ToList();
 
-        public static IEnumerable<UcsTableRecord> GetRecords(this UcsTable ucsTable) => 
-            GetRecords((SymbolTable)ucsTable).Cast<UcsTableRecord>();
+        public static List<UcsTableRecord> GetRecords(this UcsTable ucsTable) => 
+            GetRecords((SymbolTable)ucsTable).Cast<UcsTableRecord>()
+                                             .ToList();
 
         #endregion
 
@@ -228,7 +237,7 @@ namespace ICA.AutoCAD
 
         public static SymbolTableRecord GetRecord(this SymbolTable symbolTable, ObjectId id) => symbolTable.Transact(GetRecord, id);
 
-        public static IEnumerable<SymbolTableRecord> GetRecords(this SymbolTable symbolTable) => symbolTable.Transact(GetRecords);
+        public static List<SymbolTableRecord> GetRecords(this SymbolTable symbolTable) => symbolTable.Transact(GetRecords);
 
         /// <summary>
         /// Get the <see cref="BlockTable"/> for the database.

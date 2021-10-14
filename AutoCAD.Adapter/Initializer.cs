@@ -13,7 +13,7 @@ namespace ICA.AutoCAD.Adapter
         public void Initialize()
         {
             if (Environment.UserName.Contains("cmoth"))
-                ConfigureDefaults();
+                //ConfigureDefaults();
 
             DocumentCollection.DocumentCreated += new DocumentCollectionEventHandler(DocumentCreated);
         }

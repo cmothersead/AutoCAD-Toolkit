@@ -26,7 +26,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Protected Properties
 
-        protected BlockReference BlockReference { get; }
+        public BlockReference BlockReference { get; }
 
         protected virtual AttributeReference TagAttribute { get; }
 
@@ -147,7 +147,7 @@ namespace ICA.AutoCAD.Adapter
                                                                      .Select(reference => new LinkConnection(reference))
                                                                      .ToList();
 
-        
+
 
         #endregion
 
@@ -204,11 +204,11 @@ namespace ICA.AutoCAD.Adapter
             return result.StringResult;
         }
 
-        public static void Link(IEnumerable<Symbol> symbols)
+        public static void Link(Database database, ICollection<Symbol> symbols)
         {
-            IEnumerable<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber);
-            ordered.OfType<ChildSymbol>().ForEach(child => 
-            { 
+            List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
+            ordered.OfType<ChildSymbol>().ForEach(child =>
+            {
                 child.TagHidden = true;
                 child.SetParent(ordered.First() as ParentSymbol);
             });
@@ -223,11 +223,25 @@ namespace ICA.AutoCAD.Adapter
                     if (top.Location.X == bottom.Location.X)
                     {
                         Line link = new Line(top.Location.ToPoint3d(), bottom.Location.ToPoint3d());
-                        link.Insert();
+                        
+                        if (!database.GetRegisteredApplicationTable().Has("ICA"))
+                        {
+                            var record = new RegAppTableRecord() { Name = "ICA" };
+                            using (Transaction transaction1 = database.TransactionManager.StartTransaction())
+                            {
+                                database.GetRegisteredApplicationTable(transaction1).GetForWrite(transaction1).Add(record);
+                                transaction1.Commit();
+                            }
+                        }
+                        ResultBuffer buffer = new ResultBuffer
+                        {
+                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, "ICA"),
+                            new TypedValue((int)DxfCode.ExtendedDataHandle, $"{top.Reference.Id.Handle}"),
+                            new TypedValue((int)DxfCode.ExtendedDataHandle, $"{bottom.Reference.Id.Handle}")
+                        };
+                        link.XData = buffer;
+                        link.Insert(database);
                         link.SetLayer(ElectricalLayers.LinkLayer);
-                        ResultBuffer buffer = new ResultBuffer();
-                        buffer.Add(new TypedValue((int)DxfCode.ExtendedDataHandle, $"{top.Reference.BlockId.Handle}"));
-                        buffer.Add(new TypedValue((int)DxfCode.ExtendedDataHandle, $"{bottom.Reference.BlockId.Handle}"));
                         top.Reference.SetValue($"{link.Handle}");
                         bottom.Reference.SetValue($"{link.Handle}");
                     }

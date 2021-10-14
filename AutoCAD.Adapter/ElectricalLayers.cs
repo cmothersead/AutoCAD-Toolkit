@@ -185,7 +185,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 Layers.Select(pair => pair.Value)
                       .Where(layer => layer.IsLocked && database.HasLayer(layer))
-                      .ForEach(layer => layer.GetForWrite(transaction).Modified += UnlockWarning);
+                      .ForEach(layer => database.GetLayer(transaction, layer).GetForWrite(transaction).Modified += UnlockWarning);
                 transaction.Commit();
             }
         }

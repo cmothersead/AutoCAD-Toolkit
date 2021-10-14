@@ -61,9 +61,9 @@ namespace ICA.AutoCAD.Adapter.Prompt
 
         public static List<ISymbol> Symbols(Editor editor, string message = null)
         {
-            List<ISymbol> list = Multiple(editor, message)?.Where(obj => obj is BlockReference)
-                                           .Select(reference => FromReference(editor, (BlockReference)reference))
-                                           .ToList();
+            List<ISymbol> list = Multiple(editor, message)?.OfType<BlockReference>()
+                                                           .Select(reference => FromReference(editor, reference))
+                                                           .ToList();
             return list;
         }
 
@@ -94,13 +94,13 @@ namespace ICA.AutoCAD.Adapter.Prompt
             return selectionResult.Status == PromptStatus.OK ? (ObjectId?)selectionResult.Value.GetObjectIds()[0] : null;
         }
 
-        public static List<DBObject> Multiple(Editor editor, string message = null)
+        public static IEnumerable<DBObject> Multiple(Editor editor, string message = null)
         {
             PromptSelectionOptions options = new PromptSelectionOptions { MessageForAdding = message };
             PromptSelectionResult selectionResult = editor.GetSelection(options);
 
             if (selectionResult.Status == PromptStatus.OK)
-                return selectionResult.Value.GetObjectIds().Select(id => id.Open()).ToList();
+                return selectionResult.Value.GetObjectIds().Select(id => id.Open());
 
             return null;
         }

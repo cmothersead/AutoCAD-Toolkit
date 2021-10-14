@@ -151,9 +151,9 @@ namespace ICA.AutoCAD.Adapter
             PhaseCount = phaseCount;
         }
 
-        public Ladder(List<Entity> entities)
+        public Ladder(ICollection<Entity> entities)
         {
-            Database = entities[0].Database;
+            Database = entities.FirstOrDefault()?.Database;
 
             _rails = entities.OfType<Line>()
                              .OrderBy(rail => rail.StartPoint.X)

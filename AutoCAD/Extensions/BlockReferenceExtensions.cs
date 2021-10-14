@@ -35,9 +35,11 @@ namespace ICA.AutoCAD
         public static AttributeReference GetAttributeReference(this BlockReference blockReference, Transaction transaction, string tag) => blockReference.GetAttributeReferences(transaction)
                                                                                                                                                          .FirstOrDefault(att => att.Tag == tag);
 
-        public static IEnumerable<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction) =>
+        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference, Transaction transaction) =>
             blockReference.AttributeCollection.Cast<ObjectId>()
-                                              .Select(id => id.Open(transaction) as AttributeReference);
+                                              .Select(id => id.Open(transaction))
+                                              .Cast<AttributeReference>()
+                                              .ToList();
 
         public static AttributeReference AddAttributeReference(this BlockReference blockReference, Transaction transaction, AttributeReference attributeReference)
         {
@@ -147,7 +149,7 @@ namespace ICA.AutoCAD
 
         public static AttributeReference GetAttributeReference(this BlockReference blockReference, string tag) => blockReference.Transact(GetAttributeReference, tag);
 
-        public static IEnumerable<AttributeReference> GetAttributeReferences(this BlockReference blockReference) => blockReference.Transact(GetAttributeReferences);
+        public static List<AttributeReference> GetAttributeReferences(this BlockReference blockReference) => blockReference.Transact(GetAttributeReferences);
 
         public static AttributeReference AddAttributeReference(this BlockReference blockReference, AttributeReference attributeReference) => blockReference.Transact(AddAttributeReference, attributeReference);
 

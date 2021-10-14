@@ -55,8 +55,7 @@ namespace ICA.AutoCAD.Adapter
             Stack.Add(BlockReference.GetAttributeReferences()
                                     .Select(att => att.Tag)
                                     .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
-                                    .Union(RequiredAttributes)
-                                    .ToList());
+                                    .Union(RequiredAttributes));
         }
 
         #endregion

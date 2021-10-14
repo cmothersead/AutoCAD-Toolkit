@@ -175,7 +175,7 @@ namespace ICA.AutoCAD.Adapter
                     symbol.CollapseAttributeStack();
                 });
                 symbols.OfType<ChildSymbol>().ForEach(child => child.SetParent(parent));
-                Symbol.Link(symbols);
+                Symbol.Link(CurrentDocument.Database, symbols);
             }
         }
 
@@ -244,9 +244,9 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("LINK")]
-        public static void Link() => Symbol.Link(Select.Symbols(Editor, "Select symbols:")
-                                                       .OfType<Symbol>()
-                                                       .ToList());
+        public static void Link() => Symbol.Link(CurrentDocument.Database, Select.Symbols(Editor, "Select symbols:")
+                                                                                 .OfType<Symbol>()
+                                                                                 .ToList());
 
         #endregion
 
@@ -522,6 +522,20 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TESTPREFERENCES")]
         public static void TestPrefs()
         {
+        }
+
+        [CommandMethod("GETXDATA")]
+        public static void GetXData()
+        {
+            var test = Select.SingleImplied(Editor);
+            var test2 = test.Value.Open().XData;
+            var test3 = test2.Cast<TypedValue>().Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle).Select(value => value.Value).ToList();
+            var test4 = test3.Select(handleString => Convert.ToInt64((string)handleString, 16)).ToList();
+            var test7 = test4.Select(handleLong => new Handle(handleLong)).ToList();
+            var test5 = test7.Select(handle => CurrentDocument.Database.GetObjectId(false, handle, 0)).ToList();
+            var test6 = test5.Select(id => id.Open()).OfType<AttributeReference>().ToList();
+            var test8 = test6.Select(attRef => attRef.OwnerId.Open()).OfType<BlockReference>().ToList();
+            test8.ForEach(reference => reference.Highlight());
         }
 
         public static void ZoomExtents(Document document, Extents3d extents)

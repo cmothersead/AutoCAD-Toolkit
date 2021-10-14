@@ -111,13 +111,16 @@ namespace ICA.AutoCAD
         public static BlockTableRecord GetModelSpace(this Database database, Transaction transaction) =>
             database.GetBlockTable(transaction).GetRecord(BlockTableRecord.ModelSpace);
 
-        public static IEnumerable<ObjectId> GetObjectIds(this Database database, Transaction transaction) =>
+        public static ICollection<ObjectId> GetObjectIds(this Database database, Transaction transaction) =>
             database.GetModelSpace(transaction)
-                    .Cast<ObjectId>();
+                    .Cast<ObjectId>()
+                    .ToList();
 
-        public static IEnumerable<Entity> GetEntities(this Database database, Transaction transaction) =>
+        public static ICollection<Entity> GetEntities(this Database database, Transaction transaction) =>
             database.GetObjectIds(transaction)
-                    .Select(id => id.Open(transaction) as Entity);
+                    .Select(id => id.Open(transaction))
+                    .Cast<Entity>()
+                    .ToList();
 
         public static bool HasLayer(this Database database, Transaction transaction, string name) =>
             database.GetLayerTable(transaction)
@@ -171,9 +174,9 @@ namespace ICA.AutoCAD
 
         public static BlockTableRecord GetModelSpace(this Database database) => database.Transact(GetModelSpace);
 
-        public static IEnumerable<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
+        public static ICollection<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
 
-        public static IEnumerable<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
+        public static ICollection<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
 
         public static bool HasLayer(this Database database, string name) => database.Transact(HasLayer, name);
 
