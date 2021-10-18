@@ -37,8 +37,9 @@ namespace ICA.AutoCAD.Adapter
         #region Public Static Properties
 
         public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
+        public static Database CurrentDatabase => CurrentDocument.Database;
         public static Editor Editor => CurrentDocument.Editor;
-        public static Project CurrentProject => CurrentDocument.Database.GetProject();
+        public static Project CurrentProject => CurrentDatabase.GetProject();
 
         public static bool? MountMode
         {
@@ -46,7 +47,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 if (_mountMode is null)
                 {
-                    LayerTableRecord mountingLayer = CurrentDocument.Database.GetLayer("MOUNTING");
+                    LayerTableRecord mountingLayer = CurrentDatabase.GetLayer("MOUNTING");
                     return !mountingLayer?.IsFrozen;
                 }
                 return _mountMode;
@@ -88,14 +89,14 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("MOUNT")]
         public static void ToggleMountingLayers() => MountMode ^= true;
 
-        private static List<LayerTableRecord> MountingLayers => CurrentDocument.Database.GetLayers(new List<LayerTableRecord>
+        private static List<LayerTableRecord> MountingLayers => CurrentDatabase.GetLayers(new List<LayerTableRecord>
         {
             ElectricalLayers.MountingLayer,
             ElectricalLayers.BoundsLayer,
             ElectricalLayers.ClearanceLayer
         });
 
-        private static List<LayerTableRecord> ViewingLayers => CurrentDocument.Database.GetLayers(new List<LayerTableRecord>
+        private static List<LayerTableRecord> ViewingLayers => CurrentDatabase.GetLayers(new List<LayerTableRecord>
         {
             ElectricalLayers.ComponentsLayer,
             ElectricalLayers.WipeoutLayer
@@ -155,7 +156,7 @@ namespace ICA.AutoCAD.Adapter
                 return;
             if (int.TryParse(result.StringResult, out int poles))
             {
-                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, name);
+                SchematicSymbolRecord record = SchematicSymbolRecord.GetRecord(CurrentDatabase, name);
                 if (record is null)
                     return;
 
@@ -166,7 +167,7 @@ namespace ICA.AutoCAD.Adapter
                 List<Symbol> symbols = new List<Symbol> { parent };
                 for (int i = 1; i < poles; i++)
                 {
-                    symbols.Add(record.InsertSymbol(new Point2d(symbols.Last().Position.X, symbols.Last().Position.Y - CurrentDocument.Database.GetLadder().LineHeight), Symbol.Type.Child) as ChildSymbol);
+                    symbols.Add(record.InsertSymbol(new Point2d(symbols.Last().Position.X, symbols.Last().Position.Y - CurrentDatabase.GetLadder().LineHeight), Symbol.Type.Child) as ChildSymbol);
                 }
                 parent.UpdateTag();
                 symbols.ForEach(symbol =>
@@ -175,7 +176,7 @@ namespace ICA.AutoCAD.Adapter
                     symbol.CollapseAttributeStack();
                 });
                 symbols.OfType<ChildSymbol>().ForEach(child => child.SetParent(parent));
-                Symbol.Link(CurrentDocument.Database, symbols);
+                Symbol.Link(CurrentDatabase, symbols);
             }
         }
 
@@ -184,7 +185,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static void InsertSymbol(string symbolName)
         {
-            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDocument.Database, symbolName)?.InsertSymbol() as Symbol;
+            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDatabase, symbolName)?.InsertSymbol() as Symbol;
             if (symbol is null)
                 return;
 
@@ -214,7 +215,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("UPDATELAYERS")]
-        public static void UpdateLayers() => ElectricalLayers.Update(CurrentDocument.Database);
+        public static void UpdateLayers() => ElectricalLayers.Update(CurrentDatabase);
 
         [CommandMethod("FINDPARENT")]
         public static void FindParent()
@@ -244,7 +245,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("LINK")]
-        public static void Link() => Symbol.Link(CurrentDocument.Database, Select.Symbols(Editor, "Select symbols:")
+        public static void Link() => Symbol.Link(CurrentDatabase, Select.Symbols(Editor, "Select symbols:")
                                                                                  .OfType<Symbol>()
                                                                                  .ToList());
 
@@ -351,7 +352,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("REMOVELADDER")]
         public static void RemoveLadder()
         {
-            Ladder.RemoveFrom(CurrentDocument.Database);
+            Ladder.RemoveFrom(CurrentDatabase);
         }
 
         [CommandMethod("LADDERCONFIG")]
@@ -372,7 +373,7 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             RemoveLadder();
-            Database database = CurrentDocument.Database;
+            Database database = CurrentDatabase;
             AddTitleBlock(database, newTitleBlock);
             ZoomExtents(CurrentDocument, newTitleBlock.Reference.GeometricExtents);
         }
@@ -411,7 +412,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("REMOVETITLEBLOCK")]
-        public static void PurgeTitleBlock() => CurrentDocument.Database.GetTitleBlock()?.Purge();
+        public static void PurgeTitleBlock() => CurrentDatabase.GetTitleBlock()?.Purge();
 
         [CommandMethod("TITLEBLOCKCONFIG")]
         public static void ConfigureTitleBlock() { }
@@ -419,7 +420,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("SPARE")]
         public static void SpareSheet()
         {
-            CurrentDocument.Database.GetTitleBlock().Spare ^= true;
+            CurrentDatabase.GetTitleBlock().Spare ^= true;
             Editor.Regen();
         }
 
@@ -494,7 +495,7 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             Point3d point = result.Value;
-            var entity = CurrentDocument.Database.GetEntities()
+            var entity = CurrentDatabase.GetEntities()
                                                  .OfType<Line>()
                                                  .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
                                                  .Select(line => new { Line = line, Dist = line.GetClosestPointTo(point, false).DistanceTo(point) })
@@ -532,7 +533,7 @@ namespace ICA.AutoCAD.Adapter
             var test3 = test2.Cast<TypedValue>().Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle).Select(value => value.Value).ToList();
             var test4 = test3.Select(handleString => Convert.ToInt64((string)handleString, 16)).ToList();
             var test7 = test4.Select(handleLong => new Handle(handleLong)).ToList();
-            var test5 = test7.Select(handle => CurrentDocument.Database.GetObjectId(false, handle, 0)).ToList();
+            var test5 = test7.Select(handle => CurrentDatabase.GetObjectId(false, handle, 0)).ToList();
             var test6 = test5.Select(id => id.Open()).OfType<AttributeReference>().ToList();
             var test8 = test6.Select(attRef => attRef.OwnerId.Open()).OfType<BlockReference>().ToList();
             test8.ForEach(reference => reference.Highlight());
@@ -542,12 +543,28 @@ namespace ICA.AutoCAD.Adapter
         public static void GetLinkedLine()
         {
             var test1 = Select.Symbol(Editor) as Symbol;
-            var test2 = test1.LinkConnections[0].Reference.XData?.Cast<TypedValue>()
-                             .Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle)
-                             .Select(value => value.Value).ToList();
-            var test3 = test2.OfType<Handle>();
-            var test4 = test3.Select(handle => CurrentDocument.Database.GetObjectId(false, handle, 0).Open() as Entity).ToList();
+            var test2 = test1.LinkConnections.SelectMany(connection => connection.Reference.XData?.Cast<TypedValue>() ?? Enumerable.Empty<TypedValue>())
+                                             .Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle)
+                                             .Select(value => value.Value as string)
+                                             .ToList();
+            var test3 = test2.OfType<string>().ToList();
+            var test4 = test3.Select(handleString => CurrentDatabase.OpenHandleString(handleString) as Entity).ToList();
             test4.ForEach(entity => entity.Highlight());
+        }
+
+        [CommandMethod("GETLINKED")]
+        public static void GetLinked()
+        {
+            var entity = Select.SingleImplied(Editor, "Select linked object:")?.Open() as Entity;
+            if (entity is null)
+                return;
+            GetLinked(entity).ForEach(ent => ent.Highlight());
+        }
+
+        public static List<Entity> GetLinked(Entity entity)
+        {
+            Graph<EntityNode, Entity> linkGraph = new Graph<EntityNode, Entity>(new EntityNode(entity));
+            return linkGraph.Nodes.Select(node => node.Value).ToList();
         }
 
         public static void ZoomExtents(Document document, Extents3d extents)

@@ -223,37 +223,7 @@ namespace ICA.AutoCAD.Adapter
                     if (top.Location.X == bottom.Location.X)
                     {
                         Line link = new Line(top.Location.ToPoint3d(), bottom.Location.ToPoint3d());
-                        
-                        if (!database.GetRegisteredApplicationTable().Has("ICA"))
-                        {
-                            var record = new RegAppTableRecord() { Name = "ICA" };
-                            using (Transaction transaction1 = database.TransactionManager.StartTransaction())
-                            {
-                                database.GetRegisteredApplicationTable(transaction1).GetForWrite(transaction1).Add(record);
-                                transaction1.Commit();
-                            }
-                        }
-                        ResultBuffer buffer = new ResultBuffer
-                        {
-                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, "ICA"),
-                            new TypedValue((int)DxfCode.ExtendedDataHandle, top.Reference.Id.Handle),
-                            new TypedValue((int)DxfCode.ExtendedDataHandle, bottom.Reference.Id.Handle)
-                        };
-                        link.XData = buffer;
-                        link.Insert(database);
-                        link.SetLayer(ElectricalLayers.LinkLayer);
-                        buffer = new ResultBuffer
-                        {
-                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, "ICA"),
-                            new TypedValue((int)DxfCode.ExtendedDataHandle, link.Handle)
-                        };
-                        using (Transaction transaction = database.TransactionManager.StartTransaction())
-                        {
-                            var forWrite = top.Reference.GetForWrite(transaction);
-                            forWrite.XData = buffer;
-                            transaction.Commit();
-                        }
-                        
+                        link.Insert(database, ElectricalLayers.LinkLayer);
                     }
                     else
                     {
@@ -262,10 +232,7 @@ namespace ICA.AutoCAD.Adapter
                         link.AddVertexAt(1, new Point2d(top.Location.X, (top.Location.Y + bottom.Location.Y) / 2), 0, 0, 0);
                         link.AddVertexAt(2, new Point2d(bottom.Location.X, (top.Location.Y + bottom.Location.Y) / 2), 0, 0, 0);
                         link.AddVertexAt(3, bottom.Location, 0, 0, 0);
-                        link.Insert();
-                        link.SetLayer(ElectricalLayers.LinkLayer);
-                        top.Reference.SetValue($"{link.Handle}");
-                        bottom.Reference.SetValue($"{link.Handle}");
+                        link.Insert(database, ElectricalLayers.LinkLayer);
                     }
                     top = null;
                     bottom = null;

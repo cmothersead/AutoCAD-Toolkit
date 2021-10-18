@@ -112,6 +112,8 @@
     <Compile Include="Config\Enums\WireGapStyle.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\TitleBlockSettings.cs" />
+    <Compile Include="EntityNode.cs" />
+    <Compile Include="IGraphNode.cs" />
     <Compile Include="ImportExport\WDM.cs" />
     <Compile Include="Config\WireSettings.cs" />
     <Compile Include="Drawing\Drawing.cs" />
@@ -134,6 +136,7 @@
     <Compile Include="Schematic\AttributeStack.cs" />
     <Compile Include="Schematic\Component.cs" />
     <Compile Include="Schematic\GroundSymbol.cs" />
+    <Compile Include="Graph.cs" />
     <Compile Include="Wire\LinkConnection.cs" />
     <Compile Include="Schematic\Symbol.cs" />
     <Compile Include="Schematic\SignalJig.cs" />

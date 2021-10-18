@@ -168,6 +168,9 @@ namespace ICA.AutoCAD
             transaction.AddNewlyCreatedDBObject(layerClone, true);
         }
 
+        public static DBObject OpenHandleString(this Database database, Transaction transaction, string handleString) => database.GetObjectId(false, new Handle(Convert.ToInt64(handleString, 16)), 0)
+                                                                                                                                 .Open(transaction);
+
         #endregion
 
         #region Transacted Overloads
@@ -189,6 +192,8 @@ namespace ICA.AutoCAD
         public static List<LayerTableRecord> GetLayers(this Database database, List<LayerTableRecord> layers) => database.Transact(GetLayers, layers);
 
         public static void AddLayer(this Database database, LayerTableRecord layer) => database.Transact(AddLayer, layer);
+
+        public static DBObject OpenHandleString(this Database database, string handleString) => database.Transact(OpenHandleString, handleString);
 
         #endregion
 
