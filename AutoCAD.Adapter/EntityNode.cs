@@ -11,11 +11,11 @@ namespace ICA.AutoCAD.Adapter
     {
         public Entity Value { get; set; }
 
-        public ICollection<IGraphNode<Entity>> Neighbors => Value.XData?.Cast<TypedValue>()
-                                                                       .Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle)
-                                                                       .Select(value => new EntityNode(Value.Database.OpenHandleString(value.Value as string) as Entity))
-                                                                       .Cast<IGraphNode<Entity>>()
-                                                                       .ToList();
+        public ICollection<IGraphNode<Entity>> Neighbors => Value.GetXData()
+                                                                 .Where(data => data.TypeCode == DxfCode.ExtendedDataHandle)
+                                                                 .Select(data => new EntityNode(Value.Database.OpenHandleString((string)data.Value) as Entity))
+                                                                 .Cast<IGraphNode<Entity>>()
+                                                                 .ToList();
 
         public EntityNode(Entity entity)
         {
@@ -26,20 +26,18 @@ namespace ICA.AutoCAD.Adapter
 
         public bool AddNeighbor(Entity neighbor)
         {
-            ResultBuffer buffer = new ResultBuffer
-            {
-                new TypedValue((int)DxfCode.ExtendedDataRegAppName, "ICA"),
-                new TypedValue((int)DxfCode.ExtendedDataHandle, neighbor.Handle)
-            };
-            using (Transaction transaction = neighbor.Database.TransactionManager.StartTransaction())
-            {
-                neighbor.SetXData(transaction, buffer);
-                transaction.Commit();
-            }
-            return neighbor.XData == buffer;
+            if (!neighbor.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle))
+                neighbor.AddXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
+            return neighbor.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle.Value);
         }
 
-        public bool RemoveNeighbor(IGraphNode<Entity> neighbor) => throw new NotImplementedException();
+        public bool RemoveNeighbor(IGraphNode<Entity> neighbor) => RemoveNeighbor(neighbor.Value);
+
+        public bool RemoveNeighbor(Entity neighbor)
+        {
+            neighbor.RemoveXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
+            return !neighbor.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle.Value);
+        }
 
         public static bool AddEdge(IGraphNode<Entity> node1, IGraphNode<Entity> node2) => node1.AddNeighbor(node2) && node2.AddNeighbor(node1);
 

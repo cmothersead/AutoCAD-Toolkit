@@ -213,6 +213,7 @@ namespace ICA.AutoCAD.Adapter
                 child.SetParent(ordered.First() as ParentSymbol);
             });
             LinkConnection top = null, bottom = null;
+            Graph<EntityNode, Entity> linkGraph = new Graph<EntityNode, Entity>();
 
             foreach (Symbol symbol in ordered)
             {
@@ -220,10 +221,15 @@ namespace ICA.AutoCAD.Adapter
                                             .Aggregate((next, highest) => next.Location.Y > highest.Location.Y ? next : highest);
                 if (top != null && bottom != null)
                 {
+                    EntityNode topNode = linkGraph.AddNode(new EntityNode(top.Reference.OwnerId.Open() as Entity));
+                    EntityNode bottomNode = linkGraph.AddNode(new EntityNode(bottom.Reference.OwnerId.Open() as Entity));
                     if (top.Location.X == bottom.Location.X)
                     {
                         Line link = new Line(top.Location.ToPoint3d(), bottom.Location.ToPoint3d());
                         link.Insert(database, ElectricalLayers.LinkLayer);
+                        EntityNode linkNode = linkGraph.AddNode(new EntityNode(link));
+                        linkGraph.AddEdge(topNode, linkNode);
+                        linkGraph.AddEdge(bottomNode, linkNode);
                     }
                     else
                     {
@@ -233,6 +239,9 @@ namespace ICA.AutoCAD.Adapter
                         link.AddVertexAt(2, new Point2d(bottom.Location.X, (top.Location.Y + bottom.Location.Y) / 2), 0, 0, 0);
                         link.AddVertexAt(3, bottom.Location, 0, 0, 0);
                         link.Insert(database, ElectricalLayers.LinkLayer);
+                        EntityNode linkNode = linkGraph.AddNode(new EntityNode(link));
+                        linkGraph.AddEdge(topNode, linkNode);
+                        linkGraph.AddEdge(bottomNode, linkNode);
                     }
                     top = null;
                     bottom = null;

@@ -113,6 +113,8 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\TitleBlockSettings.cs" />
     <Compile Include="EntityNode.cs" />
+    <Compile Include="Extensions\DBObjectExtensions.cs" />
+    <Compile Include="Extensions\XData.cs" />
     <Compile Include="IGraphNode.cs" />
     <Compile Include="ImportExport\WDM.cs" />
     <Compile Include="Config\WireSettings.cs" />

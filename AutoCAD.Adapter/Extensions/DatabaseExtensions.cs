@@ -44,6 +44,16 @@ namespace ICA.AutoCAD.Adapter
             database.SaveAs(database.Filename, DwgVersion.Current);
         }
 
+        public static void AddRegApp(this Database database, Transaction transaction)
+        {
+            RegAppTable table = database.GetRegisteredApplicationTable(transaction);
+            if (table.Has("ICA"))
+                return;
+            table.GetForWrite(transaction).Add(new RegAppTableRecord() { Name = "ICA" });
+        }
+
+        public static void AddRegApp(this Database database) => database.Transact(AddRegApp);
+
         #endregion
 
         #region Title Block

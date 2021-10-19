@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -10,19 +7,18 @@ namespace ICA.AutoCAD.Adapter
     {
         public List<TNode> Nodes { get; set; } = new List<TNode>();
 
-        public Graph (TNode first)
+        public Graph() { }
+
+        public Graph(TNode first) => DiscoverNodes(first);
+
+        public TNode AddNode(TNode value)
         {
-            DiscoverNodes(first);
-        }
-
-        public void AddNode(TNode value, List<TNode> neighbors)
-        {
-            if (Contains(value))
-                return;
-
-            Nodes.Add(value);
-
-            neighbors.ForEach(neighbor => AddEdge(value, neighbor));
+            if (!Contains(value))
+            {
+                Nodes.Add(value);
+                value.Neighbors.ForEach(neighbor => AddEdge(value, neighbor));
+            }
+            return Nodes[Nodes.IndexOf(value)];
         }
 
         public void RemoveNode(TNode value)
@@ -35,9 +31,9 @@ namespace ICA.AutoCAD.Adapter
             Nodes.Remove(value);
         }
 
-        public static bool AddEdge(IGraphNode<TData> node1, IGraphNode<TData> node2) => node1.AddNeighbor(node2) && node2.AddNeighbor(node1);
+        public bool AddEdge(IGraphNode<TData> node1, IGraphNode<TData> node2) => node1.AddNeighbor(node2) && node2.AddNeighbor(node1);
 
-        public static bool RemoveEdge(IGraphNode<TData> node1, IGraphNode<TData> node2) => node1.RemoveNeighbor(node2) && node2.RemoveNeighbor(node1);
+        public bool RemoveEdge(IGraphNode<TData> node1, IGraphNode<TData> node2) => node1.RemoveNeighbor(node2) && node2.RemoveNeighbor(node1);
 
         public bool Contains(TNode value) => Nodes.Contains(value);
 

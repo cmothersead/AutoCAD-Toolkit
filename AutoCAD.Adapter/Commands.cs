@@ -171,8 +171,8 @@ namespace ICA.AutoCAD.Adapter
                 }
                 parent.UpdateTag();
                 symbols.ForEach(symbol =>
-                { 
-                    symbol.AssignLayers(); 
+                {
+                    symbol.AssignLayers();
                     symbol.CollapseAttributeStack();
                 });
                 symbols.OfType<ChildSymbol>().ForEach(child => child.SetParent(parent));
@@ -529,27 +529,13 @@ namespace ICA.AutoCAD.Adapter
         public static void GetXData()
         {
             var test = Select.SingleImplied(Editor);
-            var test2 = test.Value.Open().XData;
-            var test3 = test2.Cast<TypedValue>().Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle).Select(value => value.Value).ToList();
-            var test4 = test3.Select(handleString => Convert.ToInt64((string)handleString, 16)).ToList();
-            var test7 = test4.Select(handleLong => new Handle(handleLong)).ToList();
-            var test5 = test7.Select(handle => CurrentDatabase.GetObjectId(false, handle, 0)).ToList();
-            var test6 = test5.Select(id => id.Open()).OfType<AttributeReference>().ToList();
-            var test8 = test6.Select(attRef => attRef.OwnerId.Open()).OfType<BlockReference>().ToList();
-            test8.ForEach(reference => reference.Highlight());
-        }
 
-        [CommandMethod("GETLINKLINE")]
-        public static void GetLinkedLine()
-        {
-            var test1 = Select.Symbol(Editor) as Symbol;
-            var test2 = test1.LinkConnections.SelectMany(connection => connection.Reference.XData?.Cast<TypedValue>() ?? Enumerable.Empty<TypedValue>())
-                                             .Where(value => value.TypeCode == (int)DxfCode.ExtendedDataHandle)
-                                             .Select(value => value.Value as string)
-                                             .ToList();
-            var test3 = test2.OfType<string>().ToList();
-            var test4 = test3.Select(handleString => CurrentDatabase.OpenHandleString(handleString) as Entity).ToList();
-            test4.ForEach(entity => entity.Highlight());
+            if (test is null)
+                return;
+
+            Entity entity = test.Value.Open() as Entity;
+            
+            var result = entity.GetXData();
         }
 
         [CommandMethod("GETLINKED")]

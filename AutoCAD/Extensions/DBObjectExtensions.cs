@@ -11,8 +11,6 @@ namespace ICA.AutoCAD
 
         public static void Erase(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
 
-        public static void SetXData(this DBObject obj, Transaction transaction, ResultBuffer value) => obj.GetForWrite(transaction).XData = value;
-
         #endregion
 
         #region Transaction Handlers
