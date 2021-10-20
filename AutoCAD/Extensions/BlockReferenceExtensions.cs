@@ -133,9 +133,15 @@ namespace ICA.AutoCAD
             {
                 record.GetAttributeDefinitions(transaction)
                       .Where(definition => definition != null && !definition.Constant)
-                      .ForEach(definition => blockReference.AddAttributeReference(transaction,
-                                                                                  definition,
-                                                                                  (bool)attributes?.ContainsKey(definition.Tag) ? attributes[definition.Tag] : definition.TextString));
+                      .ForEach(definition =>
+                      {
+                          string tag;
+                          if (attributes != null && attributes.ContainsKey(definition.Tag))
+                              tag = attributes[definition.Tag];
+                          else
+                              tag = definition.TextString;
+                          blockReference.AddAttributeReference(transaction, definition, tag);
+                      });
             }
             if (layer != null)
                 blockReference.SetLayer(transaction, layer);

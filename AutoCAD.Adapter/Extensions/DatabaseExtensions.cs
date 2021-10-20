@@ -49,7 +49,9 @@ namespace ICA.AutoCAD.Adapter
             RegAppTable table = database.GetRegisteredApplicationTable(transaction);
             if (table.Has("ICA"))
                 return;
-            table.GetForWrite(transaction).Add(new RegAppTableRecord() { Name = "ICA" });
+            RegAppTableRecord regAppTableRecord = new RegAppTableRecord() { Name = "ICA" };
+            table.GetForWrite(transaction).Add(regAppTableRecord);
+            transaction.AddNewlyCreatedDBObject(regAppTableRecord, true);
         }
 
         public static void AddRegApp(this Database database) => database.Transact(AddRegApp);
