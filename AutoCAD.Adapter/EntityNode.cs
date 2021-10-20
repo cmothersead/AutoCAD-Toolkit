@@ -26,17 +26,17 @@ namespace ICA.AutoCAD.Adapter
 
         public bool AddNeighbor(Entity neighbor)
         {
-            if (!neighbor.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle))
-                neighbor.AddXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
-            return neighbor.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle.Value);
+            if (!Value.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle))
+                Value.AddXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
+            return Value.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
         }
 
         public bool RemoveNeighbor(IGraphNode<Entity> neighbor) => RemoveNeighbor(neighbor.Value);
 
         public bool RemoveNeighbor(Entity neighbor)
         {
-            neighbor.RemoveXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
-            return !neighbor.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle.Value);
+            Value.RemoveXData(DxfCode.ExtendedDataHandle, neighbor.Handle);
+            return !Value.HasXData(DxfCode.ExtendedDataHandle, neighbor.Handle.Value);
         }
 
         public static bool AddEdge(IGraphNode<Entity> node1, IGraphNode<Entity> node2) => node1.AddNeighbor(node2) && node2.AddNeighbor(node1);

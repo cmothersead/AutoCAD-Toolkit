@@ -31,7 +31,7 @@ namespace ICA.AutoCAD
         public override bool Equals(object obj)
         {
             if (obj is XData data)
-                return data.TypeCode.Equals(TypeCode) && data.Value.Equals(Value);
+                return data.TypeCode.Equals(TypeCode) && data.Value.ToString().Equals(Value.ToString());
 
             return false;
         }
