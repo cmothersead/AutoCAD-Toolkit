@@ -105,6 +105,12 @@ namespace ICA.AutoCAD.Adapter.Prompt
             return null;
         }
 
+        public static List<DBObject> Implied(Editor editor)
+        {
+            PromptSelectionResult selectionResult = editor.SelectImplied();
+            return selectionResult.Status == PromptStatus.OK ? selectionResult.Value.GetObjectIds().Select(id => id.Open()).ToList() : null;
+        }
+
         public static Point2d? Point(Editor editor, string message = null)
         {
             PromptPointOptions options = new PromptPointOptions(message);

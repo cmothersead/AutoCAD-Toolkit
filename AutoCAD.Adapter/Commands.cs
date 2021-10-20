@@ -572,6 +572,32 @@ namespace ICA.AutoCAD.Adapter
             Editor.WriteMessage($"{test?.Open().Handle}");
         }
 
+        [CommandMethod("ADDDOUBLECLICK", CommandFlags.Session)]
+        public static void AddDoubleClick()
+        {
+            Application.BeginDoubleClick += Application_BeginDoubleClick;
+        }
+
+        [CommandMethod("REMOVEDOUBLECLICK")]
+        public static void RemoveDoubleClick()
+        {
+            Application.BeginDoubleClick -= Application_BeginDoubleClick;
+        }
+
+        private static void Application_BeginDoubleClick(object sender, BeginDoubleClickEventArgs e)
+        {
+            var objects = Select.Implied(Editor);
+            ParentSymbol parent = objects.OfType<BlockReference>()
+                                         .Where(reference => reference.HasAttributeReference("TAG1"))
+                                         .Select(reference => new ParentSymbol(reference))
+                                         .FirstOrDefault();
+            using(DocumentLock doclock = CurrentDocument.LockDocument())
+            {
+                ParentSymbolEditView editView = new ParentSymbolEditView(parent);
+                Application.ShowModalWindow(editView);
+            }
+        }
+
         public static List<Entity> GetLinked(Entity entity)
         {
             Graph<EntityNode, Entity> linkGraph = new Graph<EntityNode, Entity>(new EntityNode(entity));
