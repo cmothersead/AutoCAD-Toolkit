@@ -111,12 +111,12 @@ namespace ICA.AutoCAD
         public static BlockTableRecord GetModelSpace(this Database database, Transaction transaction) =>
             database.GetBlockTable(transaction).GetRecord(BlockTableRecord.ModelSpace);
 
-        public static ICollection<ObjectId> GetObjectIds(this Database database, Transaction transaction) =>
+        public static List<ObjectId> GetObjectIds(this Database database, Transaction transaction) =>
             database.GetModelSpace(transaction)
                     .Cast<ObjectId>()
                     .ToList();
 
-        public static ICollection<Entity> GetEntities(this Database database, Transaction transaction) =>
+        public static List<Entity> GetEntities(this Database database, Transaction transaction) =>
             database.GetObjectIds(transaction)
                     .Select(id => id.Open(transaction))
                     .Cast<Entity>()
@@ -171,15 +171,24 @@ namespace ICA.AutoCAD
         public static DBObject OpenHandleString(this Database database, Transaction transaction, string handleString) => database.GetObjectId(false, new Handle(Convert.ToInt64(handleString, 16)), 0)
                                                                                                                                  .Open(transaction);
 
+        public static DBDictionary GetGroupDictionary(this Database database, Transaction transaction) => database.GroupDictionaryId.Open(transaction) as DBDictionary;
+
+        public static void AddGroup(this Database database, Transaction transaction, string name, Group group)
+        {
+            database.GetGroupDictionary(transaction).GetForWrite(transaction).SetAt(name, group);
+            transaction.AddNewlyCreatedDBObject(group, true);
+        }
+
+
         #endregion
 
         #region Transacted Overloads
 
         public static BlockTableRecord GetModelSpace(this Database database) => database.Transact(GetModelSpace);
 
-        public static ICollection<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
+        public static List<ObjectId> GetObjectIds(this Database database) => database.Transact(GetObjectIds);
 
-        public static ICollection<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
+        public static List<Entity> GetEntities(this Database database) => database.Transact(GetEntities);
 
         public static bool HasLayer(this Database database, string name) => database.Transact(HasLayer, name);
 
@@ -194,6 +203,10 @@ namespace ICA.AutoCAD
         public static void AddLayer(this Database database, LayerTableRecord layer) => database.Transact(AddLayer, layer);
 
         public static DBObject OpenHandleString(this Database database, string handleString) => database.Transact(OpenHandleString, handleString);
+
+        public static DBDictionary GetGroupDictionary(this Database database) => database.Transact(GetGroupDictionary);
+
+        public static void AddGroup(this Database database, string name, Group group) => database.Transact(AddGroup, name, group);
 
         #endregion
 

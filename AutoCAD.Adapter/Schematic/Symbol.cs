@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static ICA.AutoCAD.Adapter.ConnectionPoint;
+using EntityGroup = Autodesk.AutoCAD.DatabaseServices.Group;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -249,6 +250,9 @@ namespace ICA.AutoCAD.Adapter
                 bottom = symbol.LinkConnections.Where(connection => connection.WireDirection == Orientation.Down)
                                                .Aggregate((next, lowest) => next.Location.Y < lowest.Location.Y ? next : lowest);
             }
+            EntityGroup group = new EntityGroup(ordered.First().Tag, true);
+            linkGraph.Nodes.Select(node => node.Value).ForEach(entity => group.Append(entity.Id));
+            database.AddGroup(group.Description, group);
         }
 
         #endregion
