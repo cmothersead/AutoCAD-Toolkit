@@ -37,7 +37,7 @@ namespace ICA.AutoCAD.Adapter
             obj.GetForWrite(transaction).XData = buffer;
         }
 
-        public static void ClearXData(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).XData = null;
+        public static void ClearXData(this DBObject obj, Transaction transaction) => obj.SetXData(transaction, new List<XData>());
 
         public static void AddXData(this DBObject obj, Transaction transaction, XData value)
         {

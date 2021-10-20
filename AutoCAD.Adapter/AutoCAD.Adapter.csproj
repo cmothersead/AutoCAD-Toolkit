@@ -113,6 +113,7 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\TitleBlockSettings.cs" />
     <Compile Include="EntityNode.cs" />
+    <Compile Include="Overrules\EraseLinksOverrule.cs" />
     <Compile Include="Extensions\DBObjectExtensions.cs" />
     <Compile Include="Extensions\XData.cs" />
     <Compile Include="IGraphNode.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Ladder\ILadder.cs" />
     <Compile Include="Ladder\LadderTemplate.cs" />
     <Compile Include="Config\LadderSettings.cs" />
+    <Compile Include="Overrules\GroupGripOverrule.cs" />
     <Compile Include="Project\Customer.cs" />
     <Compile Include="Project\FamilyCode.cs" />
     <Compile Include="Project\Job.cs" />
@@ -150,8 +152,8 @@
     <Compile Include="Schematic\SchematicSymbolRecord.cs" />
     <Compile Include="Schematic\SignalSymbol.cs" />
     <Compile Include="Schematic\SymbolJig.cs" />
-    <Compile Include="SymbolGripOverrule.cs" />
-    <Compile Include="SymbolTranformOverrule.cs" />
+    <Compile Include="Overrules\SymbolGripOverrule.cs" />
+    <Compile Include="Overrules\SymbolTranformOverrule.cs" />
     <Compile Include="Title Block\TitleBlock.cs" />
     <Compile Include="Wire\ConnectionPoint.cs" />
     <Compile Include="Wire\Wire.cs" />

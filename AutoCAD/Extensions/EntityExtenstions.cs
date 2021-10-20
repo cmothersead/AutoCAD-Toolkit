@@ -7,6 +7,8 @@ namespace ICA.AutoCAD
 {
     public static class EntityExtenstions
     {
+        #region Public Extension Methods
+
         /// <summary>
         /// Adds entity to the current document's database within self-contained transaction.
         /// </summary>
@@ -69,6 +71,17 @@ namespace ICA.AutoCAD
             return true;
         }
 
+        public static bool IntersectsWith(this Entity entity, Entity otherEntity)
+        {
+            Point3dCollection collection = new Point3dCollection();
+            entity.IntersectWith(otherEntity, Intersect.OnBothOperands, collection, 0, 0);
+            return collection.Count != 0;
+        }
+
+        #endregion
+
+        #region Transacted Overloads
+
         public static void SetLayer(this Entity entity, LayerTableRecord layer) => entity.Transact(SetLayer, layer);
 
         public static void SetLayer(this Entity entity, string name) => entity.Transact(SetLayer, name);
@@ -77,13 +90,8 @@ namespace ICA.AutoCAD
 
         public static void SetColor(this Entity entity, Color color) => entity.Transact(SetColor, color);
 
-        public static bool IntersectsWith(this Entity entity, Entity otherEntity)
-        {
-            Point3dCollection collection = new Point3dCollection();
-            entity.IntersectWith(otherEntity, Intersect.OnBothOperands, collection, 0, 0);
-            return collection.Count != 0;
-        }
-
         public static bool IntersectsWith(this Entity entity, Point2d point) => entity.IntersectsWith(new DBPoint(point.ToPoint3d()));
+
+        #endregion
     }
 }

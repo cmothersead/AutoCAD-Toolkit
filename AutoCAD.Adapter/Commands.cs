@@ -511,9 +511,15 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TOGGLEOVERRULES")]
         public static void EnableOverrule()
         {
-            Overrule.Overruling = true;
-            //Overrule.AddOverrule(RXObject.GetClass(typeof(Group)), new SymbolGripOverrule(), false);
+            Overrule.Overruling = false;
             Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
+        }
+
+        [CommandMethod("LINKOVERRULE")]
+        public static void EnableLinkOverrule()
+        {
+            Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new EraseLinksOverrule(), false);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new GroupGripOverrule(), false);
         }
 
         [CommandMethod("GROUND")]
@@ -535,7 +541,15 @@ namespace ICA.AutoCAD.Adapter
 
             Entity entity = test.Value.Open() as Entity;
             
-            var result = entity.GetXData();
+            entity.GetXData().ForEach(data => Editor.WriteMessage($"{data.Value}"));
+        }
+
+        [CommandMethod("CLEARXDATA")]
+        public static void ClearXData()
+        {
+            Application.ShowAlertDialog("Removing XData can cause unexpected behavior");
+            var test = Select.Multiple(Editor, "Select objects to clear XData from:");
+            test?.ForEach(obj => obj.ClearXData());
         }
 
         [CommandMethod("GETLINKED")]
@@ -545,6 +559,13 @@ namespace ICA.AutoCAD.Adapter
             if (entity is null)
                 return;
             GetLinked(entity).ForEach(ent => ent.Highlight());
+        }
+
+        [CommandMethod("GETHANDLE")]
+        public static void GetHandle()
+        {
+            var test = Select.SingleImplied(Editor);
+            Editor.WriteMessage($"{test?.Open().Handle}");
         }
 
         public static List<Entity> GetLinked(Entity entity)

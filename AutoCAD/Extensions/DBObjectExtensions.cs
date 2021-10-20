@@ -1,5 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD
 {
@@ -10,6 +12,24 @@ namespace ICA.AutoCAD
         public static TDBObject GetForWrite<TDBObject>(this TDBObject obj, Transaction transaction) where TDBObject : DBObject => transaction.GetObject(obj.ObjectId, OpenMode.ForWrite) as TDBObject;
 
         public static void Erase(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
+
+        public static bool HasGroup(this DBObject obj, Transaction transaction) => obj.GetPersistentReactorIds().Cast<ObjectId>().Any(id => id.Open(transaction) is Group);
+
+        public static List<Group> GetGroups(this DBObject obj, Transaction transaction) => obj.GetPersistentReactorIds()
+                                                                                              .Cast<ObjectId>()
+                                                                                              .Select(id => id.Open(transaction))
+                                                                                              .OfType<Group>()
+                                                                                              .ToList();
+
+        #endregion
+
+        #region Transacted Overloads
+
+        public static void Erase(this DBObject obj) => obj.Transact(Erase);
+
+        public static bool HasGroup(this DBObject obj) => obj.Transact(HasGroup);
+
+        public static List<Group> GetGroups(this DBObject obj) => obj.Transact(GetGroups);
 
         #endregion
 
