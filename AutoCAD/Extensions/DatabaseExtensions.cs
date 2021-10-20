@@ -179,7 +179,6 @@ namespace ICA.AutoCAD
             transaction.AddNewlyCreatedDBObject(group, true);
         }
 
-
         #endregion
 
         #region Transacted Overloads

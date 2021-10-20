@@ -143,12 +143,10 @@ namespace ICA.AutoCAD.Adapter
                                                                      .Select(reference => new WireConnection(reference))
                                                                      .ToList();
 
-        public List<LinkConnection> LinkConnections => BlockReference.GetAttributeReferences()
-                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]LINK"))
-                                                                     .Select(reference => new LinkConnection(reference))
+        public List<LinkConnection> LinkConnections => (BlockReference.BlockTableRecord.Open() as BlockTableRecord).GetAttributeDefinitions()
+                                                                     .Where(definition => Regex.IsMatch(definition.Tag, @"X[1,2,4,8]LINK"))
+                                                                     .Select(definition => new LinkConnection(BlockReference, definition))
                                                                      .ToList();
-
-
 
         #endregion
 
@@ -222,8 +220,8 @@ namespace ICA.AutoCAD.Adapter
                                             .Aggregate((next, highest) => next.Location.Y > highest.Location.Y ? next : highest);
                 if (top != null && bottom != null)
                 {
-                    EntityNode topNode = linkGraph.AddNode(new EntityNode(top.Reference.OwnerId.Open() as Entity));
-                    EntityNode bottomNode = linkGraph.AddNode(new EntityNode(bottom.Reference.OwnerId.Open() as Entity));
+                    EntityNode topNode = linkGraph.AddNode(new EntityNode(top.Owner));
+                    EntityNode bottomNode = linkGraph.AddNode(new EntityNode(bottom.Owner));
                     if (top.Location.X == bottom.Location.X)
                     {
                         Line link = new Line(top.Location.ToPoint3d(), bottom.Location.ToPoint3d());
@@ -250,9 +248,9 @@ namespace ICA.AutoCAD.Adapter
                 bottom = symbol.LinkConnections.Where(connection => connection.WireDirection == Orientation.Down)
                                                .Aggregate((next, lowest) => next.Location.Y < lowest.Location.Y ? next : lowest);
             }
-            EntityGroup group = new EntityGroup(ordered.First().Tag, true);
+            EntityGroup group = new EntityGroup();
             linkGraph.Nodes.Select(node => node.Value).ForEach(entity => group.Append(entity.Id));
-            database.AddGroup(group.Description, group);
+            database.AddGroup(ordered.First().Tag, group);
         }
 
         #endregion

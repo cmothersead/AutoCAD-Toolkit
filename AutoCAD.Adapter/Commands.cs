@@ -150,6 +150,10 @@ namespace ICA.AutoCAD.Adapter
         public static void InsertMultipole()
         {
             string name = Symbol.PromptSymbolName(Editor);
+
+            if (name is null)
+                return;
+
             PromptStringOptions options = new PromptStringOptions("Number of poles:");
             PromptResult result = Editor.GetString(options);
             if (result.Status != PromptStatus.OK)

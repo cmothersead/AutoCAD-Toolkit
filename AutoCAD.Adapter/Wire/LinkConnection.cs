@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Text.RegularExpressions;
 
@@ -10,7 +11,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properies
 
-        public AttributeReference Reference { get; set; }
+        public BlockReference Owner { get; }
 
         #endregion
 
@@ -18,15 +19,15 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public LinkConnection(AttributeReference reference)
+        public LinkConnection(BlockReference blockReference, AttributeDefinition definition)
         {
             Regex format = new Regex(@"X([1,2,4,8])LINK");
-            Match match = format.Match(reference.Tag);
+            Match match = format.Match(definition.Tag);
             if (!match.Success)
-                throw new ArgumentException("Attribute reference is not formatted as a valid link connection.");
+                throw new ArgumentException("Attribute definition is not formatted as a valid link connection.");
             WireDirection = (Orientation)int.Parse(match.Groups[1].ToString());
-            Location = reference.GetPosition();
-            Reference = reference;
+            Location = blockReference.Position.TransformBy(Matrix3d.Displacement(definition.Position.GetAsVector())).ToPoint2D();
+            Owner = blockReference;
         }
 
         #endregion
