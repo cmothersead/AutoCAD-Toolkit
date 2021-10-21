@@ -24,7 +24,11 @@ namespace ICA.AutoCAD.Adapter
         {
             if(!entity.HasGroup())
             {
-                base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
+                try
+                {
+                    base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
+                }
+                catch { }
                 return;
             }
 

@@ -28,9 +28,9 @@ namespace ICA.AutoCAD.Adapter
 
         public Point2d Position => BlockReference.Position.ToPoint2D();
 
-        public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
-                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
-                                                                     .Select(reference => new WireConnection(reference))
+        public List<WireConnection> WireConnections => (BlockReference.BlockTableRecord.Open() as BlockTableRecord).GetAttributeDefinitions()
+                                                                     .Where(definition => Regex.IsMatch(definition.Tag, @"X[1,2,4,8]TERM\d{2}"))
+                                                                     .Select(definition => new WireConnection(BlockReference, definition))
                                                                      .ToList();
 
         #endregion

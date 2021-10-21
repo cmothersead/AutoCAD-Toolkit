@@ -515,25 +515,14 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TOGGLEOVERRULES")]
         public static void EnableOverrule()
         {
-            Overrule.Overruling = false;
-            Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
-        }
-
-        [CommandMethod("LINKOVERRULE")]
-        public static void EnableLinkOverrule()
-        {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new EraseLinksOverrule(), false);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new GroupGripOverrule(), false);
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(Entity)), new EraseLinksOverrule());
+            //Overrule.Overruling = false;
+            //Editor.WriteMessage(Overrule.Overruling ? "\nOverrules enabled." : "\nOverrules disabled.");
         }
 
         [CommandMethod("GROUND")]
         public static void InsertGround() => GroundSymbol.Insert(CurrentDocument)
                                                          .GroundConnectedWires();
-
-        [CommandMethod("TESTPREFERENCES")]
-        public static void TestPrefs()
-        {
-        }
 
         [CommandMethod("GETXDATA")]
         public static void GetXData()

@@ -49,29 +49,29 @@ namespace ICA.AutoCAD.Adapter
         public int PhaseCount { get; } = 1;
         public Database Database { get; }
 
-        private List<Line> _rails;
-        public List<Line> Rails
+        private List<Rail> _rails;
+        private List<Rail> Rails
         {
             get
             {
                 if (_rails != null)
                     return _rails;
 
-                _rails = new List<Line>();
+                _rails = new List<Rail>();
                 Origins.ForEach(origin => _rails.Add(new Rail(origin, Height)));
                 return _rails;
             }
         }
 
-        private List<BlockReference> _lineNumbers;
-        public List<BlockReference> LineNumbers
+        private List<LineNumber> _lineNumbers;
+        private List<LineNumber> LineNumbers
         {
             get
             {
                 if (_lineNumbers != null)
                     return _lineNumbers;
 
-                _lineNumbers = new List<BlockReference>();
+                _lineNumbers = new List<LineNumber>();
                 int reference = FirstReference;
                 for (double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
@@ -108,6 +108,8 @@ namespace ICA.AutoCAD.Adapter
 
             public Rail(Point2d top, double length)
                 : base(top.ToPoint3d(), new Point3d(top.X, top.Y - length, 0)) { }
+
+            public void Insert(Transaction transaction, Database database) => this.Insert(transaction, database, ElectricalLayers.LadderLayer);
         }
 
         private class LineNumber : BlockReference
@@ -119,13 +121,10 @@ namespace ICA.AutoCAD.Adapter
                 _number = number;
             }
 
-            public void Insert(Transaction transaction, Database database)
-            {
-                this.Insert(transaction, database, new Dictionary<string, string>
+            public void Insert(Transaction transaction, Database database) => this.Insert(transaction, database, new Dictionary<string, string>
                 {
                     { "LINENUMBER", _number }
-                });
-            }
+                }, ElectricalLayers.LadderLayer);
         }
 
         #endregion
@@ -155,11 +154,11 @@ namespace ICA.AutoCAD.Adapter
         {
             Database = entities.FirstOrDefault()?.Database;
 
-            _rails = entities.OfType<Line>()
+            _rails = entities.OfType<Rail>()
                              .OrderBy(rail => rail.StartPoint.X)
                              .ToList();
 
-            _lineNumbers = entities.OfType<BlockReference>()
+            _lineNumbers = entities.OfType<LineNumber>()
                                    .OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER"))
                                    .ToList();
 
@@ -189,8 +188,8 @@ namespace ICA.AutoCAD.Adapter
 
         public void Insert(Transaction transaction)
         {
-            Rails.ForEach(rail => rail.Insert(transaction, Database, ElectricalLayers.LadderLayer));
-            LineNumbers.ForEach(lineNumber => lineNumber.Insert(transaction, Database, ElectricalLayers.LadderLayer));
+            Rails.ForEach(rail => rail.Insert(transaction, Database));
+            LineNumbers.ForEach(lineNumber => lineNumber.Insert(transaction, Database));
         }
 
         public string ClosestLineNumber(Point2d position) => LineNumbers.OrderByDescending(number => number.Position.X)

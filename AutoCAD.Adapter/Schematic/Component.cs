@@ -40,6 +40,8 @@ namespace ICA.AutoCAD.Adapter
 
         public Project Project => ((ParentSymbol)Symbol).Database.GetProject();
 
+        public string LineNumber => ((ParentSymbol)Symbol).LineNumber;
+
         public Component(ParentSymbol parent)
         {
             Symbol = parent;

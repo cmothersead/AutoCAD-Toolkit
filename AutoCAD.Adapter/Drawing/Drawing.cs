@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
 using System;
 using System.Collections;
@@ -31,6 +32,9 @@ namespace ICA.AutoCAD.Adapter
 
                 if (_database is null)
                 {
+                    if (Application.DocumentManager.Contains(new Uri(FullPath)))
+                        return Application.DocumentManager.Get(FullPath).Database;
+
                     if (!File.Exists(FullPath))
                         return null;
 
@@ -79,9 +83,8 @@ namespace ICA.AutoCAD.Adapter
         public DrawingSettings Settings { get; set; }
 
         [XmlIgnore]
-        public List<Component> Components => Database.GetObjectIds()
-                                                     .Where(id => id.Open() is BlockReference)
-                                                     .Select(id => id.Open() as BlockReference)
+        public List<Component> Components => Database.GetEntities()
+                                                     .OfType<BlockReference>()
                                                      .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name & reference.HasAttributeReference("TAG1"))
                                                      .Select(reference => new Component(new ParentSymbol(reference)))
                                                      .ToList();

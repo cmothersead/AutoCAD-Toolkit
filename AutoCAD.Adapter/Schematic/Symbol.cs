@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static ICA.AutoCAD.Adapter.ConnectionPoint;
@@ -70,7 +71,7 @@ namespace ICA.AutoCAD.Adapter
             { "%F", $"{FamilyView}" },
             { "%S", $"" }, //Fix so that sheet is not included in line number
             { "%N", $"{LineNumber}" },
-            { "%X", "1" } //suffix character for reference based tagging
+            { "%X", $"{Index}" }
         };
 
         protected AttributeStack Stack { get; }
@@ -79,11 +80,15 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
+        public Handle Handle => BlockReference.Handle;
+
         public Component Component { get; set; }
 
         public Database Database => BlockReference.Database;
 
         public Project Project => Database.GetProject();
+
+        public Drawing Drawing => Project.Drawings.FirstOrDefault(drawing => drawing.Name == Path.GetFileNameWithoutExtension(Database.OriginalFileName));
 
         public string Family
         {
@@ -138,9 +143,11 @@ namespace ICA.AutoCAD.Adapter
 
         public string SheetNumber => BlockReference.Database.GetSheetNumber();
 
-        public List<WireConnection> WireConnections => BlockReference.GetAttributeReferences()
-                                                                     .Where(reference => Regex.IsMatch(reference.Tag, @"X[1,2,4,8]TERM\d{2}"))
-                                                                     .Select(reference => new WireConnection(reference))
+        public int Index => GetIndex();
+
+        public List<WireConnection> WireConnections => (BlockReference.BlockTableRecord.Open() as BlockTableRecord).GetAttributeDefinitions()
+                                                                     .Where(definition => Regex.IsMatch(definition.Tag, @"X[1,2,4,8]TERM\d{2}"))
+                                                                     .Select(definition => new WireConnection(BlockReference, definition))
                                                                      .ToList();
 
         public List<LinkConnection> LinkConnections => (BlockReference.BlockTableRecord.Open() as BlockTableRecord).GetAttributeDefinitions()
@@ -182,6 +189,18 @@ namespace ICA.AutoCAD.Adapter
                               .ForEach(reference => reference.SetLayer(AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key)).Value));
                 transaction.Commit();
             }
+        }
+
+        public int GetIndex()
+        {
+            List<Component> indexList = Drawing.Components.Where(component => component.Family == Family && component.LineNumber == LineNumber)
+                                                          .OrderBy(component => ((ParentSymbol)component.Symbol).Position.X)
+                                                          .ToList();
+            Component found = indexList.Find(component => ((ParentSymbol)component.Symbol).Handle == Handle);
+            if (found is null)
+                return indexList.Count + 1;
+            else
+                return indexList.IndexOf(found) + 1;
         }
 
         #endregion

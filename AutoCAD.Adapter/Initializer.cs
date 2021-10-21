@@ -13,8 +13,9 @@ namespace ICA.AutoCAD.Adapter
         public void Initialize()
         {
             if (Environment.UserName.Contains("cmoth"))
-                //ConfigureDefaults();
-
+                ConfigureDefaults();
+            //Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new EraseLinksOverrule(), false);
+            //Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new GroupGripOverrule(), false);
             DocumentCollection.DocumentCreated += new DocumentCollectionEventHandler(DocumentCreated);
         }
 
@@ -39,7 +40,9 @@ namespace ICA.AutoCAD.Adapter
             SystemVariables.PDFComments = false;
             SystemVariables.LockFade = 0;
             var test = SystemVariables.TrustedPaths;
-            test.Add($"{Path.GetDirectoryName(Directory.GetParent(Environment.CurrentDirectory).Parent.FullName)}\\...");
+            string trustedPath = $"{Path.GetDirectoryName(Directory.GetParent(Environment.CurrentDirectory).Parent.FullName)}\\...";
+            if (!test.Contains(trustedPath))
+                test.Add(trustedPath);
             SystemVariables.TrustedPaths = test;
         }
     }

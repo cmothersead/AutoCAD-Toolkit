@@ -9,14 +9,14 @@ namespace ICA.AutoCAD.Adapter
     {
         #region Constructors
 
-        public WireConnection(AttributeReference reference)
+        public WireConnection(BlockReference blockReference, AttributeDefinition definition) : base(blockReference)
         {
             Regex format = new Regex(@"X([1,2,4,8])TERM\d{2}");
-            Match match = format.Match(reference.Tag);
+            Match match = format.Match(definition.Tag);
             if (!match.Success)
-                throw new ArgumentException("Attribute reference is not formatted as a valid wire connection.");
+                throw new ArgumentException("Attribute definition is not formatted as a valid wire connection.");
             WireDirection = (Orientation)int.Parse(match.Groups[1].ToString());
-            Location = reference.GetPosition();
+            Location = blockReference.Position.TransformBy(Matrix3d.Displacement(definition.Position.GetAsVector())).ToPoint2D();
         }
 
         public WireConnection(Point2d location, double entryAngle)
