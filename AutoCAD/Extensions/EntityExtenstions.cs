@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using System;
 
 namespace ICA.AutoCAD
 {
@@ -74,7 +75,7 @@ namespace ICA.AutoCAD
         public static bool IntersectsWith(this Entity entity, Entity otherEntity)
         {
             Point3dCollection collection = new Point3dCollection();
-            entity.IntersectWith(otherEntity, Intersect.OnBothOperands, collection, 0, 0);
+            entity.IntersectWith(otherEntity, Intersect.OnBothOperands, collection, IntPtr.Zero, IntPtr.Zero);
             return collection.Count != 0;
         }
 
