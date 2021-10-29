@@ -53,6 +53,7 @@
                        Grid.Row="0"/>
                 <TextBox Name="Manufacturer_TextBox"
                          Text="{Binding Manufacturer}"
+                         CharacterCasing="{Binding CharacterCasing}"
                          Grid.Column="1"
                          Grid.Row="0"/>
 
@@ -62,6 +63,7 @@
                        Grid.Column="0"/>
                 <TextBox Name="Part_TextBox"
                          Text="{Binding Part}"
+                         CharacterCasing="{Binding CharacterCasing}"
                          Grid.Column="1"
                          Grid.Row="1"
                          Grid.ColumnSpan="2"/>

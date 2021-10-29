@@ -39,8 +39,8 @@ namespace ICA.AutoCAD.Adapter.Windows.Controls
                 typeof(DescriptionControl));
         public CharacterCasing CharacterCasing
         {
-            get => (CharacterCasing)GetValue(IsCheckedProperty);
-            set => SetValue(IsCheckedProperty, value);
+            get => (CharacterCasing)GetValue(CharacterCasingProperty);
+            set => SetValue(CharacterCasingProperty, value);
         }
 
         public event EventHandler Checked;

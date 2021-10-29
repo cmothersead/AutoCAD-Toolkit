@@ -7,7 +7,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
     {
         private string _value;
         /// <summary>
-        /// Text value of this description line. Forces all characters to uppercase
+        /// Text value of this description line.
         /// </summary>
         public string Value
         {
@@ -23,7 +23,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
                 {
                     Filled?.Invoke(this, new EventArgs());
                 }
-                _value = value.ToUpper();
+                _value = value;
             }
         }
 
@@ -47,6 +47,8 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Value);
             return hashCode;
         }
+
+        public override bool Equals(object obj) => base.Equals(obj);
 
         public static bool operator ==(DescriptionLine x, DescriptionLine y) => x.Equals(y);
         public static bool operator !=(DescriptionLine x, DescriptionLine y) => !x.Equals(y);

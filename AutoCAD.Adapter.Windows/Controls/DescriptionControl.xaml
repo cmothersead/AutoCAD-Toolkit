@@ -36,7 +36,8 @@
                 <DataTemplate>
                     <StackPanel>
                         <TextBox Name="Value_TextBox"
-                                 Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                 CharacterCasing="{Binding Chara}"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
