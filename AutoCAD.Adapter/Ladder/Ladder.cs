@@ -49,29 +49,29 @@ namespace ICA.AutoCAD.Adapter
         public int PhaseCount { get; } = 1;
         public Database Database { get; }
 
-        private List<Rail> _rails;
-        private List<Rail> Rails
+        private List<Line> _rails;
+        private List<Line> Rails
         {
             get
             {
                 if (_rails != null)
                     return _rails;
 
-                _rails = new List<Rail>();
+                _rails = new List<Line>();
                 Origins.ForEach(origin => _rails.Add(new Rail(origin, Height)));
                 return _rails;
             }
         }
 
-        private List<LineNumber> _lineNumbers;
-        private List<LineNumber> LineNumbers
+        private List<BlockReference> _lineNumbers;
+        private List<BlockReference> LineNumbers
         {
             get
             {
                 if (_lineNumbers != null)
                     return _lineNumbers;
 
-                _lineNumbers = new List<LineNumber>();
+                _lineNumbers = new List<BlockReference>();
                 int reference = FirstReference;
                 for (double y = Origin.Y; Origin.Y - y <= Height; y -= LineHeight)
                 {
@@ -154,11 +154,11 @@ namespace ICA.AutoCAD.Adapter
         {
             Database = entities.FirstOrDefault()?.Database;
 
-            _rails = entities.OfType<Rail>()
+            _rails = entities.OfType<Line>()
                              .OrderBy(rail => rail.StartPoint.X)
                              .ToList();
 
-            _lineNumbers = entities.OfType<LineNumber>()
+            _lineNumbers = entities.OfType<BlockReference>()
                                    .OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER"))
                                    .ToList();
 
@@ -188,13 +188,13 @@ namespace ICA.AutoCAD.Adapter
 
         public void Insert(Transaction transaction)
         {
-            Rails.ForEach(rail => rail.Insert(transaction, Database));
-            LineNumbers.ForEach(lineNumber => lineNumber.Insert(transaction, Database));
+            Rails.ForEach(rail => ((Rail)rail).Insert(transaction, Database));
+            LineNumbers.ForEach(lineNumber => ((LineNumber)lineNumber).Insert(transaction, Database));
         }
 
         public string ClosestLineNumber(Point2d position) => LineNumbers.OrderByDescending(number => number.Position.X)
-                                                                        .Where(number => number.Position.X < position.X)
-                                                                        .Aggregate((closest, next) => Math.Abs(next.Position.Y - position.Y) < Math.Abs(closest.Position.Y - position.Y) ? next : closest)
+                                                                        .Where(number => number.Position.X <= position.X)
+                                                                        .Aggregate((closest, next) => Math.Abs(next.Position.Y - position.Y) < Math.Abs(closest.Position.Y - position.Y) ? next : closest)?
                                                                         .GetAttributeValue("LINENUMBER");
 
         public string ClosestLineNumber(Point3d position) => ClosestLineNumber(position.ToPoint2D());

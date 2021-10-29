@@ -83,10 +83,8 @@ namespace ICA.AutoCAD.Adapter
         public DrawingSettings Settings { get; set; }
 
         [XmlIgnore]
-        public List<Component> Components => Database.GetEntities()
-                                                     .OfType<BlockReference>()
-                                                     .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name & reference.HasAttributeReference("TAG1"))
-                                                     .Select(reference => new Component(new ParentSymbol(reference)))
+        public List<Component> Components => Database.GetParentSymbols()
+                                                     .Select(symbol => new Component(symbol))
                                                      .ToList();
 
         #endregion

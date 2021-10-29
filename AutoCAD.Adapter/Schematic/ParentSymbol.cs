@@ -54,6 +54,14 @@ namespace ICA.AutoCAD.Adapter
             "INST"
         };
 
+        private Dictionary<string, string> Replacements => new Dictionary<string, string>()
+        {
+            { "%F", $"{FamilyView}" },
+            { "%S", $"" }, //Fix so that sheet is not included in line number
+            { "%N", $"{LineNumber}" },
+            { "%X", $"{Index}" }
+        };
+
         private List<AttributeReference> InstallationAttributes => new List<AttributeReference>() { InstAttribute, LocAttribute };
 
         private List<AttributeReference> PartAttributes => new List<AttributeReference>() { MfgAttribute, CatAttribute };
@@ -104,17 +112,41 @@ namespace ICA.AutoCAD.Adapter
             set => PartAttributes.ForEach(a => a?.SetVisibility(!value));
         }
 
+        public int Index
+        {
+            get
+            {
+                List<ParentSymbol> indexList = Database.GetParentSymbols().Where(parent => parent.Family == Family && parent.LineNumber == LineNumber)
+                                                              .OrderBy(parent => parent.Position.X)
+                                                              .ToList();
+                ParentSymbol found = indexList.Find(parent => parent.Handle == Handle);
+                if (found is null)
+                    return indexList.Count + 1;
+                else
+                    return indexList.IndexOf(found) + 1;
+            }
+        }
+
         #endregion
 
         #endregion
 
         #region Constructor
 
-        public ParentSymbol(BlockReference blockReference) : base(blockReference) => Stack.Add(BlockReference.GetAttributeReferences()
-                                                                                                             .Select(att => att.Tag)
-                                                                                                             .Where(tag => AttributeNames.Any(att => tag.Contains(att)) && !Exclude.Any(att => tag.Contains(att)))
-                                                                                                             .Union(RequiredAttributes)
-                                                                                                             .ToList());
+        public ParentSymbol(BlockReference blockReference) : base(blockReference)
+        {
+            Stack.Add(BlockReference.GetAttributeReferences()
+                                    .Select(att => att.Tag)
+                                    .Where(tag => AttributeNames.Any(att => tag.Contains(att)) && !Exclude.Any(att => tag.Contains(att)))
+                                    .Union(RequiredAttributes)
+                                    .ToList());
+            if (!Database.GetNamedDictionary("Parents").Contains(BlockReference.Handle.ToString()))
+                using (Transaction transaction = Database.TransactionManager.StartTransaction())
+                {
+                    Database.GetNamedDictionary("Parents").GetForWrite(transaction).SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
+                    transaction.Commit();
+                }
+        }
 
         #endregion
 
@@ -127,8 +159,8 @@ namespace ICA.AutoCAD.Adapter
             if (format is null)
                 format = Database.GetProject().Settings.Component.Format;
             Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
-        } 
-            
+        }
+
 
         public void MatchWireNumbers()
         {

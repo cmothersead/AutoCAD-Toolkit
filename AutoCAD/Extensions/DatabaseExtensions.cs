@@ -179,6 +179,8 @@ namespace ICA.AutoCAD
             transaction.AddNewlyCreatedDBObject(group, true);
         }
 
+        public static DBDictionary GetNamedObjectDictionary(this Database database, Transaction transaction) => database.NamedObjectsDictionaryId.Open(transaction) as DBDictionary;
+
         #endregion
 
         #region Transacted Overloads
@@ -206,6 +208,8 @@ namespace ICA.AutoCAD
         public static DBDictionary GetGroupDictionary(this Database database) => database.Transact(GetGroupDictionary);
 
         public static void AddGroup(this Database database, string name, Group group) => database.Transact(AddGroup, name, group);
+
+        public static DBDictionary GetNamedObjectDictionary(this Database database) => database.Transact(GetNamedObjectDictionary);
 
         #endregion
 

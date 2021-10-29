@@ -56,6 +56,12 @@ namespace ICA.AutoCAD.Adapter
                                     .Select(att => att.Tag)
                                     .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
                                     .Union(RequiredAttributes));
+            if (!Database.GetNamedDictionary("Children").Contains(BlockReference.Handle.ToString()))
+                using (Transaction transaction = Database.TransactionManager.StartTransaction())
+                {
+                    Database.GetNamedDictionary("Children").GetForWrite(transaction).SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
+                    transaction.Commit();
+                }
         }
 
         #endregion

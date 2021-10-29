@@ -66,14 +66,6 @@ namespace ICA.AutoCAD.Adapter
             { "XREF", ElectricalLayers.XrefLayer }
         };
 
-        protected Dictionary<string, string> Replacements => new Dictionary<string, string>()
-        {
-            { "%F", $"{FamilyView}" },
-            { "%S", $"" }, //Fix so that sheet is not included in line number
-            { "%N", $"{LineNumber}" },
-            { "%X", $"{Index}" }
-        };
-
         protected AttributeStack Stack { get; }
 
         #endregion
@@ -143,8 +135,6 @@ namespace ICA.AutoCAD.Adapter
 
         public string SheetNumber => BlockReference.Database.GetSheetNumber();
 
-        public int Index => GetIndex();
-
         public List<WireConnection> WireConnections => (BlockReference.BlockTableRecord.Open() as BlockTableRecord).GetAttributeDefinitions()
                                                                      .Where(definition => Regex.IsMatch(definition.Tag, @"X[1,2,4,8]TERM\d{2}"))
                                                                      .Select(definition => new WireConnection(BlockReference, definition))
@@ -191,16 +181,29 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public int GetIndex()
+        public void BreakWires()
         {
-            List<Component> indexList = Drawing.Components.Where(component => component.Family == Family && component.LineNumber == LineNumber)
-                                                          .OrderBy(component => ((ParentSymbol)component.Symbol).Position.X)
-                                                          .ToList();
-            Component found = indexList.Find(component => ((ParentSymbol)component.Symbol).Handle == Handle);
-            if (found is null)
-                return indexList.Count + 1;
-            else
-                return indexList.IndexOf(found) + 1;
+            foreach(WireConnection point in WireConnections)
+            {
+                Line intersectLine;
+                switch (point.WireDirection)
+                {
+                    case Orientation.Left | Orientation.Right:
+                        intersectLine = new Line(point.Location.ToPoint3d(), new Point3d(point.Location.X, point.Location.Y + 1, 0));
+                        break;
+                    default:
+                        intersectLine = new Line(point.Location.ToPoint3d(), new Point3d(point.Location.X + 1, point.Location.Y, 0));
+                        break;
+                }
+                List<Entity> list = point.Owner.Database.GetEntities()
+                                                        .Where(entity => entity.Layer == ElectricalLayers.WireLayer.Name)
+                                                        .Where(entity => entity.IntersectsWith(intersectLine))
+                                                        .ToList();
+                foreach(Entity entity in list)
+                {
+                    Line clone = entity.Clone() as Line;
+                }
+            }
         }
 
         #endregion

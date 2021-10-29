@@ -1,4 +1,5 @@
-﻿using ICA.Schematic;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using ICA.Schematic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,8 +46,9 @@ namespace ICA.AutoCAD.Adapter
         public Component(ParentSymbol parent)
         {
             Symbol = parent;
-            //Children = Project.Drawings.SelectMany(drawing => drawing.GetChildSymbols(Tag))
-            //                           .ToList();
+            Children = ((ParentSymbol)Symbol).Database.GetChildSymbols()
+                                                      .Where(child => child.Tag == Tag)
+                                                      .Cast<IChildSymbol>().ToList();
         }
 
         public override string ToString() => Tag;
@@ -54,7 +56,11 @@ namespace ICA.AutoCAD.Adapter
         public void UpdateTag()
         {
             ((ParentSymbol)Symbol).UpdateTag();
-            //Children.ForEach(child => child.Tag = Tag);
+            Children.ForEach(child =>
+            {
+                child.Tag = Tag;
+                child.Description = Description;
+            });
         }
     }
 }

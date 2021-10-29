@@ -200,8 +200,15 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("UPDATETAGS")]
-        public static void UpdateTag() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
+        public static void UpdateTags() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
                                                                 .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag());
+
+        [CommandMethod("UPDATETAG")]
+        public static void UpdateTag()
+        {
+            if (Select.Component(Editor, "Select component:") is Component component)
+                component.UpdateTag();
+        }
 
         [CommandMethod("MATCHWIRES")]
         public static void Matchwires()
@@ -233,19 +240,6 @@ namespace ICA.AutoCAD.Adapter
                         symbol.Xref = parent.LineNumber;
                 }
             }
-        }
-
-        [CommandMethod("SETPARENT")]
-        public static void SetParent()
-        {
-            if (Select.Symbol(Editor, "Select parent:") is ParentSymbol parent)
-                foreach (ChildSymbol child in Select.Symbols(Editor, "Select children:"))
-                    if (parent.Family == child.Family)
-                    {
-                        child.Tag = parent.Tag;
-                        child.Xref = parent.LineNumber;
-                        child.Description = parent.Description;
-                    }
         }
 
         [CommandMethod("LINK")]
@@ -591,6 +585,36 @@ namespace ICA.AutoCAD.Adapter
         {
             Graph<EntityNode, Entity> linkGraph = new Graph<EntityNode, Entity>(new EntityNode(entity));
             return linkGraph.Nodes.Select(node => node.Value).ToList();
+        }
+
+        [CommandMethod("LOGSYMBOLS")]
+        public static void LogSymbols()
+        {
+            using (Transaction transaction = CurrentDatabase.TransactionManager.StartTransaction())
+            {
+                DBDictionary parents = CurrentDatabase.GetNamedDictionary(transaction, "Parents");
+                CurrentDatabase.GetEntities(transaction)
+                               .OfType<BlockReference>()
+                               .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG1"))
+                               .ForEach(blockReference => parents.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
+
+                DBDictionary children = CurrentDatabase.GetNamedDictionary(transaction, "Children");
+                CurrentDatabase.GetEntities(transaction)
+                               .OfType<BlockReference>()
+                               .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG2"))
+                               .ForEach(blockReference => children.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
+
+                transaction.Commit();
+            }
+        }
+
+        [CommandMethod("GETSYMBOLS")]
+        public static void GetSymbols()
+        {
+            var test1 = CurrentDatabase.GetParentSymbols();
+            test1.ForEach(symbol => symbol.BlockReference.Highlight());
+            var test2 = CurrentDatabase.GetChildSymbols();
+            test2.ForEach(symbol => symbol.BlockReference.Highlight());
         }
 
         public static void ZoomExtents(Document document, Extents3d extents)

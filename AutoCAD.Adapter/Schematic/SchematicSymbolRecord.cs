@@ -120,6 +120,9 @@ namespace ICA.AutoCAD.Adapter
 
             if (record is null)
             {
+                if (name == "")
+                    return null;
+
                 throw new ArgumentException($"Symbol with name: \"{name}\" not found");
             }
 
