@@ -23,7 +23,7 @@ namespace ICA.AutoCAD.Adapter
         #region Private Properties
 
         private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
-                                                                                      .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
+                                                                                              .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
         
         #endregion
 
@@ -83,7 +83,7 @@ namespace ICA.AutoCAD.Adapter
             Color = Color.FromColorIndex(ColorMethod.ByAci, 11),
             Description = "Ratings"
         };
-        public static LayerTableRecord MiscellaneousLayer = new LayerTableRecord()
+        public static LayerTableRecord MiscellaneousLayer => new LayerTableRecord()
         {
             Name = "MISC",
             Color = Color.FromColorIndex(ColorMethod.ByAci, 40),
