@@ -54,8 +54,6 @@ namespace ICA.AutoCAD.Adapter
             transaction.AddNewlyCreatedDBObject(regAppTableRecord, true);
         }
 
-        public static void AddRegApp(this Database database) => database.Transact(AddRegApp);
-
         public static DBDictionary GetNamedDictionary(this Database database, Transaction transaction, string name)
         {
             DBDictionary namedObjectDictionary = database.GetNamedObjectDictionary(transaction);
@@ -66,6 +64,26 @@ namespace ICA.AutoCAD.Adapter
                 transaction.AddNewlyCreatedDBObject(newDict, true);
             }
             return namedObjectDictionary.GetAt(name).Open(transaction) as DBDictionary;
+        }
+
+        #endregion
+
+        #region Symbols
+
+        public static void LogSymbols(this Database database, Transaction transaction)
+        {
+            DBDictionary parents = database.GetNamedDictionary(transaction, "Parents").GetForWrite(transaction);
+            ;
+            database.GetEntities(transaction)
+                    .OfType<BlockReference>()
+                    .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG1"))
+                    .ForEach(blockReference => parents.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
+
+            DBDictionary children = database.GetNamedDictionary(transaction, "Children").GetForWrite(transaction);
+            database.GetEntities(transaction)
+                    .OfType<BlockReference>()
+                    .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG2"))
+                    .ForEach(blockReference => children.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
         }
 
         public static List<ParentSymbol> GetParentSymbols(this Database database, Transaction transaction)
@@ -91,8 +109,8 @@ namespace ICA.AutoCAD.Adapter
         public static TitleBlock GetTitleBlock(this Database database)
         {
             BlockTableRecord titleBlockRecord = database.GetBlockTable()
-                                                  .GetRecords()
-                                                  .FirstOrDefault(record => record.Name.Contains("Title Block") && record.HasAttribute("TB"));
+                                                        .GetRecords()
+                                                        .FirstOrDefault(record => record.Name.Contains("Title Block") && record.HasAttribute("TB"));
             return titleBlockRecord == null ? null : new TitleBlock(titleBlockRecord);
         }
 
@@ -134,7 +152,11 @@ namespace ICA.AutoCAD.Adapter
 
         #region Transacted Overloads
 
+        public static void AddRegApp(this Database database) => database.Transact(AddRegApp);
+
         public static DBDictionary GetNamedDictionary(this Database database, string name) => database.Transact(GetNamedDictionary, name);
+
+        public static void LogSymbols(this Database database) => database.Transact(LogSymbols);
 
         public static List<ParentSymbol> GetParentSymbols(this Database database) => database.Transact(GetParentSymbols);
 

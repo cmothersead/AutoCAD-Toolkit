@@ -1,18 +1,18 @@
-﻿using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using ICA.Schematic;
-using ICA.AutoCAD.Adapter.Windows.Views;
-using System.Collections.Generic;
-using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using System.IO;
-using System;
-using ICA.AutoCAD.Adapter.Prompt;
-using System.Linq;
+using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
+using ICA.AutoCAD.Adapter.Prompt;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
+using ICA.AutoCAD.Adapter.Windows.Views;
+using ICA.Schematic;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -194,14 +194,23 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             if (symbol is ParentSymbol parent)
+            {
+                if(parent.Family == "")
+                {
+                    PromptResult result = Editor.GetString("Enter family code:");
+                    if (result.Status == PromptStatus.OK)
+                        parent.Family = result.StringResult;
+                }
                 parent.UpdateTag();
+            }
             symbol.AssignLayers();
             symbol.CollapseAttributeStack();
         }
 
         [CommandMethod("UPDATETAGS")]
-        public static void UpdateTags() => Select.Symbols(Editor).Where(symbol => symbol is ParentSymbol parent)
-                                                                .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag());
+        public static void UpdateTags() => Select.Symbols(Editor)
+                                                 .Where(symbol => symbol is ParentSymbol parent)
+                                                 .ForEach(symbol => ((ParentSymbol)symbol).UpdateTag());
 
         [CommandMethod("UPDATETAG")]
         public static void UpdateTag()
@@ -228,24 +237,10 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("UPDATELAYERS")]
         public static void UpdateLayers() => ElectricalLayers.Update(CurrentDatabase);
 
-        [CommandMethod("FINDPARENT")]
-        public static void FindParent()
-        {
-            if (Select.Symbol(Editor) is ChildSymbol symbol)
-            {
-                foreach (BlockReference reference in symbol.Database.GetLayer("SYMS").GetEntities().Where(entity => entity is BlockReference))
-                {
-                    ParentSymbol parent = new ParentSymbol(reference);
-                    if (parent.Tag == symbol.Tag)
-                        symbol.Xref = parent.LineNumber;
-                }
-            }
-        }
-
         [CommandMethod("LINK")]
         public static void Link() => Symbol.Link(CurrentDatabase, Select.Symbols(Editor, "Select symbols:")
-                                                                                 .OfType<Symbol>()
-                                                                                 .ToList());
+                                                                        .OfType<Symbol>()
+                                                                        .ToList());
 
         #endregion
 
@@ -535,24 +530,16 @@ namespace ICA.AutoCAD.Adapter
         public static void ClearXData()
         {
             Application.ShowAlertDialog("Removing XData can cause unexpected behavior");
-            var test = Select.Multiple(Editor, "Select objects to clear XData from:");
-            test?.ForEach(obj => obj.ClearXData());
+            Select.Multiple(Editor, "Select objects to clear XData from:")?.ForEach(obj => obj.ClearXData());
         }
 
         [CommandMethod("GETLINKED")]
         public static void GetLinked()
         {
-            var entity = Select.SingleImplied(Editor, "Select linked object:")?.Open() as Entity;
+            Entity entity = Select.SingleImplied(Editor, "Select linked object:")?.Open() as Entity;
             if (entity is null)
                 return;
             GetLinked(entity).ForEach(ent => ent.Highlight());
-        }
-
-        [CommandMethod("GETHANDLE")]
-        public static void GetHandle()
-        {
-            var test = Select.SingleImplied(Editor);
-            Editor.WriteMessage($"{test?.Open().Handle}");
         }
 
         [CommandMethod("ADDDOUBLECLICK", CommandFlags.Session)]
@@ -588,25 +575,8 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("LOGSYMBOLS")]
-        public static void LogSymbols()
-        {
-            using (Transaction transaction = CurrentDatabase.TransactionManager.StartTransaction())
-            {
-                DBDictionary parents = CurrentDatabase.GetNamedDictionary(transaction, "Parents");
-                CurrentDatabase.GetEntities(transaction)
-                               .OfType<BlockReference>()
-                               .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG1"))
-                               .ForEach(blockReference => parents.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
-
-                DBDictionary children = CurrentDatabase.GetNamedDictionary(transaction, "Children");
-                CurrentDatabase.GetEntities(transaction)
-                               .OfType<BlockReference>()
-                               .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG2"))
-                               .ForEach(blockReference => children.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
-
-                transaction.Commit();
-            }
-        }
+        public static void LogSymbols(Database database) => CurrentDatabase.GetProject().Drawings
+                                                                           .ForEach(drawing => drawing.LogSymbols());
 
         [CommandMethod("GETSYMBOLS")]
         public static void GetSymbols()

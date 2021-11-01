@@ -69,7 +69,7 @@ namespace ICA.AutoCAD.Adapter
                 if (newLine is null)
                     break;
 
-                if (newLine.GetAngle2d() == previousLine?.GetAngle2d())
+                if (newLine.Angle == previousLine?.Angle)
                     using(Transaction transaction = document.Database.TransactionManager.StartTransaction())
                     {
                         previousLine.GetForWrite(transaction).EndPoint = newLine.EndPoint;
@@ -77,7 +77,7 @@ namespace ICA.AutoCAD.Adapter
                     }
                 else
                 {
-                    currentPoints = new List<WireConnection>() { new WireConnection(newLine.EndPoint.ToPoint2D(), newLine.GetAngle2d()) };
+                    currentPoints = new List<WireConnection>() { new WireConnection(newLine.EndPoint.ToPoint2D(), newLine.Angle) };
                     newLine.Insert(document.Database);
                     newLine.SetLayer(ElectricalLayers.WireLayer);
 

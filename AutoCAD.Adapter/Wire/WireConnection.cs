@@ -22,7 +22,7 @@ namespace ICA.AutoCAD.Adapter
         public WireConnection(Point2d location, double entryAngle)
         {
             Location = location;
-            switch(entryAngle)
+            switch (entryAngle)
             {
                 case 0:
                     WireDirection = Orientation.All ^ Orientation.Left;
@@ -36,6 +36,25 @@ namespace ICA.AutoCAD.Adapter
                 case Math.PI * 3 / 2:
                     WireDirection = Orientation.All ^ Orientation.Up;
                     break;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public bool IsAligned(double angle)
+        {
+            switch (angle)
+            {
+                case 0:
+                case Math.PI:
+                    return WireDirection == (Orientation.Left | Orientation.Right);
+                case Math.PI / 2:
+                case Math.PI * 3 / 2:
+                    return WireDirection == (Orientation.Up | Orientation.Down);
+                default:
+                    return false;
             }
         }
 

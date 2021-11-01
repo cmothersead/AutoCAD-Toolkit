@@ -185,23 +185,18 @@ namespace ICA.AutoCAD.Adapter
         {
             foreach(WireConnection point in WireConnections)
             {
-                Line intersectLine;
-                switch (point.WireDirection)
-                {
-                    case Orientation.Left | Orientation.Right:
-                        intersectLine = new Line(point.Location.ToPoint3d(), new Point3d(point.Location.X, point.Location.Y + 1, 0));
-                        break;
-                    default:
-                        intersectLine = new Line(point.Location.ToPoint3d(), new Point3d(point.Location.X + 1, point.Location.Y, 0));
-                        break;
-                }
-                List<Entity> list = point.Owner.Database.GetEntities()
+                List<Line> list = point.Owner.Database.GetEntities()
                                                         .Where(entity => entity.Layer == ElectricalLayers.WireLayer.Name)
-                                                        .Where(entity => entity.IntersectsWith(intersectLine))
+                                                        .OfType<Line>()
+                                                        .Where(line => new Line2d(line.StartPoint.ToPoint2D(), line.EndPoint.ToPoint2D()).IsOn(point.Location) && point.IsAligned(line.Angle))
                                                         .ToList();
-                foreach(Entity entity in list)
+
+                foreach(Line line in list)
                 {
-                    Line clone = entity.Clone() as Line;
+                    if (line.IsOn(point.Location))
+                    {
+                        var test = line.GetSplitCurves(new Point3dCollection() { point.Location.ToPoint3d() }).OfType<Line>().ToList();
+                    }
                 }
             }
         }

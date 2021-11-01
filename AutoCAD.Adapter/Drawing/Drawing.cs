@@ -131,19 +131,9 @@ namespace ICA.AutoCAD.Adapter
             return currentObject.ToString();
         }
 
-        public List<IChildSymbol> GetChildSymbols() => Database.GetObjectIds()
-                                                              .Where(id => id.Open() is BlockReference)
-                                                              .Select(id => id.Open() as BlockReference)
-                                                              .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name && reference.HasAttributeReference("TAG2"))
-                                                              .Select(reference => new ChildSymbol(reference) as IChildSymbol)
-                                                              .ToList();
+        public List<ChildSymbol> GetChildSymbols() => Database.GetChildSymbols();
 
-        public List<IChildSymbol> GetChildSymbols(string tag) => Database.GetObjectIds()
-                                                                        .Where(id => id.Open() is BlockReference)
-                                                                        .Select(id => id.Open() as BlockReference)
-                                                                        .Where(reference => reference.Layer == ElectricalLayers.SymbolLayer.Name && reference.HasAttributeReference("TAG2") && reference.GetAttributeValue("TAG2") == tag)
-                                                                        .Select(reference => new ChildSymbol(reference) as IChildSymbol)
-                                                                        .ToList();
+        public void LogSymbols() => Database.LogSymbols();
 
         #region Description
 

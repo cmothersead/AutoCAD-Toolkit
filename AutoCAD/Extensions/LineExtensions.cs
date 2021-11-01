@@ -1,14 +1,23 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD
 {
     public static class LineExtensions
     {
-        /// <summary>
-        /// Returns the angle between the X axis and this line's 2d delta in the range [0, 2*pi)
-        /// </summary>
-        /// <param name="line"></param>
-        /// <returns></returns>
-        public static double GetAngle2d(this Line line) => line.Delta.ToVector2d().Angle;
+        public static bool IsOn(this Line line, Point2d point)
+        {
+            List<double> x = new List<double> { line.StartPoint.X, line.EndPoint.X };
+            if (point.X < x.Min() || point.X > x.Max())
+                return false;
+
+            List<double> y = new List<double> { line.StartPoint.Y, line.EndPoint.Y };
+            if (point.Y < y.Min() || point.Y > y.Max())
+                return false;
+
+            return new Line2d(line.StartPoint.ToPoint2D(), line.EndPoint.ToPoint2D()).IsOn(point);
+        }
     }
 }
