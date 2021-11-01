@@ -59,7 +59,9 @@ namespace ICA.AutoCAD.Adapter
             if (!Database.GetNamedDictionary("Children").Contains(BlockReference.Handle.ToString()))
                 using (Transaction transaction = Database.TransactionManager.StartTransaction())
                 {
-                    Database.GetNamedDictionary("Children").GetForWrite(transaction).SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
+                    Database.GetNamedDictionary(transaction, "Children")
+                            .GetForWrite(transaction)
+                            .SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
                     transaction.Commit();
                 }
         }
