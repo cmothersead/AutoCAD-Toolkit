@@ -178,6 +178,7 @@ namespace ICA.AutoCAD.Adapter
                 {
                     symbol.AssignLayers();
                     symbol.CollapseAttributeStack();
+                    symbol.BreakWires();
                 });
                 symbols.OfType<ChildSymbol>().ForEach(child => child.SetParent(parent));
                 Symbol.Link(CurrentDatabase, symbols);
@@ -205,6 +206,7 @@ namespace ICA.AutoCAD.Adapter
             }
             symbol.AssignLayers();
             symbol.CollapseAttributeStack();
+            symbol.BreakWires();
         }
 
         [CommandMethod("UPDATETAGS")]
@@ -512,6 +514,9 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("GROUND")]
         public static void InsertGround() => GroundSymbol.Insert(CurrentDocument)
                                                          .GroundConnectedWires();
+
+        [CommandMethod("CHECKLINE")]
+        public static void CheckInline() => Editor.WriteMessage($"{((Symbol)Select.Symbol(Editor)).IsInline}");
 
         [CommandMethod("GETXDATA")]
         public static void GetXData()

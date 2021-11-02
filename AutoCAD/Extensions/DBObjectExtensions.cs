@@ -11,7 +11,7 @@ namespace ICA.AutoCAD
 
         public static TDBObject GetForWrite<TDBObject>(this TDBObject obj, Transaction transaction) where TDBObject : DBObject => transaction.GetObject(obj.ObjectId, OpenMode.ForWrite) as TDBObject;
 
-        public static void Erase(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
+        public static void EraseObject(this DBObject obj, Transaction transaction) => obj.GetForWrite(transaction).Erase();
 
         public static bool HasGroup(this DBObject obj, Transaction transaction) => obj.GetPersistentReactorIds().Cast<ObjectId>().Any(id => id.Open(transaction) is Group);
 
@@ -25,7 +25,7 @@ namespace ICA.AutoCAD
 
         #region Transacted Overloads
 
-        public static void Erase(this DBObject obj) => obj.Transact(Erase);
+        public static void EraseObject(this DBObject obj) => obj.Transact(EraseObject);
 
         public static bool HasGroup(this DBObject obj) => obj.Transact(HasGroup);
 

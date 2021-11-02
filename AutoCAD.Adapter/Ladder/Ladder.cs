@@ -256,7 +256,7 @@ namespace ICA.AutoCAD.Adapter
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 ladderLayer.GetEntities(transaction)
-                           .ForEach(entity => entity.Erase(transaction));
+                           .ForEach(entity => entity.EraseObject(transaction));
                 transaction.Commit();
             }
             ladderLayer.LockWithWarning();

@@ -126,7 +126,7 @@ namespace ICA.AutoCAD.Adapter
                 LayerTableRecord titleBlockLayer = _blockTableRecord.Database.GetLayer(ElectricalLayers.TitleBlockLayer);
                 titleBlockLayer.UnlockWithoutWarning();
                 _blockTableRecord.GetBlockReferences(transaction)
-                                 .ForEach(reference => reference.Erase(transaction));
+                                 .ForEach(reference => reference.EraseObject(transaction));
                 titleBlockLayer.LockWithWarning();
                 SystemVariables.GridDisplay |= GridDisplay.BeyondLimits;
                 transaction.Commit();
@@ -142,7 +142,7 @@ namespace ICA.AutoCAD.Adapter
 
             using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
             {
-                _blockTableRecord.Erase(transaction);
+                _blockTableRecord.EraseObject(transaction);
                 transaction.Commit();
             }
         }

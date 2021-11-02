@@ -29,6 +29,48 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Methods
+
+        #region Private Methods
+
+        protected double OrientationToAngle(Orientation orientation)
+        {
+            switch (orientation)
+            {
+                case Orientation.Right:
+                    return 0;
+                case Orientation.Up:
+                    return Math.PI / 2;
+                case Orientation.Left:
+                    return Math.PI;
+                case Orientation.Down:
+                    return Math.PI * 3 / 2;
+                default:
+                    throw new ArgumentException("Orientation must only have one flag value raised to be converted.");
+            }
+        }
+
+        protected Orientation AngleToOrientation(double angle)
+        {
+            switch (angle % (Math.PI * 2))
+            {
+                case 0:
+                    return Orientation.Right;
+                case Math.PI / 2:
+                    return Orientation.Up;
+                case Math.PI:
+                    return Orientation.Left;
+                case Math.PI * 3 / 2:
+                    return Orientation.Down;
+                default:
+                    throw new ArgumentException("Invalid angle, must be multiple of PI/2.");
+            }
+        }
+
+        #endregion
+
+        #endregion
+
         #region Enums
 
         [Flags]

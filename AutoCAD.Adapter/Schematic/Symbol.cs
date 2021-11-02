@@ -145,6 +145,17 @@ namespace ICA.AutoCAD.Adapter
                                                                      .Select(definition => new LinkConnection(BlockReference, definition))
                                                                      .ToList();
 
+        public bool IsInline
+        {
+            get
+            {
+                if (WireConnections.Count != 2)
+                    return false;
+
+                return WireConnections[0].IsPairWith(WireConnections[1]);
+            }
+        }
+
         #endregion
 
         #endregion
@@ -183,22 +194,34 @@ namespace ICA.AutoCAD.Adapter
 
         public void BreakWires()
         {
-            foreach(WireConnection point in WireConnections)
+            List<Line> forDelete = new List<Line>();
+            foreach (WireConnection point in WireConnections)
             {
                 List<Line> list = point.Owner.Database.GetEntities()
                                                         .Where(entity => entity.Layer == ElectricalLayers.WireLayer.Name)
                                                         .OfType<Line>()
-                                                        .Where(line => new Line2d(line.StartPoint.ToPoint2D(), line.EndPoint.ToPoint2D()).IsOn(point.Location) && point.IsAligned(line.Angle))
+                                                        .Where(line => line.IsOn(point.Location) && point.IsAligned(line.Angle))
                                                         .ToList();
 
+                
                 foreach(Line line in list)
                 {
                     if (line.IsOn(point.Location))
                     {
                         var test = line.GetSplitCurves(new Point3dCollection() { point.Location.ToPoint3d() }).OfType<Line>().ToList();
+                        foreach(Line splitLine in test)
+                        {
+                            if (point.IsConnected(splitLine))
+                            {
+                                splitLine.Insert(ElectricalLayers.WireLayer);
+                                if(!forDelete.Contains(line))
+                                    forDelete.Add(line);
+                            }
+                        }
                     }
                 }
             }
+            forDelete.ForEach(line => line.EraseObject());
         }
 
         #endregion
