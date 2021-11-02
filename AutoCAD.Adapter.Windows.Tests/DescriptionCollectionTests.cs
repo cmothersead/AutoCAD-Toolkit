@@ -20,10 +20,7 @@ namespace AutoCAD.Adapter.Windows.Models.Tests
 
         [Theory]
         [MemberData(nameof(Data))]
-        public void EmptyIsLast(DescriptionCollection descriptionLines)
-        {
-            Assert.Equal(descriptionLines.IndexOf(new DescriptionLine()), descriptionLines.Count - 1);
-        }
+        public void EmptyIsLast(DescriptionCollection descriptionLines) => Assert.Equal(descriptionLines.IndexOf(new DescriptionLine()), descriptionLines.Count - 1);
 
         [Theory]
         [MemberData(nameof(Data))]
@@ -31,13 +28,10 @@ namespace AutoCAD.Adapter.Windows.Models.Tests
         {
             int expected;
             if (descriptionLines.Count == 1)
-            {
                 expected = 1;
-            }
             else
-            {
                 expected = descriptionLines.Count - 1;
-            }
+
             descriptionLines[0].Value = "";
 
             int actual = descriptionLines.Count;
