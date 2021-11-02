@@ -8,10 +8,7 @@ namespace AutoCAD.Adapter.Windows.Models.Tests
     {
         [Theory]
         [MemberData(nameof(Data))]
-        public void HasEmpty(DescriptionCollection descriptionLines)
-        {
-            Assert.Contains(new DescriptionLine(), descriptionLines);
-        }
+        public void HasEmpty(DescriptionCollection descriptionLines) => Assert.Contains(new DescriptionLine(), descriptionLines);
 
         public static IEnumerable<object[]> Data =>
             new List<object[]>

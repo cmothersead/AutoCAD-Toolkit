@@ -48,7 +48,13 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
             return hashCode;
         }
 
-        public override bool Equals(object obj) => base.Equals(obj);
+        public override bool Equals(object obj)
+        {
+            if (obj is DescriptionLine line)
+                return line.Value == Value;
+
+            return false;
+        }
 
         public static bool operator ==(DescriptionLine x, DescriptionLine y) => x.Equals(y);
         public static bool operator !=(DescriptionLine x, DescriptionLine y) => !x.Equals(y);
