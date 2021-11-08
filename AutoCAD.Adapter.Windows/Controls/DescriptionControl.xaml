@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
              mc:Ignorable="d">
     
-    <!--Styling Resources-->
+    <!--#region Styling Resources-->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,8 +15,9 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    <!--#endregion-->
     
-    <!--Content-->
+    <!--#region Content-->
     <GroupBox ToolTip="Description information"
               DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:DescriptionControl}}">
         <GroupBox.Header>
@@ -37,10 +38,12 @@
                     <StackPanel>
                         <TextBox Name="Value_TextBox"
                                  Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"
-                                 CharacterCasing="{Binding Chara}"/>
+                                 CharacterCasing="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:DescriptionControl}, Path=CharacterCasing}"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </GroupBox>
+    <!--#endregion-->
+    
 </UserControl>
