@@ -192,8 +192,7 @@ namespace ICA.AutoCAD.Adapter
             LineNumbers.ForEach(lineNumber => ((LineNumber)lineNumber).Insert(transaction, Database));
         }
 
-        public string ClosestLineNumber(Point2d position) => LineNumbers.OrderByDescending(number => number.Position.X)
-                                                                        .Where(number => number.Position.X <= position.X)
+        public string ClosestLineNumber(Point2d position) => LineNumbers.Where(number => number.Position.X <= position.X)
                                                                         .Aggregate((closest, next) => Math.Abs(next.Position.Y - position.Y) < Math.Abs(closest.Position.Y - position.Y) ? next : closest)?
                                                                         .GetAttributeValue("LINENUMBER");
 
