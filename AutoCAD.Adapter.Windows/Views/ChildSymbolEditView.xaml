@@ -18,7 +18,7 @@
 
         <StackPanel Margin="5" Grid.Column="0">
             <controls:ChildTagControl x:Name="TagControl" Text="{Binding Tag}" Command="{Binding SelectCommand}" IsChecked="{Binding Path=TagHidden, Mode=TwoWay}"/>
-            <controls:DescriptionControl x:Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}"/>
+            <controls:DescriptionControl x:Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}" CharacterCasing="{Binding CharacterCasing}"/>
             <!--<controls:PartControl Name="PartControl" Family="{Binding Family}" SelectedManufacturer="{Binding Family.CurrentManufacturer}" SelectedPart="{Binding Family.CurrentPart}" IsEnabled="{Binding Family.IsLoaded}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}"/>-->
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="5" Grid.Column="1">
                 <Button Name="OK_Button" Content="OK" HorizontalAlignment="Right" Height="28" Width="65" Margin="2" Command="{Binding OkCommand}"/>

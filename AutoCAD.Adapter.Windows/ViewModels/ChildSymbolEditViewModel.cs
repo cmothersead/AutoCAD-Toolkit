@@ -2,6 +2,7 @@
 using ICA.Schematic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
@@ -16,6 +17,8 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         public bool TagHidden { get; set; }
         public DescriptionCollection Description { get; set; }
         public bool DescriptionHidden { get; set; }
+
+        public CharacterCasing CharacterCasing { get; set; } = CharacterCasing.Upper;
 
         public ICommand SelectCommand { get; set; }
 
@@ -47,7 +50,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             base.UpdateAndClose();
         }
 
-        private void SelectParent() => Tag = ChildSymbol?.SelectParent().Tag;
+        private void SelectParent() => Tag = ChildSymbol?.SelectParent()?.Tag;
 
         #endregion
 
