@@ -10,17 +10,19 @@ namespace ICA.AutoCAD.Adapter
         private Matrix3d _ucs;
         private Point3d _position;
         private Transaction _transaction;
+        private string _prompt;
 
-        public SymbolJig(Matrix3d ucs, Transaction transaction, BlockReference blockReference) : base(blockReference)
+        public SymbolJig(Matrix3d ucs, Transaction transaction, BlockReference blockReference, string prompt) : base(blockReference)
         {
             _ucs = ucs;
             _position = blockReference.Position;
             _transaction = transaction;
+            _prompt = prompt;
         }
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
-            JigPromptPointOptions options = new JigPromptPointOptions("\nSelect insertion point:")
+            JigPromptPointOptions options = new JigPromptPointOptions(_prompt)
             {
                 BasePoint = Point3d.Origin,
                 UserInputControls = UserInputControls.NoZeroResponseAccepted
@@ -39,14 +41,33 @@ namespace ICA.AutoCAD.Adapter
         protected override bool Update()
         {
             BlockReference blockReference = Entity as BlockReference;
+            blockReference.TransformBy(Matrix3d.Displacement(blockReference.Position.GetVectorTo(_position)));
             blockReference.Position = _position;
             return true;
         }
 
-        public PromptStatus Run()
+        public static PromptStatus Run(Document document, Symbol symbol)
         {
-            Document document = Application.DocumentManager.MdiActiveDocument;
             if (document == null)
+                return PromptStatus.Error;
+
+            if (symbol.Database != null && document.Database != symbol.Database)
+                return PromptStatus.Error;
+
+            using (Transaction transaction = document.Database.TransactionManager.StartTransaction())
+            {
+                PromptStatus result = document.Editor.Drag(symbol.GetJig(document, transaction)).Status;
+                transaction.Commit();
+                return result;
+            }
+        }
+
+        public PromptStatus Run(Document document)
+        {
+            if (document == null)
+                return PromptStatus.Error;
+
+            if (document.Database != Entity.Database)
                 return PromptStatus.Error;
 
             return document.Editor.Drag(this).Status;

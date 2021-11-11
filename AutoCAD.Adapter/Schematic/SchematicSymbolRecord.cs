@@ -45,42 +45,74 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
-        public ISymbol InsertSymbol(Transaction transaction, Point2d location = new Point2d(), Symbol.Type? type = null)
+        public ISymbol InsertSymbol(Transaction transaction, Document document)
+        {
+            BlockReference blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId);
+
+            Symbol symbol = GetSymbol(document, blockReference) as Symbol;
+
+            symbol.Insert(transaction, Database);
+
+            if (SymbolJig.Run(document, symbol) != PromptStatus.OK)
+                return null;
+
+            return symbol as ISymbol;
+        }
+
+        public ISymbol InsertSymbol(Document document)
+        {
+            if (document.Database != _blockTableRecord.Database)
+                return null;
+
+            using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
+            {
+                ISymbol symbol = InsertSymbol(transaction, document);
+                transaction.Commit();
+                return symbol;
+            }
+        }
+
+        public ISymbol InsertSymbol(Transaction transaction, Point2d location, Symbol.Type type)
         {
             BlockReference blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
 
-            if (blockReference.Position == Point3d.Origin)
-            {
-                Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-                SymbolJig jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, blockReference);
+            Symbol symbol = GetSymbol(blockReference, type) as Symbol;
 
-                if (jig.Run() != PromptStatus.OK)
+            symbol.Insert(transaction, Database);
+
+            return symbol as ISymbol;
+        }
+
+        public ISymbol InsertSymbol(Point2d location, Symbol.Type type)
+        {
+            using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
+            {
+                ISymbol symbol = InsertSymbol(transaction, location, type);
+                transaction.Commit();
+                return symbol;
+            }
+        }
+
+        private ISymbol GetSymbol(Document document, BlockReference blockReference)
+        {
+            Symbol.Type type = Symbol.Type.Parent;
+
+            if (_blockTableRecord.HasAttribute("TAG2"))
+                type = Symbol.Type.Child;
+            else
+            {
+                PromptKeywordOptions options = new PromptKeywordOptions("\nSymbol type: ");
+                options.Keywords.Add("Parent");
+                options.Keywords.Add("Child");
+                options.Keywords.Default = "Parent";
+
+                PromptResult result = document.Editor.GetKeywords(options);
+                if (result.Status != PromptStatus.OK)
                     return null;
+
+                if (Enum.TryParse(result.StringResult, out Symbol.Type parsed))
+                    type = parsed;
             }
-
-            if (type is null)
-            {
-                if (_blockTableRecord.HasAttribute("TAG1"))
-                    type = Symbol.Type.Parent;
-                else if (_blockTableRecord.HasAttribute("TAG2"))
-                    type = Symbol.Type.Child;
-                else
-                {
-                    PromptKeywordOptions options = new PromptKeywordOptions("\nSymbol type: ");
-                    options.Keywords.Add("Parent");
-                    options.Keywords.Add("Child");
-                    options.Keywords.Default = "Parent";
-
-                    PromptResult result = Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(options);
-                    if (result.Status != PromptStatus.OK)
-                        return null;
-
-                    if (Enum.TryParse(result.StringResult, out Symbol.Type parsed))
-                        type = parsed;
-                }
-            }
-
-            blockReference.Insert(transaction, Database, ElectricalLayers.SymbolLayer);
 
             switch (type)
             {
@@ -93,15 +125,23 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public ISymbol InsertSymbol(Point2d location = new Point2d(), Symbol.Type? type = null)
+        private ISymbol GetSymbol(BlockReference blockReference, Symbol.Type type)
         {
-            ISymbol symbol;
-            using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
+            if (_blockTableRecord.HasAttribute("TAG1") && type != Symbol.Type.Parent)
+                throw new ArgumentException($"TAG1 attribute present in block, symbol can only be of type: \"{nameof(Symbol.Type.Parent)}\"");
+
+            if (_blockTableRecord.HasAttribute("TAG2") && type != Symbol.Type.Child)
+                throw new ArgumentException($"TAG1 attribute present in block, symbol can only be of type: \"{nameof(Symbol.Type.Parent)}\"");
+
+            switch (type)
             {
-                symbol = InsertSymbol(transaction, location, type);
-                transaction.Commit();
+                case Symbol.Type.Parent:
+                    return new ParentSymbol(blockReference);
+                case Symbol.Type.Child:
+                    return new ChildSymbol(blockReference);
+                default:
+                    return null;
             }
-            return symbol;
         }
 
         #endregion

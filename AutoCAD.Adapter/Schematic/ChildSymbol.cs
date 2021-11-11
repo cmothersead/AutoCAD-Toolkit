@@ -34,6 +34,8 @@ namespace ICA.AutoCAD.Adapter
             "DESC1"
         };
 
+        private string DictionaryName => "Children";
+
         #endregion
 
         #region Public Properties
@@ -52,18 +54,14 @@ namespace ICA.AutoCAD.Adapter
 
         public ChildSymbol(BlockReference blockReference) : base(blockReference)
         {
-            Stack.Add(BlockReference.GetAttributeReferences()
-                                    .Select(att => att.Tag)
-                                    .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
-                                    .Union(RequiredAttributes));
-            if (!Database.GetNamedDictionary("Children").Contains(BlockReference.Handle.ToString()))
-                using (Transaction transaction = Database.TransactionManager.StartTransaction())
-                {
-                    Database.GetNamedDictionary(transaction, "Children")
-                            .GetForWrite(transaction)
-                            .SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
-                    transaction.Commit();
-                }
+            if(Database != null)
+            {
+                Stack.Add(BlockReference.GetAttributeReferences()
+                                        .Select(att => att.Tag)
+                                        .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
+                                        .Union(RequiredAttributes));
+                AddToDictionary(DictionaryName);
+            }
         }
 
         #endregion
@@ -72,11 +70,22 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Methods
 
+        public override bool Insert(Transaction transaction, Database database)
+        {
+            bool result = base.Insert(transaction, database);
+            Stack.Add(BlockReference.GetAttributeReferences()
+                                        .Select(att => att.Tag)
+                                        .Where(tag => AttributeNames.Any(att => tag.Contains(att)))
+                                        .Union(RequiredAttributes));
+            AddToDictionary(DictionaryName);
+            return result;
+        }
+
         public IParentSymbol SelectParent()
         {
             var components = Database.GetProject().Components
-                                 .Where(component => component.Family == Family)
-                                 .ToList();
+                                     .Where(component => component.Family == Family)
+                                     .ToList();
             var view = new ComponentsListView(components);
             if (Application.ShowModalWindow(view) == true)
                 return ((ComponentsListViewModel)view.DataContext).SelectedComponent.Symbol;

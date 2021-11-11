@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
@@ -145,6 +146,11 @@ namespace ICA.AutoCAD.Adapter
                                                                      .Select(definition => new LinkConnection(BlockReference, definition))
                                                                      .ToList();
 
+        public List<Line> ConnectedWires => WireConnections.SelectMany(connection => connection.Owner.Database.GetEntities()
+                                                                                                              .Where(entity => entity.Layer == ElectricalLayers.WireLayer.Name)
+                                                                                                              .OfType<Line>()
+                                                                                                              .Where(line => connection.IsConnected(line))).ToList();
+
         public bool IsInline
         {
             get
@@ -156,6 +162,8 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public bool IsInserted => Database != null;
+
         #endregion
 
         #endregion
@@ -165,20 +173,70 @@ namespace ICA.AutoCAD.Adapter
         public Symbol(BlockReference blockReference)
         {
             BlockReference = blockReference;
-            Stack = new AttributeStack(BlockReference, AttributeLayers)
+            Stack = new AttributeStack(BlockReference, AttributeLayers);
+            if (Database != null)
             {
-                Position = FamilyAttribute.Justify == AttachmentPoint.BaseLeft ?
+                Stack.Position = FamilyAttribute.Justify == AttachmentPoint.BaseLeft ?
                            FamilyAttribute.Position.ToPoint2D() :
-                           FamilyAttribute.AlignmentPoint.ToPoint2D(),
-                Justification = FamilyAttribute.Justify,
-            };
+                           FamilyAttribute.AlignmentPoint.ToPoint2D();
+                Stack.Justification = FamilyAttribute.Justify;
+            }
         }
 
         #endregion
 
         #region Methods
 
+        #region Protected Methods
+
+        protected void AddToDictionary(string name)
+        {
+            if (Database is null)
+                return;
+
+            if (!Database.GetNamedDictionary(name).Contains(BlockReference.Handle.ToString()))
+                using (Transaction transaction = Database.TransactionManager.StartTransaction())
+                {
+                    Database.GetNamedDictionary(transaction, name)
+                            .GetForWrite(transaction)
+                            .SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
+                    transaction.Commit();
+                }
+        }
+
+        #endregion
+
         #region Public Methods
+
+        public SymbolJig GetJig(Document document, Transaction transaction) => IsInserted ? new SymbolJig(document.Editor.CurrentUserCoordinateSystem,
+                                                                                                          transaction,
+                                                                                                          BlockReference.GetForWrite(transaction),
+                                                                                                          "Specify new location:") : null;
+
+        public virtual bool Insert(Transaction transaction, Database database)
+        {
+            if (IsInserted)
+                return false;
+
+            BlockReference.Insert(transaction, database, ElectricalLayers.SymbolLayer);
+
+            Stack.Position = FamilyAttribute.Justify == AttachmentPoint.BaseLeft ?
+                           FamilyAttribute.Position.ToPoint2D() :
+                           FamilyAttribute.AlignmentPoint.ToPoint2D();
+            Stack.Justification = FamilyAttribute.Justify;
+
+            return true;
+        }
+
+        public bool Insert(Database database)
+        {
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                bool result = Insert(transaction, database);
+                transaction.Commit();
+                return result;
+            }
+        }
 
         public void CollapseAttributeStack() => Stack.Collapse();
 
@@ -203,18 +261,18 @@ namespace ICA.AutoCAD.Adapter
                                                         .Where(line => line.IsOn(point.Location) && point.IsAligned(line.Angle))
                                                         .ToList();
 
-                
-                foreach(Line line in list)
+
+                foreach (Line line in list)
                 {
                     if (line.IsOn(point.Location))
                     {
                         var test = line.GetSplitCurves(new Point3dCollection() { point.Location.ToPoint3d() }).OfType<Line>().ToList();
-                        foreach(Line splitLine in test)
+                        foreach (Line splitLine in test)
                         {
                             if (point.IsConnected(splitLine))
                             {
                                 splitLine.Insert(ElectricalLayers.WireLayer);
-                                if(!forDelete.Contains(line))
+                                if (!forDelete.Contains(line))
                                     forDelete.Add(line);
                             }
                         }
@@ -222,6 +280,32 @@ namespace ICA.AutoCAD.Adapter
                 }
             }
             forDelete.ForEach(line => line.EraseObject());
+        }
+
+        public void UnbreakWires()
+        {
+            if (!IsInline)
+                return;
+
+            Line lineBetween = new Line(WireConnections.First().Location.ToPoint3d(), WireConnections.Last().Location.ToPoint3d());
+            lineBetween.JoinEntities(ConnectedWires.ToArray());
+            lineBetween.Insert(ElectricalLayers.WireLayer);
+            ConnectedWires.ForEach(line => line.EraseObject());
+        }
+
+        public void Scoot(double magnitude)
+        {
+            Matrix3d transformation = Matrix3d.Displacement(new Vector3d(magnitude, 0, 0));
+
+            foreach (Line wire in ConnectedWires)
+            {
+                if (WireConnections.Any(connection => wire.StartPoint == connection.Location.ToPoint3d()))
+                    wire.StartPoint.TransformBy(transformation);
+                else
+                    wire.EndPoint.TransformBy(transformation);
+            }
+            if (BlockReference.Name.StartsWith("H"))
+                BlockReference.TransformBy(transformation);
         }
 
         #endregion
@@ -245,6 +329,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static void Link(Database database, ICollection<Symbol> symbols)
         {
+            if (symbols is null)
+                return;
+
             List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
             ordered.OfType<ChildSymbol>().ForEach(child =>
             {

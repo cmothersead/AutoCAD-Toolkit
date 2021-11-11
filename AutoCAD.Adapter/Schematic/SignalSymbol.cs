@@ -120,10 +120,9 @@ namespace ICA.AutoCAD.Adapter
 
             if (blockReference.Position == new Point3d())
             {
-                Document currentDocument = Application.DocumentManager.MdiActiveDocument;
-                SymbolJig jig = new SymbolJig(currentDocument.Editor.CurrentUserCoordinateSystem, transaction, blockReference);
+                SymbolJig jig = new SymbolJig(document.Editor.CurrentUserCoordinateSystem, transaction, blockReference, "Select location:");
 
-                if (jig.Run() != PromptStatus.OK)
+                if (jig.Run(document) != PromptStatus.OK)
                     return null;
             }
 

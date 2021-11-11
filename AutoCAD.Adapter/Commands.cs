@@ -190,7 +190,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static void InsertSymbol(string symbolName)
         {
-            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDatabase, symbolName)?.InsertSymbol() as Symbol;
+            Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDatabase, symbolName)?.InsertSymbol(CurrentDocument) as Symbol;
             if (symbol is null)
                 return;
 
@@ -240,7 +240,7 @@ namespace ICA.AutoCAD.Adapter
         public static void UpdateLayers() => ElectricalLayers.Update(CurrentDatabase);
 
         [CommandMethod("LINK")]
-        public static void Link() => Symbol.Link(CurrentDatabase, Select.Symbols(Editor, "Select symbols:")
+        public static void Link() => Symbol.Link(CurrentDatabase, Select.Symbols(Editor, "Select symbols:")?
                                                                         .OfType<Symbol>()
                                                                         .ToList());
 
@@ -515,8 +515,25 @@ namespace ICA.AutoCAD.Adapter
         public static void InsertGround() => GroundSymbol.Insert(CurrentDocument)
                                                          .GroundConnectedWires();
 
-        [CommandMethod("CHECKLINE")]
-        public static void CheckInline() => Editor.WriteMessage($"{((Symbol)Select.Symbol(Editor)).IsInline}");
+        [CommandMethod("SCOOT")]
+        public static void Scoot() => SymbolJig.Run(CurrentDocument, Select.Symbol(Editor) as Symbol);
+
+        [CommandMethod("TOGGLEWIREBREAK")]
+        public static void ToggleWireBreak()
+        {
+            var symbol = Select.Symbol(Editor) as Symbol;
+            if (!symbol.IsInline)
+                return;
+
+            if(symbol.WireConnections.Any(connection => CurrentDatabase.GetLayer(ElectricalLayers.WireLayer).GetEntities().OfType<Line>().Any(line => connection.IsConnected(line))))
+            {
+                symbol.UnbreakWires();
+            }
+            else
+            {
+                symbol.BreakWires();
+            }
+        }
 
         [CommandMethod("GETXDATA")]
         public static void GetXData()

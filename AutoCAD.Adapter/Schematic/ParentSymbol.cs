@@ -66,6 +66,8 @@ namespace ICA.AutoCAD.Adapter
 
         private List<AttributeReference> PartAttributes => new List<AttributeReference>() { MfgAttribute, CatAttribute };
 
+        private string DictionaryName => "Parents";
+
         #endregion
 
         #region Protected Properties
@@ -135,19 +137,15 @@ namespace ICA.AutoCAD.Adapter
 
         public ParentSymbol(BlockReference blockReference) : base(blockReference)
         {
-            Stack.Add(BlockReference.GetAttributeReferences()
+            if(Database != null)
+            {
+                Stack.Add(BlockReference.GetAttributeReferences()
                                     .Select(att => att.Tag)
                                     .Where(tag => AttributeNames.Any(att => tag.Contains(att)) && !Exclude.Any(att => tag.Contains(att)))
                                     .Union(RequiredAttributes)
                                     .ToList());
-            if (!Database.GetNamedDictionary("Parents").Contains(BlockReference.Handle.ToString()))
-                using (Transaction transaction = Database.TransactionManager.StartTransaction())
-                {
-                    Database.GetNamedDictionary(transaction, "Parents")
-                            .GetForWrite(transaction)
-                            .SetAt(BlockReference.Handle.ToString(), BlockReference.GetForWrite(transaction));
-                    transaction.Commit();
-                }
+                AddToDictionary(DictionaryName);
+            }
         }
 
         #endregion
@@ -155,6 +153,17 @@ namespace ICA.AutoCAD.Adapter
         #region Methods
 
         #region Public Methods
+
+        public override bool Insert(Transaction transaction, Database database)
+        {
+            bool result = base.Insert(transaction, database);
+            Stack.Add(BlockReference.GetAttributeReferences()
+                                    .Select(att => att.Tag)
+                                    .Where(tag => AttributeNames.Any(att => tag.Contains(att)) && !Exclude.Any(att => tag.Contains(att)))
+                                    .Union(RequiredAttributes));
+            AddToDictionary(DictionaryName);
+            return result;
+        }
 
         public void UpdateTag(string format = null)
         {
