@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -219,12 +220,7 @@ namespace ICA.AutoCAD.Adapter
                 return false;
 
             BlockReference.Insert(transaction, database, ElectricalLayers.SymbolLayer);
-
-            Stack.Position = FamilyAttribute.Justify == AttachmentPoint.BaseLeft ?
-                           FamilyAttribute.Position.ToPoint2D() :
-                           FamilyAttribute.AlignmentPoint.ToPoint2D();
-            Stack.Justification = FamilyAttribute.Justify;
-
+            CollapseAttributeStack();
             return true;
         }
 
@@ -238,7 +234,14 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public void CollapseAttributeStack() => Stack.Collapse();
+        public void CollapseAttributeStack()
+        {
+            Stack.Position = FamilyAttribute.Justify == AttachmentPoint.BaseLeft ?
+                             FamilyAttribute.Position.ToPoint2D() :
+                             FamilyAttribute.AlignmentPoint.ToPoint2D();
+            Stack.Justification = FamilyAttribute.Justify;
+            Stack.Collapse();
+        } 
 
         public void AssignLayers()
         {

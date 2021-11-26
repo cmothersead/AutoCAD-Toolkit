@@ -164,7 +164,7 @@ namespace ICA.AutoCAD.Adapter
                 if (record is null)
                     return;
 
-                ParentSymbol parent = record.InsertSymbol(new Point2d(), Symbol.Type.Parent) as ParentSymbol;
+                ParentSymbol parent = record.InsertSymbol(CurrentDocument, Symbol.Type.Parent) as ParentSymbol;
                 if (parent is null)
                     return;
 

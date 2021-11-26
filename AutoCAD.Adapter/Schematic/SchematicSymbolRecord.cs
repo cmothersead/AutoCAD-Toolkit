@@ -49,7 +49,7 @@ namespace ICA.AutoCAD.Adapter
         {
             BlockReference blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId);
 
-            Symbol symbol = GetSymbol(document, blockReference) as Symbol;
+            Symbol symbol = GetSymbol(blockReference, document.Editor) as Symbol;
 
             symbol.Insert(transaction, Database);
 
@@ -58,6 +58,33 @@ namespace ICA.AutoCAD.Adapter
 
             return symbol as ISymbol;
         }
+
+        public ISymbol InsertSymbol(Transaction transaction, Document document, Symbol.Type type)
+        {
+            BlockReference blockReference = new BlockReference(Point3d.Origin, _blockTableRecord.ObjectId);
+
+            Symbol symbol = GetSymbol(blockReference, type) as Symbol;
+
+            symbol.Insert(transaction, Database);
+
+            if (SymbolJig.Run(document, symbol) != PromptStatus.OK)
+                return null;
+
+            return symbol as ISymbol;
+        }
+
+        public ISymbol InsertSymbol(Transaction transaction, Point2d location, Symbol.Type type)
+        {
+            BlockReference blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
+
+            Symbol symbol = GetSymbol(blockReference, type) as Symbol;
+
+            symbol.Insert(transaction, Database);
+
+            return symbol as ISymbol;
+        }
+
+        #region Transacted Overloads
 
         public ISymbol InsertSymbol(Document document)
         {
@@ -72,15 +99,17 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public ISymbol InsertSymbol(Transaction transaction, Point2d location, Symbol.Type type)
+        public ISymbol InsertSymbol(Document document, Symbol.Type type)
         {
-            BlockReference blockReference = new BlockReference(location.ToPoint3d(), _blockTableRecord.ObjectId);
+            if (document.Database != _blockTableRecord.Database)
+                throw new ArgumentException("Symbol Record is not a resident of the working database.");
 
-            Symbol symbol = GetSymbol(blockReference, type) as Symbol;
-
-            symbol.Insert(transaction, Database);
-
-            return symbol as ISymbol;
+            using (Transaction transaction = _blockTableRecord.Database.TransactionManager.StartTransaction())
+            {
+                ISymbol symbol = InsertSymbol(transaction, document, type);
+                transaction.Commit();
+                return symbol;
+            }
         }
 
         public ISymbol InsertSymbol(Point2d location, Symbol.Type type)
@@ -93,11 +122,15 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        private ISymbol GetSymbol(Document document, BlockReference blockReference)
+        #endregion
+
+        private ISymbol GetSymbol(BlockReference blockReference, Editor editor)
         {
             Symbol.Type type = Symbol.Type.Parent;
 
-            if (_blockTableRecord.HasAttribute("TAG2"))
+            if (_blockTableRecord.HasAttribute("TAG1"))
+                type = Symbol.Type.Parent;
+            else if (_blockTableRecord.HasAttribute("TAG2"))
                 type = Symbol.Type.Child;
             else
             {
@@ -106,7 +139,7 @@ namespace ICA.AutoCAD.Adapter
                 options.Keywords.Add("Child");
                 options.Keywords.Default = "Parent";
 
-                PromptResult result = document.Editor.GetKeywords(options);
+                PromptResult result = editor.GetKeywords(options);
                 if (result.Status != PromptStatus.OK)
                     return null;
 
@@ -131,7 +164,7 @@ namespace ICA.AutoCAD.Adapter
                 throw new ArgumentException($"TAG1 attribute present in block, symbol can only be of type: \"{nameof(Symbol.Type.Parent)}\"");
 
             if (_blockTableRecord.HasAttribute("TAG2") && type != Symbol.Type.Child)
-                throw new ArgumentException($"TAG1 attribute present in block, symbol can only be of type: \"{nameof(Symbol.Type.Parent)}\"");
+                throw new ArgumentException($"TAG2 attribute present in block, symbol can only be of type: \"{nameof(Symbol.Type.Child)}\"");
 
             switch (type)
             {
