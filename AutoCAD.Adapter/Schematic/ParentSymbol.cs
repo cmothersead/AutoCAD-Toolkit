@@ -172,22 +172,6 @@ namespace ICA.AutoCAD.Adapter
             Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
         }
 
-
-        public void MatchWireNumbers()
-        {
-            foreach (AttributeReference reference in BlockReference.GetAttributeReferences().Where(r => r.Tag.Contains("WIRENO")))
-            {
-                if (BlockReference.GetAttributeReference($"X1TERM{reference.Tag.Substring(6, 2)}") is AttributeReference term1)
-                    reference.SetValue(term1.TextString);
-                else if (BlockReference.GetAttributeReference($"X2TERM{reference.Tag.Substring(6, 2)}") is AttributeReference term2)
-                    reference.SetValue(term2.TextString);
-                else if (BlockReference.GetAttributeReference($"X4TERM{reference.Tag.Substring(6, 2)}") is AttributeReference term4)
-                    reference.SetValue(term4.TextString);
-                else if (BlockReference.GetAttributeReference($"X8TERM{reference.Tag.Substring(6, 2)}") is AttributeReference term8)
-                    reference.SetValue(term8.TextString);
-            }
-        }
-
         #endregion
 
         #endregion

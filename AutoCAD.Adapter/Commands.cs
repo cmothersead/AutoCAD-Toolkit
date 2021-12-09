@@ -222,13 +222,6 @@ namespace ICA.AutoCAD.Adapter
                 component.UpdateTag();
         }
 
-        [CommandMethod("MATCHWIRES")]
-        public static void Matchwires()
-        {
-            if (Select.Symbol(Editor) is ParentSymbol symbol)
-                symbol.MatchWireNumbers();
-        }
-
         [CommandMethod("XREFSIGS")]
         public static void XrefSignals()
         {
