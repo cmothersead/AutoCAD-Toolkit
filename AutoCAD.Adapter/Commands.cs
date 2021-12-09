@@ -171,7 +171,8 @@ namespace ICA.AutoCAD.Adapter
                 List<Symbol> symbols = new List<Symbol> { parent };
                 for (int i = 1; i < poles; i++)
                 {
-                    symbols.Add(record.InsertSymbol(new Point2d(symbols.Last().Position.X, symbols.Last().Position.Y - CurrentDatabase.GetLadder().LineHeight), Symbol.Type.Child) as ChildSymbol);
+                    //LineHeight needs to be a database variable not a ladder-specific value
+                    symbols.Add(record.InsertSymbol(new Point2d(symbols.Last().Position.X, symbols.Last().Position.Y - CurrentDatabase.GetLadders().First().LineHeight), Symbol.Type.Child) as ChildSymbol);
                 }
                 parent.UpdateTag();
                 symbols.ForEach(symbol =>

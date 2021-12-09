@@ -126,18 +126,51 @@ namespace ICA.AutoCAD.Adapter
 
         public static bool HasLadder(this Database database)
         {
-            if (database.GetLadder() != null) // Refactor this to reduce the workload/redundancy
-                return true;
+            if (!database.HasLayer(ElectricalLayers.LadderLayer))
+                return false;
+
+            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                LayerTableRecord ladderLayer = database.GetLayer(transaction, ElectricalLayers.LadderLayer);
+                if (ladderLayer.GetEntities(transaction).Count != 0)
+                    return true;
+            }
 
             return false;
         }
 
-        public static Ladder GetLadder(this Database database)
+        public static List<Ladder> GetLadders(this Database database)
         {
-            if (!database.HasLayer(ElectricalLayers.LadderLayer))
+            if (!database.HasLadder())
                 return null;
 
-            return new Ladder(database.GetLayer(ElectricalLayers.LadderLayer).GetEntities());
+            List<Ladder> ladders = new List<Ladder>();
+
+            List<Entity> entities = database.GetLayer(ElectricalLayers.LadderLayer).GetEntities().ToList();
+
+            List<double> ladderPositions = entities.OfType<BlockReference>()
+                                                   .Select(blockReference => blockReference.Position.X)
+                                                   .Distinct()
+                                                   .OrderByDescending(x => x)
+                                                   .ToList();
+
+            foreach(double xPosition in ladderPositions)
+            {
+                List<Entity> rails = entities.OfType<Line>()
+                                             .Where(line => line.StartPoint.X >= xPosition)
+                                             .Cast<Entity>()
+                                             .ToList();
+                List<Entity> lineNumbers = entities.OfType<BlockReference>()
+                                                   .Where(blockReference => blockReference.Position.X >= xPosition)
+                                                   .Cast<Entity>()
+                                                   .ToList();
+                List<Entity> ladderEntities = rails.Union(lineNumbers).ToList();
+                ladders.Add(new Ladder(ladderEntities));
+
+                entities.RemoveAll(entity => ladderEntities.Contains(entity));
+            }
+
+            return ladders;
         }
 
         #endregion

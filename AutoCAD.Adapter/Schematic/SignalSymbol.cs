@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.IO;
 using ICA.Schematic;
 using System;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -62,7 +63,7 @@ namespace ICA.AutoCAD.Adapter
 
         public string Sheet => BlockReference.Database.GetSheetNumber();
 
-        public string Line => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position).Replace(Sheet, "");
+        public string Line => Ladder.GetClosestLineNumber(BlockReference.Database.GetLadders(), BlockReference.Position).Replace(Sheet, "");
 
         #endregion
 

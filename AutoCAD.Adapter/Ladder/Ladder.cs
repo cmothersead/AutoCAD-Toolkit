@@ -150,9 +150,21 @@ namespace ICA.AutoCAD.Adapter
             PhaseCount = phaseCount;
         }
 
+        /// <summary>
+        /// Creates a ladder from a colleciton of entities. Invalid objects are ignored. Incorrect quanities of objects will return an error
+        /// </summary>
+        /// <param name="entities"></param>
         public Ladder(ICollection<Entity> entities)
         {
-            Database = entities.FirstOrDefault()?.Database;
+            var databases = entities.Select(entity => entity.Database).ToList();
+
+            if (!databases.Any(database => database != null))
+                throw new ArgumentException("Ladder entities do not belong to a database");
+
+            if (databases.Distinct().Count() != 1)
+                throw new ArgumentException("Ladder entities belong to more than one database");
+
+            Database = databases.First();
 
             _rails = entities.OfType<Line>()
                              .OrderBy(rail => rail.StartPoint.X)
@@ -162,11 +174,16 @@ namespace ICA.AutoCAD.Adapter
                                    .OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER"))
                                    .ToList();
 
-            Origin = _rails[0].StartPoint.ToPoint2D();
-            Height = _rails[0].StartPoint.Y - _rails[0].EndPoint.Y;
-            Width = _rails[1].StartPoint.X - _rails[0].StartPoint.X;
-            FirstReference = int.Parse(_lineNumbers[0].GetAttributeValue("LINENUMBER").Substring(SheetNumber.Length));
-            LineHeight = _lineNumbers[0].Position.Y - _lineNumbers[1].Position.Y;
+            if(_lineNumbers.Select(lineNumber => lineNumber.Position.X).Distinct().Count() != 1)
+                throw new ArgumentException("Ladder line numbers misaligned (possibly two ladders joined)");
+
+            Origin = _rails.First().StartPoint.ToPoint2D();
+            Height = _rails.First().StartPoint.Y - _rails.First().EndPoint.Y;
+            Width = _rails[1].StartPoint.X - _rails.First().StartPoint.X;
+            FirstReference = int.Parse(_lineNumbers.First()
+                                                   .GetAttributeValue("LINENUMBER")
+                                                   .Substring(SheetNumber.Length));
+            LineHeight = _lineNumbers.First().Position.Y - _lineNumbers[1].Position.Y;
             PhaseCount = _rails.Count - 1;
 
             if (_rails.Count == 3)
@@ -192,11 +209,12 @@ namespace ICA.AutoCAD.Adapter
             LineNumbers.ForEach(lineNumber => ((LineNumber)lineNumber).Insert(transaction, Database));
         }
 
-        public string ClosestLineNumber(Point2d position) => LineNumbers.Where(number => number.Position.X <= position.X)
-                                                                        .Aggregate((closest, next) => Math.Abs(next.Position.Y - position.Y) < Math.Abs(closest.Position.Y - position.Y) ? next : closest)?
-                                                                        .GetAttributeValue("LINENUMBER");
+        public string ClosestLineNumber(Point2d position) => GetClosestLineNumber(new List<Ladder> { this }, position);
 
         public string ClosestLineNumber(Point3d position) => ClosestLineNumber(position.ToPoint2D());
+
+        private string GetLineNumber(Point2d position) => LineNumbers.Aggregate((closest, next) => Math.Abs(next.Position.Y - position.Y) < Math.Abs(closest.Position.Y - position.Y) ? next : closest)?
+                                                                        .GetAttributeValue("LINENUMBER");
 
         #endregion
 
@@ -260,6 +278,21 @@ namespace ICA.AutoCAD.Adapter
             }
             ladderLayer.LockWithWarning();
         }
+
+        public static string GetClosestLineNumber(List<Ladder> ladders, Point2d position)
+        {
+            foreach(Ladder ladder in ladders.OrderByDescending(ladder => ladder.Origin.X))
+            {
+                if (position.X < ladder.Origin.X)
+                    continue;
+
+                return ladder.GetLineNumber(position);
+            }
+
+            return null;
+        }
+
+        public static string GetClosestLineNumber(List<Ladder> ladders, Point3d position) => GetClosestLineNumber(ladders, position.ToPoint2D());
 
         #endregion
     }

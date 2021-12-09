@@ -133,7 +133,7 @@ namespace ICA.AutoCAD.Adapter
 
         public Point2d Position => BlockReference.Position.ToPoint2D();
 
-        public string LineNumber => BlockReference.Database.GetLadder()?.ClosestLineNumber(BlockReference.Position);
+        public string LineNumber => Ladder.GetClosestLineNumber(BlockReference.Database.GetLadders(), BlockReference.Position);
 
         public string SheetNumber => BlockReference.Database.GetSheetNumber();
 
