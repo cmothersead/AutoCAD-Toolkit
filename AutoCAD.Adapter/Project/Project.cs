@@ -42,7 +42,7 @@ namespace ICA.AutoCAD.Adapter
         public Dictionary<string, string> TitleBlockAttributes { get; set; } = new Dictionary<string, string>()
             {
                 { "DWGNO", "Project.Job.Code" },
-                { "SHTS", "Project.Drawings.Count" },
+                { "SHTS", "150" },
                 { "TITLE1", "Project.Job.Name" },
                 { "TITLE2", "Description[0]" },
                 { "SHT", "PageNumber" },
@@ -50,7 +50,7 @@ namespace ICA.AutoCAD.Adapter
                 { "NAME", "CM" },
                 { "CBN", "CM" },
                 { "ABN", "GB" },
-                { "DATE", "08-17-21" }
+                { "DATE", "12-09-21" }
             };
 
         #endregion

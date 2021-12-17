@@ -84,7 +84,7 @@ namespace ICA.AutoCAD.Adapter
 
             Database tempDatabase = Commands.LoadDatabase(blockFileUri);
 
-            if (!((IEnumerable<ObjectId>)tempDatabase.GetModelSpace()).Select(id => id.Open())
+            if (!tempDatabase.GetModelSpace().OfType<ObjectId>().Select(id => id.Open())
                                                                       .OfType<AttributeDefinition>()
                                                                       .Any(definition => definition.Tag == "TB"))
                 throw new ArgumentException($"\"{Path.GetFileName(blockFileUri.LocalPath)}\" is not a valid title block file. File must contain an attribute called \"TB\".");
