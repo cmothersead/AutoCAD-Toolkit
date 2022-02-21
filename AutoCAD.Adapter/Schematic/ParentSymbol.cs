@@ -168,7 +168,7 @@ namespace ICA.AutoCAD.Adapter
         public void UpdateTag(string format = null)
         {
             if (format is null)
-                format = Database.GetProject().Settings.Component.Format;
+                format = Database.GetProject()?.Settings.Component.Format ?? "%F%S%N%X"; // TODO: Replace hard-coded default with application setting default.
             Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
         }
 
