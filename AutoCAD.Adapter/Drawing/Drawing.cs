@@ -57,7 +57,7 @@ namespace ICA.AutoCAD.Adapter
         public Project Project { get; set; }
         public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
         [XmlIgnore]
-        public Dictionary<string, string> TitleBlockAttributes { get; set; }
+        public List<TitleBlock.Attribute> TitleBlockAttributes { get; set; }
 
         [XmlAttribute]
         public string Name { get; set; }
@@ -105,7 +105,7 @@ namespace ICA.AutoCAD.Adapter
             if (titleBlock is null)
                 return;
 
-            Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Key,
+            Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Tag,
                                                                                 pair => GetPropertyValue(pair.Value)?.ToUpper()
                                                                                         ?? pair.Value);
             titleBlock.Attributes = dict;

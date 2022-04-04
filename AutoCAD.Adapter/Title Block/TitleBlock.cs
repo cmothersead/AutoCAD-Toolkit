@@ -6,11 +6,11 @@ using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
 using ICA.AutoCAD.IO;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ICA.AutoCAD.Adapter
@@ -284,5 +284,24 @@ namespace ICA.AutoCAD.Adapter
         }
 
         #endregion
+
+        #region Public Structs
+        public struct Attribute
+        {
+            [XmlAttribute]
+            public string Tag;
+            [XmlAttribute]
+            public string Value;
+
+            public override bool Equals(object obj)
+            {
+                if(obj.GetType() != typeof(Attribute))
+                    return false;
+
+                return ((Attribute)obj).Tag == Tag;
+            }
+        }
+        #endregion
+
     }
 }

@@ -261,6 +261,12 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        [CommandMethod("SAVEPROJECT")]
+        public static void SaveProject()
+        {
+            CurrentProject.Save();
+        }
+
         //[CommandMethod("EXPORTCURRENTPROJECT")]
         //public static void ExportCurrentProject() => WDP.Export(CurrentProject, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
 

@@ -38,20 +38,9 @@ namespace ICA.AutoCAD.Adapter
         public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
                                                      .ToList();
 
-        [XmlIgnore]
-        public Dictionary<string, string> TitleBlockAttributes { get; set; } = new Dictionary<string, string>()
-            {
-                { "DWGNO", "Project.Job.Code" },
-                { "SHTS", "150" },
-                { "TITLE1", "Project.Job.Name" },
-                { "TITLE2", "Description[0]" },
-                { "SHT", "PageNumber" },
-                { "CUST", "Project.Job.Customer.Name" },
-                { "NAME", "CM" },
-                { "CBN", "CM" },
-                { "ABN", "GB" },
-                { "DATE", "12-09-21" }
-            };
+        public List<TitleBlock.Attribute> TitleBlockAttributes { get; set; }
+
+                 
 
         #endregion
 
@@ -65,7 +54,22 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructors
 
-        public Project() { }
+        public Project()
+        {
+            TitleBlockAttributes = new List<TitleBlock.Attribute>()
+            {
+                new TitleBlock.Attribute { Tag = "DWGNO", Value = "Project.Job.Code" },
+                new TitleBlock.Attribute { Tag = "SHTS", Value = "150" },
+                new TitleBlock.Attribute { Tag = "TITLE1", Value = "Project.Job.Name" },
+                new TitleBlock.Attribute { Tag = "TITLE2", Value = "Description[0]" },
+                new TitleBlock.Attribute { Tag = "SHT", Value = "PageNumber" },
+                new TitleBlock.Attribute { Tag = "CUST", Value = "Project.Job.Customer.Name" },
+                new TitleBlock.Attribute { Tag = "NAME", Value = "CM" },
+                new TitleBlock.Attribute { Tag = "CBN", Value = "CM" },
+                new TitleBlock.Attribute { Tag = "ABN", Value = "GB" },
+                new TitleBlock.Attribute { Tag = "DATE", Value = "12-09-21" }
+            };
+        }
 
         #endregion
 

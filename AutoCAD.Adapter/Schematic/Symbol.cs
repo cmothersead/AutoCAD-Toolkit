@@ -338,8 +338,12 @@ namespace ICA.AutoCAD.Adapter
             List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
             ordered.OfType<ChildSymbol>().ForEach(child =>
             {
-                child.TagHidden = true;
-                child.SetParent(ordered.First() as ParentSymbol);
+                if(child != ordered.First())
+                    child.TagHidden = true;
+                if(ordered.First() is ParentSymbol parent)
+                    child.SetParent(parent);
+                else
+                    child.Tag = ordered.First().Tag;
             });
             LinkConnection top = null, bottom = null;
             Graph<EntityNode, Entity> linkGraph = new Graph<EntityNode, Entity>();

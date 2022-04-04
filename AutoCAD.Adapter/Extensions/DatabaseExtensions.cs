@@ -73,7 +73,6 @@ namespace ICA.AutoCAD.Adapter
         public static void LogSymbols(this Database database, Transaction transaction)
         {
             DBDictionary parents = database.GetNamedDictionary(transaction, "Parents").GetForWrite(transaction);
-            ;
             database.GetEntities(transaction)
                     .OfType<BlockReference>()
                     .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG1"))
