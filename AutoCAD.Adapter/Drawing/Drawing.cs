@@ -95,6 +95,11 @@ namespace ICA.AutoCAD.Adapter
 
         public Drawing() { }
 
+        public Drawing(string name)
+        {
+            Name = name;
+        }
+
         #endregion
 
         #region Methods
@@ -108,7 +113,8 @@ namespace ICA.AutoCAD.Adapter
             Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Tag,
                                                                                 pair => GetPropertyValue(pair.Value)?.ToUpper()
                                                                                         ?? pair.Value);
-            titleBlock.Attributes = dict;
+            titleBlock.Attributes = dict.Select(pair => new TitleBlock.Attribute() { Tag = pair.Key, Value = pair.Value })
+                                        .ToList();
             Save();
         }
 

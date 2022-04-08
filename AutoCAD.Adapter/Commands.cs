@@ -412,6 +412,19 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("TITLEBLOCKCONFIG")]
         public static void ConfigureTitleBlock() { }
 
+        [CommandMethod("UPDATETITLEBLOCK")]
+        public static void UpdateTitleBlock()
+        {
+            Drawing drawing = new Drawing()
+            {
+                Name = Path.GetFileNameWithoutExtension(CurrentDocument.Name),
+                Project = CurrentProject,
+                TitleBlockAttributes = CurrentProject.TitleBlockAttributes
+            };
+            drawing.UpdateTitleBlock();
+            
+        }
+
         [CommandMethod("SPARE")]
         public static void SpareSheet()
         {

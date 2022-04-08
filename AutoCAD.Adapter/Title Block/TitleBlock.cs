@@ -38,11 +38,12 @@ namespace ICA.AutoCAD.Adapter
         public bool IsLoaded => _blockTableRecord != null;
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
         public Database Database => _blockTableRecord.Database;
-        public Dictionary<string, string> Attributes
+        public List<Attribute> Attributes
         {
             get => Reference?.GetAttributeReferences()
-                             .ToDictionary(def => def.Tag, def => def.TextString);
-            set => Reference?.SetAttributeValues(value);
+                             .Select(attRef => new Attribute() { Tag = attRef.Tag, Value = attRef.TextString })
+                             .ToList();
+            set => Reference?.SetAttributeValues(value.ToDictionary(att => att.Tag, att => att.Value));
         }
             
         public bool IsInserted => _blockTableRecord.GetBlockReferenceIds(true, false).Count != 0;
@@ -292,6 +293,8 @@ namespace ICA.AutoCAD.Adapter
             public string Tag;
             [XmlAttribute]
             public string Value;
+
+            public override int GetHashCode() => base.GetHashCode();
 
             public override bool Equals(object obj)
             {
