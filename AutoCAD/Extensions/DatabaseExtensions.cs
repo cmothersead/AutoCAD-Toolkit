@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -96,8 +97,22 @@ namespace ICA.AutoCAD
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
-        public static void SaveFile(this Database database) =>
-            database.SaveAs(database.OriginalFileName, true, DwgVersion.Current, database.SecurityParameters);
+        public static void SaveFile(this Database database)
+        {
+            if(Application.DocumentManager.Contains(new Uri(database.OriginalFileName)))
+            {
+                Document doc = Application.DocumentManager.Get(database.OriginalFileName);
+                Document activeDoc = Application.DocumentManager.MdiActiveDocument;
+                Application.DocumentManager.MdiActiveDocument = doc;
+                database.SaveAs(database.OriginalFileName, true, DwgVersion.Current, database.SecurityParameters);
+                Application.DocumentManager.MdiActiveDocument = activeDoc;
+            }
+            else
+            {
+                database.SaveAs(database.OriginalFileName, true, DwgVersion.Current, database.SecurityParameters);
+            }
+            
+        }
 
         #endregion
 

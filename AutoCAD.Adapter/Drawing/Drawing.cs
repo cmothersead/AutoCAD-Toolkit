@@ -106,6 +106,22 @@ namespace ICA.AutoCAD.Adapter
 
         public void UpdateTitleBlock()
         {
+            if (Application.DocumentManager.Contains(new Uri(Database.OriginalFileName)))
+            {
+                Document doc = Application.DocumentManager.Get(Database.OriginalFileName);
+                using (DocumentLock docLock = doc.LockDocument())
+                {
+                    UpdateTitleBlockPostLock();
+                }
+            }
+            else
+            {
+                UpdateTitleBlockPostLock();
+            }
+        }
+
+        internal void UpdateTitleBlockPostLock()
+        {
             TitleBlock titleBlock = Database.GetTitleBlock();
             if (titleBlock is null)
                 return;

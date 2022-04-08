@@ -385,18 +385,11 @@ namespace ICA.AutoCAD.Adapter
             return database;
         }
 
-        [CommandMethod("PROJECTTITLEBLOCK")]
+        [CommandMethod("PROJECTTITLEBLOCK", CommandFlags.Session)]
         public static void ProjectTitleBlock()
         {
             //TitleBlock titleBlock = TitleBlock.Select();
-            Project project = CurrentProject;
-            foreach (Drawing drawing in project.Drawings)
-            {
-                if (!Application.DocumentManager.Contains(drawing.FileUri))
-                {
-                    drawing.UpdateTitleBlock();
-                }
-            }
+            CurrentProject.Drawings.ForEach(drawing => drawing.UpdateTitleBlock());
         }
 
         public static void AddTitleBlock(Database database, TitleBlock titleBlock)
@@ -422,7 +415,6 @@ namespace ICA.AutoCAD.Adapter
                 TitleBlockAttributes = CurrentProject.TitleBlockAttributes
             };
             drawing.UpdateTitleBlock();
-            
         }
 
         [CommandMethod("SPARE")]
