@@ -389,7 +389,7 @@ namespace ICA.AutoCAD.Adapter
         public static void ProjectTitleBlock()
         {
             //TitleBlock titleBlock = TitleBlock.Select();
-            CurrentProject.Drawings.ForEach(drawing => drawing.UpdateTitleBlock());
+            CurrentProject.RunOnAllDrawings(drawing => drawing.UpdateTitleBlock());
         }
 
         public static void AddTitleBlock(Database database, TitleBlock titleBlock)

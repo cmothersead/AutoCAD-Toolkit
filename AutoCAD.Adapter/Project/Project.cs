@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.EditorInput;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -104,11 +105,32 @@ namespace ICA.AutoCAD.Adapter
             Save();
         }
 
+        public void RunOnAllDrawings(Action<Drawing> action)
+        {
+            foreach(Drawing drawing in Drawings)
+            {
+                if (Application.DocumentManager.Contains(drawing.FileUri))
+                {
+                    Document doc = Application.DocumentManager.Get(drawing.FullPath);
+                    Document activeDoc = Application.DocumentManager.MdiActiveDocument;
+                    
+                    Application.DocumentManager.MdiActiveDocument = doc;
+
+                    using (DocumentLock docLock = doc.LockDocument())
+                        action(drawing);
+
+                    Application.DocumentManager.MdiActiveDocument = activeDoc;
+                }
+                else
+                {
+                    action(drawing);
+                }
+            }
+        }
+
         #region File IO
 
         public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";
-
-
 
         public void Save()
         {
