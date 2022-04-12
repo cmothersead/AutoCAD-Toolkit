@@ -531,13 +531,9 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             if(symbol.WireConnections.Any(connection => CurrentDatabase.GetLayer(ElectricalLayers.WireLayer).GetEntities().OfType<Line>().Any(line => connection.IsConnected(line))))
-            {
                 symbol.UnbreakWires();
-            }
             else
-            {
                 symbol.BreakWires();
-            }
         }
 
         [CommandMethod("GETXDATA")]

@@ -281,6 +281,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static string GetClosestLineNumber(List<Ladder> ladders, Point2d position)
         {
+            if (ladders == null)
+                return null;
+
             foreach(Ladder ladder in ladders.OrderByDescending(ladder => ladder.Origin.X))
             {
                 if (position.X < ladder.Origin.X)
