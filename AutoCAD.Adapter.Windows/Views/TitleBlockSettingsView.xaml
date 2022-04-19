@@ -4,9 +4,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Windows.Views"
+        xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
+        xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:TitleBlockSettingsViewModel}"
         mc:Ignorable="d"
-        Title="Settings" Height="450" Width="800">
-    <Grid>
-        
+        Title="Settings" Height="450" Width="600">
+    <Grid Margin="10px">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Attributes}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="Attribute" Header="Attribute"  Binding="{Binding Key}" Width="Auto"/>
+                <DataGridTextColumn x:Name="Value" Header="Value" Binding="{Binding Value}"  Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <controls:OkCancelControl Grid.Row="2" x:Name="OkCancelControl" OkCommand="{Binding}"/>
     </Grid>
 </Window>

@@ -10,7 +10,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
     public class TitleBlockSettingsViewModel : BaseViewModel
     {
         private TitleBlockFile _titleBlockFile;
-        public Dictionary<string, string> Attributes { get; set; }
+        public List<KeyValuePair<string, string>> Attributes { get; set; }
 
 
         public TitleBlockSettingsViewModel(TitleBlockFile titleBlockFile)

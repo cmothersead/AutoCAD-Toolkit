@@ -29,6 +29,8 @@ namespace ICA.AutoCAD.Adapter
 
         private AttributeReference LocAttribute => BlockReference.GetAttributeReference("LOC");
 
+        private AttributeReference RatingAttribute => BlockReference.GetAttributeReference("RATING");
+
         private List<string> AttributeNames => new List<string>
         {
             "TAG",
@@ -101,6 +103,11 @@ namespace ICA.AutoCAD.Adapter
             get => LocAttribute?.TextString;
             set => LocAttribute?.SetValue(value);
         }
+        public string Rating
+        {
+            get => RatingAttribute?.TextString;
+            set => RatingAttribute?.SetValue(value);
+        }
 
         public bool InstallationHidden
         {
@@ -112,6 +119,12 @@ namespace ICA.AutoCAD.Adapter
         {
             get => MfgAttribute != null && MfgAttribute.Invisible;
             set => PartAttributes.ForEach(a => a?.SetVisibility(!value));
+        }
+
+        public bool RatingHidden
+        {
+            get => RatingAttribute !=null && RatingAttribute.Invisible;
+            set => RatingAttribute.SetVisibility(!value);
         }
 
         public int Index

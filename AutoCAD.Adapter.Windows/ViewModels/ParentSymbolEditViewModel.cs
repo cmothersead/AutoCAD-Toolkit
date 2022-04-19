@@ -38,6 +38,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         public string Manufacturer { get; set; }
         public string PartNumber { get; set; }
         public bool PartInfoHidden { get; set; }
+        public string Rating { get; set; }
 
         public CharacterCasing CharacterCasing { get; set; } = CharacterCasing.Upper;
 
@@ -63,6 +64,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             Manufacturer = ParentSymbol.ManufacturerName;
             PartNumber = ParentSymbol.PartNumber;
             PartInfoHidden = ParentSymbol.PartInfoHidden;
+            Rating = ParentSymbol.Rating;
             OkCommand = new RelayCommand(UpdateAndClose);
         }
 
@@ -85,6 +87,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             ParentSymbol.ManufacturerName = Manufacturer;
             ParentSymbol.PartNumber = PartNumber;
             ParentSymbol.PartInfoHidden = PartInfoHidden;
+            ParentSymbol.Rating = Rating;
             ParentSymbol.UpdateTag();
             ParentSymbol.CollapseAttributeStack();
         }
