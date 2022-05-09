@@ -11,7 +11,7 @@ namespace ICA.AutoCAD.Adapter
 
         public void Initialize()
         {
-            if (Environment.UserName.Contains("cmoth"))
+            if (Environment.UserName.Contains("cmoth") || Environment.UserName.Contains("Colin"))
                 ConfigureDefaults();
             //Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new EraseLinksOverrule(), false);
             //Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), new GroupGripOverrule(), false);
