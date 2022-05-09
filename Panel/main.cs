@@ -1,5 +1,4 @@
 ﻿using Autodesk.AutoCAD.Runtime;
-using Autodesk.Electrical.Project;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.OleDb;
@@ -11,7 +10,7 @@ namespace PanelInsert
     {
         public static OleDbConnection ProjectDatabase()
         {
-            var connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + ProjectManager.GetInstance().GetActiveProject().GetDbFullPath() + "'";
+            var connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=''";
             return new OleDbConnection(connectionString);
         }
 

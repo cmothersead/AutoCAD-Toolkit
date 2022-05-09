@@ -52,10 +52,6 @@
       <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcDx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="AcePageManMgd">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2022\Acade\AcePageManMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="AcMgd, Version=24.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoCAD.NET.24.1.51000\lib\net47\AcMgd.dll</HintPath>
       <Private>False</Private>
