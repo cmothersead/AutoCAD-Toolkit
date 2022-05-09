@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using ICA.Schematic;
+using System.Windows;
 using System.Windows.Input;
-using ICA.Schematic;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {

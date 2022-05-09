@@ -77,7 +77,7 @@ namespace ICA.AutoCAD.IO
 
         #region Private Methods
 
-        private static bool IsLibrary (string path)
+        private static bool IsLibrary(string path)
         {
             List<string> subfolders = new()
             {

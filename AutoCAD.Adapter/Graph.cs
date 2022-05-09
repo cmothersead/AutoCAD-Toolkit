@@ -45,7 +45,7 @@ namespace ICA.AutoCAD.Adapter
             var neighbors = value.Neighbors.ToList();
             foreach (TNode neighbor in neighbors)
             {
-                if(!Contains(neighbor))
+                if (!Contains(neighbor))
                     DiscoverNodes(neighbor);
             }
         }

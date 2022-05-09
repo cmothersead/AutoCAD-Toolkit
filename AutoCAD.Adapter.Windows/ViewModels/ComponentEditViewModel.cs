@@ -1,10 +1,10 @@
-﻿using System.Linq;
+﻿using ICA.AutoCAD.Adapter.Windows.Models;
+using ICA.Schematic;
+using ICA.Schematic.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using ICA.AutoCAD.Adapter.Windows.Models;
-using ICA.Schematic;
-using ICA.Schematic.Data;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {

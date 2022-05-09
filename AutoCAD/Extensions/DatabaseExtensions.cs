@@ -1,5 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ namespace ICA.AutoCAD
 {
     public static class DatabaseExtensions
     {
-        #region Transactionles Public Extension Methods
+        #region Transactionless Public Extension Methods
 
         /// <summary>
         /// Gets the drawing custom properties.

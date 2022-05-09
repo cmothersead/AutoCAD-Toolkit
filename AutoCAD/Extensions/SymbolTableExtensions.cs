@@ -58,7 +58,7 @@ namespace ICA.AutoCAD
                 default:
                     return null;
             }
-            
+
             return transaction.GetObject(symbolTableId, OpenMode.ForRead) as SymbolTable;
         }
 
@@ -118,14 +118,14 @@ namespace ICA.AutoCAD
         /// </summary>
         /// <param name="database">Instance this method applies to.</param>
         /// <returns>A <see cref="TextStyleTable"/> opened for read.</returns>
-        public static TextStyleTable GetTextStyleTable(this Database database, Transaction transaction) => database.GetSymbolTable(transaction, SymbolTableType.TextStyleTable) as TextStyleTable; 
+        public static TextStyleTable GetTextStyleTable(this Database database, Transaction transaction) => database.GetSymbolTable(transaction, SymbolTableType.TextStyleTable) as TextStyleTable;
 
         /// <summary>
         /// Get the <see cref="UcsTable"/> for the database.
         /// </summary>
         /// <param name="database">Instance this method applies to.</param>
         /// <returns>A <see cref="UcsTable"/> opened for read.</returns>
-        public static UcsTable GetUCSTable(this Database database, Transaction transaction) => 
+        public static UcsTable GetUCSTable(this Database database, Transaction transaction) =>
             database.GetSymbolTable(transaction, SymbolTableType.UCSTable) as UcsTable;
 
         #endregion
@@ -138,7 +138,7 @@ namespace ICA.AutoCAD
         /// <param name="blockTable">Instance this method applies to.</param>
         /// <param name="name">Name of the record to find.</param>
         /// <returns><see cref="BlockTableRecord"/> if it exists.</returns>
-        public static BlockTableRecord GetRecord(this BlockTable blockTable, string name) => 
+        public static BlockTableRecord GetRecord(this BlockTable blockTable, string name) =>
             GetRecord((SymbolTable)blockTable, name) as BlockTableRecord;
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace ICA.AutoCAD
         /// <param name="dimStyleTable">Instance this method applies to.</param>
         /// <param name="name">Name of the record to find.</param>
         /// <returns><see cref="DimStyleTableRecord"/> if it exists.</returns>
-        public static DimStyleTableRecord GetRecord(this DimStyleTable dimStyleTable, string name) => 
+        public static DimStyleTableRecord GetRecord(this DimStyleTable dimStyleTable, string name) =>
             GetRecord((SymbolTable)dimStyleTable, name) as DimStyleTableRecord;
 
         /// <summary>
@@ -192,38 +192,38 @@ namespace ICA.AutoCAD
         /// <param name="ucsTable">Instance this method applies to.</param>
         /// <param name="name">Name of the record to find.</param>
         /// <returns><see cref="UcsTableRecord"/> if it exists.</returns>
-        public static UcsTableRecord GetRecord(this UcsTable ucsTable, string name) => 
+        public static UcsTableRecord GetRecord(this UcsTable ucsTable, string name) =>
             GetRecord((SymbolTable)ucsTable, name) as UcsTableRecord;
 
         #endregion
 
         #region GetRecords
 
-        public static List<BlockTableRecord> GetRecords(this BlockTable blockTable) => 
+        public static List<BlockTableRecord> GetRecords(this BlockTable blockTable) =>
             GetRecords((SymbolTable)blockTable).Cast<BlockTableRecord>()
                                                .ToList();
 
-        public static List<DimStyleTableRecord> GetRecords(this DimStyleTable dimStyleTable) => 
+        public static List<DimStyleTableRecord> GetRecords(this DimStyleTable dimStyleTable) =>
             GetRecords((SymbolTable)dimStyleTable).Cast<DimStyleTableRecord>()
                                                   .ToList();
 
-        public static List<LayerTableRecord> GetRecords(this LayerTable layerTable) => 
+        public static List<LayerTableRecord> GetRecords(this LayerTable layerTable) =>
             GetRecords((SymbolTable)layerTable).Cast<LayerTableRecord>()
                                                .ToList();
 
-        public static List<LinetypeTableRecord> GetRecords(this LinetypeTable linetypeTable) => 
+        public static List<LinetypeTableRecord> GetRecords(this LinetypeTable linetypeTable) =>
             GetRecords((SymbolTable)linetypeTable).Cast<LinetypeTableRecord>()
                                                   .ToList();
 
-        public static List<RegAppTableRecord> GetRecords(this RegAppTable regAppTable) => 
+        public static List<RegAppTableRecord> GetRecords(this RegAppTable regAppTable) =>
             GetRecords((SymbolTable)regAppTable).Cast<RegAppTableRecord>()
                                                 .ToList();
 
-        public static List<TextStyleTableRecord> GetRecords(this TextStyleTable textStyleTable) => 
+        public static List<TextStyleTableRecord> GetRecords(this TextStyleTable textStyleTable) =>
             GetRecords((SymbolTable)textStyleTable).Cast<TextStyleTableRecord>()
                                                    .ToList();
 
-        public static List<UcsTableRecord> GetRecords(this UcsTable ucsTable) => 
+        public static List<UcsTableRecord> GetRecords(this UcsTable ucsTable) =>
             GetRecords((SymbolTable)ucsTable).Cast<UcsTableRecord>()
                                              .ToList();
 

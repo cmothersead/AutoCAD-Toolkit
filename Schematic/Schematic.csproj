@@ -86,6 +86,8 @@
     <Compile Include="ILayered.cs" />
     <Compile Include="IReference.cs" />
     <Compile Include="ISignalSymbol.cs" />
+    <Compile Include="ITBAttribute.cs" />
+    <Compile Include="ITitleBlock.cs" />
     <Compile Include="Valve.cs" />
     <Page Include="ComponentsDetails.xaml">
       <SubType>Designer</SubType>

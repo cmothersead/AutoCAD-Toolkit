@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -123,7 +123,7 @@ namespace ICA.AutoCAD.Adapter
 
         public bool RatingHidden
         {
-            get => RatingAttribute !=null && RatingAttribute.Invisible;
+            get => RatingAttribute != null && RatingAttribute.Invisible;
             set => RatingAttribute.SetVisibility(!value);
         }
 
@@ -150,7 +150,7 @@ namespace ICA.AutoCAD.Adapter
 
         public ParentSymbol(BlockReference blockReference) : base(blockReference)
         {
-            if(Database != null)
+            if (Database != null)
             {
                 Stack.Add(BlockReference.GetAttributeReferences()
                                     .Select(att => att.Tag)

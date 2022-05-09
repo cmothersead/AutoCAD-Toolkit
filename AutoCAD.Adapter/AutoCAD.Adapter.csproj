@@ -137,6 +137,7 @@
     <Compile Include="Project\Job.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Project\ProjectSettings.cs" />
+    <Compile Include="Project\TBAttribute.cs" />
     <Compile Include="Schematic\AttributeStack.cs" />
     <Compile Include="Schematic\Component.cs" />
     <Compile Include="Schematic\GroundSymbol.cs" />

@@ -25,7 +25,7 @@ namespace ICA.AutoCAD
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                switch(entity)
+                switch (entity)
                 {
                     case BlockReference reference:
                         reference.Insert(transaction, database, layer);

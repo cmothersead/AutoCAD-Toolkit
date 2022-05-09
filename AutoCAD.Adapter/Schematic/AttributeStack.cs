@@ -75,7 +75,7 @@ namespace ICA.AutoCAD.Adapter
                 reference.Invisible = !reference.Tag.Contains("TAG");
                 Owner.AddAttributeReference(reference).SetLayer(GetLayer(name));
             }
-                
+
             Attributes.Add(name);
         }
 

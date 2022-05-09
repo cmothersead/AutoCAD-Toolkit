@@ -1,10 +1,6 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using ICA.Schematic;
-using System;
+﻿using ICA.Schematic;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {

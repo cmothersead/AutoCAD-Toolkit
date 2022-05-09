@@ -23,7 +23,7 @@ namespace ICA.AutoCAD.Adapter
 
         public DrawingSettings() { }
 
-        public DrawingSettings(Database database) 
+        public DrawingSettings(Database database)
         {
             Database = database;
             Ladder = new LadderSettings();
@@ -33,7 +33,7 @@ namespace ICA.AutoCAD.Adapter
             TitleBlock = new TitleBlockSettings();
         }
 
-        public DrawingSettings(Dictionary<string, string>dictionary)
+        public DrawingSettings(Dictionary<string, string> dictionary)
         {
             Ladder = new LadderSettings(dictionary);
             Component = new ComponentSettings(dictionary);

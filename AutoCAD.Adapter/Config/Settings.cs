@@ -30,13 +30,13 @@ namespace ICA.AutoCAD.Adapter
                         property.SetValue(this, Convert.ToPoint(value));
                     else if (property.PropertyType == typeof(LeaderInsertMode))
                         property.SetValue(this, Convert.ToLeaderInsertMode(value));
-                    else if(property.PropertyType == typeof(NumberMode))
+                    else if (property.PropertyType == typeof(NumberMode))
                         property.SetValue(this, Convert.ToNumberMode(value));
-                    else if(property.PropertyType == typeof(RungOrientation))
+                    else if (property.PropertyType == typeof(RungOrientation))
                         property.SetValue(this, Convert.ToRungOrientation(value));
-                    else if(property.PropertyType == typeof(WireGapStyle))
+                    else if (property.PropertyType == typeof(WireGapStyle))
                         property.SetValue(this, Convert.ToWireGapStyle(value));
-                    else if(property.PropertyType == typeof(WireSortMode?))
+                    else if (property.PropertyType == typeof(WireSortMode?))
                         property.SetValue(this, Convert.ToWireSortMode(value));
                     else
                         property.SetValue(this, value);

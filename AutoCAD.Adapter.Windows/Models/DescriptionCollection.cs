@@ -33,7 +33,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
         public DescriptionCollection(IEnumerable<string> value)
         {
             AddEmpty();
-            foreach(string item in value)
+            foreach (string item in value)
                 Add(item);
         }
 

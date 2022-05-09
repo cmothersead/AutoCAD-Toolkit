@@ -4,7 +4,6 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Windows;
 using ICA.AutoCAD.IO;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -241,7 +240,7 @@ namespace ICA.AutoCAD.Adapter
                              FamilyAttribute.AlignmentPoint.ToPoint2D();
             Stack.Justification = FamilyAttribute.Justify;
             Stack.Collapse();
-        } 
+        }
 
         public void AssignLayers()
         {
@@ -338,9 +337,9 @@ namespace ICA.AutoCAD.Adapter
             List<Symbol> ordered = symbols.OrderBy(symbol => symbol.LineNumber).ToList();
             ordered.OfType<ChildSymbol>().ForEach(child =>
             {
-                if(child != ordered.First())
+                if (child != ordered.First())
                     child.TagHidden = true;
-                if(ordered.First() is ParentSymbol parent)
+                if (ordered.First() is ParentSymbol parent)
                     child.SetParent(parent);
                 else
                     child.Tag = ordered.First().Tag;

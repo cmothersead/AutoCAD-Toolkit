@@ -54,7 +54,7 @@ namespace ICA.AutoCAD.Adapter
 
         public ChildSymbol(BlockReference blockReference) : base(blockReference)
         {
-            if(Database != null)
+            if (Database != null)
             {
                 Stack.Add(BlockReference.GetAttributeReferences()
                                         .Select(att => att.Tag)

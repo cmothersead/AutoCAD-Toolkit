@@ -1,10 +1,10 @@
-﻿using System.Linq;
+﻿using ICA.AutoCAD.Adapter.Windows.Models;
+using ICA.Schematic;
+using ICA.Schematic.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using ICA.AutoCAD.Adapter.Windows.Models;
-using ICA.Schematic;
-using ICA.Schematic.Data;
 
 namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 {
@@ -39,6 +39,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         public string PartNumber { get; set; }
         public bool PartInfoHidden { get; set; }
         public string Rating { get; set; }
+        public bool RatingHidden { get; set; }
 
         public CharacterCasing CharacterCasing { get; set; } = CharacterCasing.Upper;
 
@@ -65,6 +66,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             PartNumber = ParentSymbol.PartNumber;
             PartInfoHidden = ParentSymbol.PartInfoHidden;
             Rating = ParentSymbol.Rating;
+            RatingHidden = ParentSymbol.RatingHidden;
             OkCommand = new RelayCommand(UpdateAndClose);
         }
 
@@ -88,6 +90,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             ParentSymbol.PartNumber = PartNumber;
             ParentSymbol.PartInfoHidden = PartInfoHidden;
             ParentSymbol.Rating = Rating;
+            ParentSymbol.RatingHidden = RatingHidden;
             ParentSymbol.UpdateTag();
             ParentSymbol.CollapseAttributeStack();
         }

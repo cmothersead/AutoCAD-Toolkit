@@ -35,7 +35,7 @@ namespace ICA.AutoCAD
 
         #region Transaction Handlers
 
-        public static void Transact<TDBObject>(this TDBObject obj, Action<TDBObject, Transaction> action) where TDBObject: DBObject
+        public static void Transact<TDBObject>(this TDBObject obj, Action<TDBObject, Transaction> action) where TDBObject : DBObject
         {
             using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
             {
@@ -54,9 +54,9 @@ namespace ICA.AutoCAD
             }
         }
 
-        public static void Transact<TDBObject, TArgument>(this TDBObject obj, Action<TDBObject, Transaction, TArgument> action, TArgument value) where TDBObject: DBObject
+        public static void Transact<TDBObject, TArgument>(this TDBObject obj, Action<TDBObject, Transaction, TArgument> action, TArgument value) where TDBObject : DBObject
         {
-            if(obj.Database != null)
+            if (obj.Database != null)
             {
                 using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
                 {
@@ -65,8 +65,8 @@ namespace ICA.AutoCAD
                     return;
                 }
             }
-            
-            if(value is Database database)
+
+            if (value is Database database)
             {
                 using (Transaction transaction = database.TransactionManager.StartTransaction())
                 {
@@ -91,7 +91,7 @@ namespace ICA.AutoCAD
 
         public static void Transact<TDBObject, TArgument1, TArgument2>(this TDBObject obj, Action<TDBObject, Transaction, TArgument1, TArgument2> action, TArgument1 value1, TArgument2 value2) where TDBObject : DBObject
         {
-            if(obj.Database != null)
+            if (obj.Database != null)
             {
                 using (Transaction transaction = obj.Database.TransactionManager.StartTransaction())
                 {
@@ -100,8 +100,8 @@ namespace ICA.AutoCAD
                     return;
                 }
             }
-            
-            if(value1 is Database database1)
+
+            if (value1 is Database database1)
             {
                 using (Transaction transaction = database1.TransactionManager.StartTransaction())
                 {
@@ -110,8 +110,9 @@ namespace ICA.AutoCAD
                     return;
                 }
             }
-            
-            if(value2 is Database database2){
+
+            if (value2 is Database database2)
+            {
                 using (Transaction transaction = database2.TransactionManager.StartTransaction())
                 {
                     action(obj, transaction, value1, value2);

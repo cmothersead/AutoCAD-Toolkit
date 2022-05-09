@@ -19,7 +19,7 @@ namespace ICA.AutoCAD.Adapter
 
         public void Insert(Database database)
         {
-            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 Insert(database, transaction);
                 transaction.Commit();

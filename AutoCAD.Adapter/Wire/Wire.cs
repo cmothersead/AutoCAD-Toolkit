@@ -70,7 +70,7 @@ namespace ICA.AutoCAD.Adapter
                     break;
 
                 if (newLine.Angle == previousLine?.Angle)
-                    using(Transaction transaction = document.Database.TransactionManager.StartTransaction())
+                    using (Transaction transaction = document.Database.TransactionManager.StartTransaction())
                     {
                         previousLine.GetForWrite(transaction).EndPoint = newLine.EndPoint;
                         transaction.Commit();

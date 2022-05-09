@@ -20,12 +20,13 @@
         <StackPanel Margin="10" Grid.Column="0">
             <controls:TagControl x:Name="TagControl" Text="{Binding Tag}"/>
             <controls:InstallationControl x:Name="InstallationControl" Installation="{Binding Path=Installation, Mode=TwoWay}" Location="{Binding Path=Location, Mode=TwoWay}" IsChecked="{Binding Path=InstallationHidden, Mode=TwoWay}" CharacterCasing="{Binding CharacterCasing}"/>
-            <TextBox x:Name="Rating" Text="{Binding Path=Rating, Mode=TwoWay}"/>
+            <controls:RatingControl x:Name="RatingControl" Rating="{Binding Path=Rating, Mode=TwoWay}" IsChecked="{Binding Path=RatingHidden, Mode=TwoWay}" CharacterCasing="{Binding CharacterCasing}"/>
         </StackPanel>
 
         <StackPanel Margin="5" Grid.Column="1">
             <controls:DescriptionControl x:Name="DescriptionControl" ItemsSource="{Binding Description}" IsChecked="{Binding Path=DescriptionHidden, Mode=TwoWay}" CharacterCasing="{Binding CharacterCasing}"/>
             <controls:TextPartControl x:Name="PartControl" Manufacturer="{Binding Path=Manufacturer, Mode=TwoWay}" Part="{Binding Path=PartNumber, Mode=TwoWay}" IsChecked="{Binding Path=PartInfoHidden, Mode=TwoWay}" CharacterCasing="{Binding CharacterCasing}"/>
+            <controls:PinsControl x:Name="PinsControl" IsChecked="{Binding}"/>
             <controls:OkCancelControl x:Name="OkCancelControl" OkCommand="{Binding OkCommand}"/>
         </StackPanel>
         

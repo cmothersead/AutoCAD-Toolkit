@@ -7,8 +7,8 @@
         xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
         xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:TitleBlockSettingsViewModel}"
         mc:Ignorable="d"
-        Title="Settings" Height="450" Width="600">
-    <Grid Margin="10px">
+        Title="Settings" d:Height="450" d:Width="600">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
@@ -17,12 +17,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Attributes}" AutoGenerateColumns="False">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Attributes}" AutoGenerateColumns="False" Margin="10px 10px 10px 0px">
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="Attribute" Header="Attribute"  Binding="{Binding Key}" Width="Auto"/>
+                <DataGridTextColumn x:Name="Attribute" Header="Attribute" Binding="{Binding Tag}" Width="Auto" IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="Value" Header="Value" Binding="{Binding Value}"  Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
-        <controls:OkCancelControl Grid.Row="2" x:Name="OkCancelControl" OkCommand="{Binding}"/>
+        <controls:OkCancelControl Grid.Row="2" x:Name="OkCancelControl" OkCommand="{Binding OKCommand}"/>
     </Grid>
 </Window>

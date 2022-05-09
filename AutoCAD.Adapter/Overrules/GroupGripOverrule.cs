@@ -1,10 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -22,7 +18,7 @@ namespace ICA.AutoCAD.Adapter
 
         public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
         {
-            if(!entity.HasGroup())
+            if (!entity.HasGroup())
             {
                 try
                 {
@@ -45,7 +41,7 @@ namespace ICA.AutoCAD.Adapter
 
         public override void MoveGripPointsAt(Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
         {
-            if(entity.Database != null && !entity.HasGroup())
+            if (entity.Database != null && !entity.HasGroup())
             {
                 base.MoveGripPointsAt(entity, grips, offset, bitFlags);
                 return;

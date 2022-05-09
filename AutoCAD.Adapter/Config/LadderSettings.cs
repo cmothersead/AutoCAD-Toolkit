@@ -20,7 +20,7 @@ namespace ICA.AutoCAD.Adapter
 
         public LadderSettings() { }
 
-        public LadderSettings(Dictionary<string, string> dictionary) : base (Prefix, dictionary) { }
+        public LadderSettings(Dictionary<string, string> dictionary) : base(Prefix, dictionary) { }
 
         #endregion
 

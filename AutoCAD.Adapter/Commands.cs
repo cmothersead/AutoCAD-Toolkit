@@ -197,7 +197,7 @@ namespace ICA.AutoCAD.Adapter
 
             if (symbol is ParentSymbol parent)
             {
-                if(parent.Family == "")
+                if (parent.Family == "")
                 {
                     PromptResult result = Editor.GetString("Enter family code:");
                     if (result.Status == PromptStatus.OK)
@@ -385,6 +385,14 @@ namespace ICA.AutoCAD.Adapter
             return database;
         }
 
+        [CommandMethod("TITLEBLOCKSETTINGS")]
+        public static void TitleBlockSettings()
+        {
+            TitleBlock titleBlock = CurrentDatabase.GetTitleBlock();
+            TitleBlockSettingsView view = new TitleBlockSettingsView(titleBlock);
+            Application.ShowModalWindow(view);
+        }
+
         [CommandMethod("PROJECTTITLEBLOCK", CommandFlags.Session)]
         public static void ProjectTitleBlock()
         {
@@ -402,8 +410,6 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("REMOVETITLEBLOCK")]
         public static void PurgeTitleBlock() => CurrentDatabase.GetTitleBlock()?.Purge();
 
-        [CommandMethod("TITLEBLOCKCONFIG")]
-        public static void ConfigureTitleBlock() { }
 
         [CommandMethod("UPDATETITLEBLOCK")]
         public static void UpdateTitleBlock()
@@ -412,7 +418,7 @@ namespace ICA.AutoCAD.Adapter
             {
                 Name = Path.GetFileNameWithoutExtension(CurrentDocument.Name),
                 Project = CurrentProject,
-                TitleBlockAttributes = CurrentProject.TitleBlockAttributes
+                TitleBlockAttributes = CurrentProject.Settings.TitleBlockAttributes
             };
             drawing.UpdateTitleBlock();
         }
@@ -441,7 +447,7 @@ namespace ICA.AutoCAD.Adapter
                         //Ladder();
                         break;
                     case "TITLE BLOCK":
-                        TitleBlockCommand();
+                        TitleBlockSettings();
                         break;
                     case "SYMS":
                         EditSymbol(reference);
@@ -530,7 +536,7 @@ namespace ICA.AutoCAD.Adapter
             if (!symbol.IsInline)
                 return;
 
-            if(symbol.WireConnections.Any(connection => CurrentDatabase.GetLayer(ElectricalLayers.WireLayer).GetEntities().OfType<Line>().Any(line => connection.IsConnected(line))))
+            if (symbol.WireConnections.Any(connection => CurrentDatabase.GetLayer(ElectricalLayers.WireLayer).GetEntities().OfType<Line>().Any(line => connection.IsConnected(line))))
                 symbol.UnbreakWires();
             else
                 symbol.BreakWires();
@@ -545,7 +551,7 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             Entity entity = test.Value.Open() as Entity;
-            
+
             entity.GetXData().ForEach(data => Editor.WriteMessage($"{data.Value}"));
         }
 
@@ -584,7 +590,7 @@ namespace ICA.AutoCAD.Adapter
                                          .Where(reference => reference.HasAttributeReference("TAG1"))
                                          .Select(reference => new ParentSymbol(reference))
                                          .FirstOrDefault();
-            using(DocumentLock doclock = CurrentDocument.LockDocument())
+            using (DocumentLock doclock = CurrentDocument.LockDocument())
             {
                 ParentSymbolEditView editView = new ParentSymbolEditView(parent);
                 Application.ShowModalWindow(editView);

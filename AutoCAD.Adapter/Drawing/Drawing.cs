@@ -2,13 +2,10 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -57,7 +54,7 @@ namespace ICA.AutoCAD.Adapter
         public Project Project { get; set; }
         public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
         [XmlIgnore]
-        public List<TitleBlock.Attribute> TitleBlockAttributes { get; set; }
+        public List<TBAttribute> TitleBlockAttributes { get; set; }
 
         [XmlAttribute]
         public string Name { get; set; }
@@ -110,31 +107,10 @@ namespace ICA.AutoCAD.Adapter
             if (titleBlock is null)
                 return;
 
-            Dictionary<string, string> dict = TitleBlockAttributes.ToDictionary(pair => pair.Tag,
-                                                                                pair => GetPropertyValue(pair.Value)?.ToUpper()
-                                                                                        ?? pair.Value);
-            titleBlock.Attributes = dict.Select(pair => new TitleBlock.Attribute() { Tag = pair.Key, Value = pair.Value })
-                                        .ToList();
+            titleBlock.Attributes = TitleBlockAttributes.Cast<ITBAttribute>()
+                                                        .ToList();
+
             Save();
-        }
-
-        public string GetPropertyValue(string name)
-        {
-            PropertyInfo currentProperty;
-            object currentObject = this;
-            Regex propertyRegex = new Regex(@"(?<!\[)\w+(?!\])");
-            Regex indexRegex = new Regex(@"(?<=\[)\d+(?=\])");
-            foreach (Match match in propertyRegex.Matches(name))
-            {
-                currentProperty = currentObject.GetType().GetProperty(match.Value);
-                if (currentProperty is null)
-                    return null;
-
-                currentObject = currentProperty.GetValue(currentObject);
-            }
-            if (int.TryParse(indexRegex.Match(name).Value, out int index) && currentObject is IList list)
-                currentObject = list[index];
-            return currentObject.ToString();
         }
 
         public List<ChildSymbol> GetChildSymbols() => Database.GetChildSymbols();

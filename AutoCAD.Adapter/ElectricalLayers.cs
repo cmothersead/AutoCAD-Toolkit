@@ -24,7 +24,7 @@ namespace ICA.AutoCAD.Adapter
 
         private static Dictionary<string, LayerTableRecord> Layers => typeof(ElectricalLayers).GetProperties(BindingFlags.Static | BindingFlags.Public)
                                                                                               .ToDictionary(p => p.Name, p => p.GetValue(null) as LayerTableRecord);
-        
+
         #endregion
 
         #region Public Properties
@@ -221,7 +221,7 @@ namespace ICA.AutoCAD.Adapter
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                Layers.Select(pair => new 
+                Layers.Select(pair => new
                 {
                     Layer = pair.Value,
                     LayerInDoc = database.GetLayer(transaction, pair.Value)

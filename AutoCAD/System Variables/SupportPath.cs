@@ -5,7 +5,7 @@ namespace ICA.AutoCAD
 {
     public class SupportPath
     {
-        public static List<string> GetDefault ()
+        public static List<string> GetDefault()
         {
             dynamic application = Application.AcadApplication;
             string path = application.Path;

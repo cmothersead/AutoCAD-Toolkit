@@ -12,7 +12,7 @@ namespace ICA.Schematic
         bool InstallationHidden { get; set; }
         bool PartInfoHidden { get; set; }
         bool RatingHidden { get; set; }
-        
+
         void UpdateTag(string format = null);
     }
 }

@@ -30,7 +30,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Controls
         public bool IsChecked
         {
             get => _isChecked;
-            set 
+            set
             {
                 _isChecked = value;
                 OnPropertyChanged(nameof(IsChecked));

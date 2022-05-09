@@ -13,6 +13,8 @@ namespace ICA.AutoCAD.Adapter
         public string FileNameFormat = "%PPG%S";
         [XmlArrayItem("Family")]
         public List<FamilyCode> FamilyCodes { get; set; }
+        [XmlArrayItem("Attribute")]
+        public List<TBAttribute> TitleBlockAttributes { get; set; }
         public LadderSettings Ladder { get; set; } = new LadderSettings();
         public ComponentSettings Component { get; set; } = new ComponentSettings();
         public WireSettings Wire { get; set; } = new WireSettings();

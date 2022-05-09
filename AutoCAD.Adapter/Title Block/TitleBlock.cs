@@ -5,17 +5,20 @@ using ICA.AutoCAD.Adapter.Windows.Models;
 using ICA.AutoCAD.Adapter.Windows.ViewModels;
 using ICA.AutoCAD.Adapter.Windows.Views;
 using ICA.AutoCAD.IO;
+using ICA.Schematic;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ICA.AutoCAD.Adapter
 {
-    public class TitleBlock
+    public class TitleBlock : ITitleBlock
     {
         #region Private Members
 
@@ -38,14 +41,27 @@ namespace ICA.AutoCAD.Adapter
         public bool IsLoaded => _blockTableRecord != null;
         public ObjectId ObjectId => _blockTableRecord.ObjectId;
         public Database Database => _blockTableRecord.Database;
-        public List<Attribute> Attributes
+        private Drawing _drawing;
+        public Drawing Drawing
+        {
+            get
+            {
+                if (_drawing != null)
+                    return _drawing;
+
+                _drawing = Database?.GetDrawing();
+                return _drawing;
+            }
+        }
+        public List<ITBAttribute> Attributes
         {
             get => Reference?.GetAttributeReferences()
-                             .Select(attRef => new Attribute() { Tag = attRef.Tag, Value = attRef.TextString })
+                             .Select(attRef => new TBAttribute() { Tag = attRef.Tag, Value = attRef.TextString })
+                             .Cast<ITBAttribute>()
                              .ToList();
-            set => Reference?.SetAttributeValues(value.ToDictionary(att => att.Tag, att => att.Value));
+            set => Reference?.SetAttributeValues(value.ToDictionary(att => att.Tag, att => GetPropertyValue(att.Value, Drawing)?.ToUpper() ?? att.Value));
         }
-            
+
         public bool IsInserted => _blockTableRecord.GetBlockReferenceIds(true, false).Count != 0;
         public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
         public bool Spare
@@ -284,26 +300,27 @@ namespace ICA.AutoCAD.Adapter
             return "No error.";
         }
 
-        #endregion
-
-        #region Public Structs
-        public struct Attribute
+        public static string GetPropertyValue(string name, object propertyObject)
         {
-            [XmlAttribute]
-            public string Tag;
-            [XmlAttribute]
-            public string Value;
+            if (!name.StartsWith("$"))
+                return name;
 
-            public override int GetHashCode() => base.GetHashCode();
-
-            public override bool Equals(object obj)
+            PropertyInfo currentProperty;
+            Regex propertyRegex = new Regex(@"(?<!\[)\w+(?!\])"); //Word characters NOT wrapped in square braces
+            Regex indexRegex = new Regex(@"(?<=\[)\d+(?=\])");    //Number characters wrapped in square braces
+            foreach (Match match in propertyRegex.Matches(name))
             {
-                if(obj.GetType() != typeof(Attribute))
-                    return false;
+                currentProperty = propertyObject.GetType().GetProperty(match.Value);
+                if (currentProperty is null)
+                    return null;
 
-                return ((Attribute)obj).Tag == Tag;
+                propertyObject = currentProperty.GetValue(propertyObject);
             }
+            if (int.TryParse(indexRegex.Match(name).Value, out int index) && propertyObject is IList list)
+                propertyObject = list[index];
+            return propertyObject?.ToString();
         }
+
         #endregion
 
     }

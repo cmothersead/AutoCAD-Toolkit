@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ICA.Schematic.Data
@@ -32,7 +29,7 @@ namespace ICA.Schematic.Data
                 if (response.IsSuccessStatusCode)
                 {
                     var manufacturers = await response.Content.ReadAsAsync<ObservableCollection<Manufacturer>>();
-                    foreach(var manufacturer in manufacturers)
+                    foreach (var manufacturer in manufacturers)
                     {
                         manufacturer.Name = manufacturer.Name.ToUpper();
                     }

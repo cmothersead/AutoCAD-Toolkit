@@ -154,7 +154,7 @@ namespace ICA.AutoCAD.IO
                     name = $"{name}.dwg";
                 return GetFiles(Paths.PanelLibrary, name).FirstOrDefault();
             }
-            catch(IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 return null;
             }

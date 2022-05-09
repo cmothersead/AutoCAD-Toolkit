@@ -5,7 +5,6 @@ using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.IO;
 using ICA.Schematic;
 using System;
-using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {

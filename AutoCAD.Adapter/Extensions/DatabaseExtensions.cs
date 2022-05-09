@@ -88,7 +88,7 @@ namespace ICA.AutoCAD.Adapter
         public static List<ParentSymbol> GetParentSymbols(this Database database, Transaction transaction)
         {
             List<ParentSymbol> parents = new List<ParentSymbol>();
-            foreach(var entry in database.GetNamedDictionary(transaction, "Parents"))
+            foreach (var entry in database.GetNamedDictionary(transaction, "Parents"))
                 parents.Add(new ParentSymbol(entry.Value.Open(transaction) as BlockReference));
             return parents;
         }
@@ -128,7 +128,7 @@ namespace ICA.AutoCAD.Adapter
             if (!database.HasLayer(ElectricalLayers.LadderLayer))
                 return false;
 
-            using(Transaction transaction = database.TransactionManager.StartTransaction())
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 LayerTableRecord ladderLayer = database.GetLayer(transaction, ElectricalLayers.LadderLayer);
                 if (ladderLayer.GetEntities(transaction).Count != 0)
@@ -153,7 +153,7 @@ namespace ICA.AutoCAD.Adapter
                                                    .OrderByDescending(x => x)
                                                    .ToList();
 
-            foreach(double xPosition in ladderPositions)
+            foreach (double xPosition in ladderPositions)
             {
                 List<Entity> rails = entities.OfType<Line>()
                                              .Where(line => line.StartPoint.X >= xPosition)
@@ -175,6 +175,8 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         #region Project
+
+        public static Drawing GetDrawing(this Database database) => new Drawing() { Name = Path.GetFileNameWithoutExtension(database.OriginalFileName), Project = database.GetProject() };
 
         public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
 

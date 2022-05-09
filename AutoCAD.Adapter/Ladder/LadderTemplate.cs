@@ -49,7 +49,7 @@ namespace ICA.AutoCAD.Adapter
 
                 if (PhaseCount != 3)
                     width = (TotalWidth - Gap) / 2;
-                
+
                 Ladder firstLadder = new Ladder(Database,
                                                 Origin,
                                                 Height,

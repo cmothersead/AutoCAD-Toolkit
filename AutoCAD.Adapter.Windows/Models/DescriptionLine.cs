@@ -14,7 +14,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Models
             get => _value;
             set
             {
-               if(string.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                 {
                     Emptied?.Invoke(this, new EventArgs());
                     return;

@@ -174,7 +174,7 @@ namespace ICA.AutoCAD.Adapter
                                    .OrderBy(linenumber => linenumber.GetAttributeValue("LINENUMBER"))
                                    .ToList();
 
-            if(_lineNumbers.Select(lineNumber => lineNumber.Position.X).Distinct().Count() != 1)
+            if (_lineNumbers.Select(lineNumber => lineNumber.Position.X).Distinct().Count() != 1)
                 throw new ArgumentException("Ladder line numbers misaligned (possibly two ladders joined)");
 
             Origin = _rails.First().StartPoint.ToPoint2D();
@@ -284,7 +284,7 @@ namespace ICA.AutoCAD.Adapter
             if (ladders == null)
                 return null;
 
-            foreach(Ladder ladder in ladders.OrderByDescending(ladder => ladder.Origin.X))
+            foreach (Ladder ladder in ladders.OrderByDescending(ladder => ladder.Origin.X))
             {
                 if (position.X < ladder.Origin.X)
                     continue;

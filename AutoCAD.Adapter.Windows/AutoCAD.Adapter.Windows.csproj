@@ -159,6 +159,12 @@
     <Compile Include="Controls\PartControl.xaml.cs">
       <DependentUpon>PartControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PinsControl.xaml.cs">
+      <DependentUpon>PinsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\RatingControl.xaml.cs">
+      <DependentUpon>RatingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TagControl.xaml.cs">
       <DependentUpon>TagControl.xaml</DependentUpon>
     </Compile>
@@ -219,6 +225,14 @@
     <Page Include="Controls\PartControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\PinsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\RatingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\TagControl.xaml">
       <Generator>MSBuild:Compile</Generator>

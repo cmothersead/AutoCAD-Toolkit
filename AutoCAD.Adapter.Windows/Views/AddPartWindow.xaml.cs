@@ -1,6 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using ICA.Schematic.Data;
+using System.Collections.ObjectModel;
 using System.Windows;
-using ICA.Schematic.Data;
 
 namespace ICA.AutoCAD.Adapter.Windows.Views
 {

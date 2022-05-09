@@ -1,15 +1,8 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.Runtime;
+using Autodesk.Electrical.Project;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.OleDb;
-using System.Windows;
-using System.Windows.Forms;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
-using Autodesk.Electrical.Project;
 using System.Linq;
 
 namespace PanelInsert

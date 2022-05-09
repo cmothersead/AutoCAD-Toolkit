@@ -39,10 +39,6 @@ namespace ICA.AutoCAD.Adapter
         public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
                                                      .ToList();
 
-        public List<TitleBlock.Attribute> TitleBlockAttributes { get; set; }
-
-                 
-
         #endregion
 
         #region Private Properties
@@ -57,19 +53,6 @@ namespace ICA.AutoCAD.Adapter
 
         public Project()
         {
-            TitleBlockAttributes = new List<TitleBlock.Attribute>()
-            {
-                new TitleBlock.Attribute { Tag = "DWGNO", Value = "Project.Job.Code" },
-                new TitleBlock.Attribute { Tag = "SHTS", Value = "150" },
-                new TitleBlock.Attribute { Tag = "TITLE1", Value = "Project.Job.Name" },
-                new TitleBlock.Attribute { Tag = "TITLE2", Value = "Description[0]" },
-                new TitleBlock.Attribute { Tag = "SHT", Value = "PageNumber" },
-                new TitleBlock.Attribute { Tag = "CUST", Value = "Project.Job.Customer.Name" },
-                new TitleBlock.Attribute { Tag = "NAME", Value = "CM" },
-                new TitleBlock.Attribute { Tag = "CBN", Value = "CM" },
-                new TitleBlock.Attribute { Tag = "ABN", Value = "GB" },
-                new TitleBlock.Attribute { Tag = "DATE", Value = "12-09-21" }
-            };
         }
 
         #endregion
@@ -107,13 +90,13 @@ namespace ICA.AutoCAD.Adapter
 
         public void RunOnAllDrawings(Action<Drawing> action)
         {
-            foreach(Drawing drawing in Drawings)
+            foreach (Drawing drawing in Drawings)
             {
                 if (Application.DocumentManager.Contains(drawing.FileUri))
                 {
                     Document doc = Application.DocumentManager.Get(drawing.FullPath);
                     Document activeDoc = Application.DocumentManager.MdiActiveDocument;
-                    
+
                     Application.DocumentManager.MdiActiveDocument = doc;
 
                     using (DocumentLock docLock = doc.LockDocument())
@@ -218,10 +201,10 @@ namespace ICA.AutoCAD.Adapter
             Project project = reader.Deserialize(file) as Project;
             file.Close();
             project.DirectoryUri = new Uri(directoryPath);
-            project.Drawings.ForEach(drawing => 
+            project.Drawings.ForEach(drawing =>
             {
                 drawing.Project = project;
-                drawing.TitleBlockAttributes = project.TitleBlockAttributes;
+                drawing.TitleBlockAttributes = project.Settings.TitleBlockAttributes;
             });
             return project;
         }
