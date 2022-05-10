@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,6 +42,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -50,9 +52,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AutoCAD.Adapter.Windows\AutoCAD.Adapter.Windows.csproj">
+      <Project>{88A9421B-73D7-4CF8-8916-1C9046EE0E88}</Project>
+      <Name>AutoCAD.Adapter.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoCAD.Adapter\AutoCAD.Adapter.csproj">
+      <Project>{E318C1C8-25FE-4EA0-B2FC-D9B3D27C24CE}</Project>
+      <Name>AutoCAD.Adapter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AutoCAD.IO\AutoCAD.IO.csproj">
       <Project>{68d45fa7-fbb1-4754-a8a6-0b2a56084e0e}</Project>
       <Name>AutoCAD.IO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Schematic\Schematic.csproj">
+      <Project>{62E2152A-0316-4966-BA17-08D846223FD3}</Project>
+      <Name>Schematic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

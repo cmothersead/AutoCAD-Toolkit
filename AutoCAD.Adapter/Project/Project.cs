@@ -33,6 +33,9 @@ namespace ICA.AutoCAD.Adapter
         public Uri FileUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
         public string Name => $"{Job}";
 
+        [XmlIgnore]
+        public int SheetCount => Drawings.Count();
+
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
 
         [XmlIgnore]

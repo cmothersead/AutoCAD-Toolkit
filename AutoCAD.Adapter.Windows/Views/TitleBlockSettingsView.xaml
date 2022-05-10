@@ -19,8 +19,21 @@
         </Grid.RowDefinitions>
         <DataGrid Grid.Row="1" ItemsSource="{Binding Attributes}" AutoGenerateColumns="False" Margin="10px 10px 10px 0px">
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="Attribute" Header="Attribute" Binding="{Binding Tag}" Width="Auto" IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="Value" Header="Value" Binding="{Binding Value}"  Width="*"/>
+                <DataGridTextColumn x:Name="Attribute" Header="Attribute" Binding="{Binding Tag}" Width="Auto" IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn x:Name="Value" Header="Value" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <controls:TitleBlockPropertyControl Margin="2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <controls:OkCancelControl Grid.Row="2" x:Name="OkCancelControl" OkCommand="{Binding OKCommand}"/>

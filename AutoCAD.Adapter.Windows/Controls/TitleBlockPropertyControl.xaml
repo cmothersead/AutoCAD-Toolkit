@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="ICA.AutoCAD.Adapter.Windows.Controls.TitleBlockPropertyControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
+             mc:Ignorable="d">
+    <StackPanel Orientation="Horizontal">
+        <Menu x:Name="Menu" MenuItem.Click="Menu_Click">
+            <MenuItem Name="MainItem" Header="Properties" Width="100" Height="30" BorderBrush="Black">
+                <MenuItem Header="Customer">
+                    <MenuItem Header="Customer ID#" Name="Project_Customer_Id"/>
+                    <MenuItem Header="Customer Name" Name="Project_Customer_Name"/>
+                </MenuItem>
+                <MenuItem Header="Project">
+                    <MenuItem Header="Project Code" Name="Project_Job_Code"/>
+                    <MenuItem Header="Project Name" Name="Project_Job_Name"/>
+                    <MenuItem Header="Project Description">
+                        <MenuItem Header="Project Line 1 - 'Test1'" Name="Project_Description0"/>
+                        <MenuItem Header="Project Line 2 - 'Test2'" Name="Project_Description1"/>
+                        <MenuItem Header="Project Line 3 - 'Test3'" Name="Project_Description2"/>
+                    </MenuItem>
+                    <MenuItem Header="Sheet Count" Name="Project_SheetCount"/>
+                </MenuItem>
+                <MenuItem Header="Document">
+                    <MenuItem Header="Page Number" Name="PageNumber"/>
+                    <MenuItem Header="Description">
+                        <MenuItem Header="Drawing Line 1" Name="Description0"/>
+                        <MenuItem Header="Drawing Line 2" Name="Description1"/>
+                        <MenuItem Header="Drawing Line 3" Name="Description2"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Custom Value" Name="Custom"/>
+            </MenuItem>
+        </Menu>
+        <TextBox Name="CustomTextBox" Visibility="Collapsed" Width="200" Padding="5" Margin="5,0,0,0" VerticalAlignment="Center"/>
+    </StackPanel>
+</UserControl>
