@@ -195,9 +195,6 @@
     <Compile Include="Views\ComponentEditView.xaml.cs">
       <DependentUpon>ComponentEditView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TestView.xaml.cs">
-      <DependentUpon>TestView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\TitleBlockSettingsView.xaml.cs">
       <DependentUpon>TitleBlockSettingsView.xaml</DependentUpon>
     </Compile>
@@ -308,10 +305,6 @@
     <Compile Include="Views\ParentSymbolEditView.xaml.cs">
       <DependentUpon>ParentSymbolEditView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\TestView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\TitleBlockSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

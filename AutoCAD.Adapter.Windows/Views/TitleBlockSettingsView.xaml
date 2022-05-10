@@ -27,7 +27,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTemplateColumn x:Name="Value" Header="Value" Width="*">
+                <DataGridTemplateColumn x:Name="Value" Header="Value" Width="*" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <controls:TitleBlockPropertyControl Margin="2"/>
