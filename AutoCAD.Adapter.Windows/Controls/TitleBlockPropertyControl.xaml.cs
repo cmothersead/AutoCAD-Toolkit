@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,45 +22,69 @@ namespace ICA.AutoCAD.Adapter.Windows.Controls
     /// </summary>
     public partial class TitleBlockPropertyControl : UserControl
     {
-        public TitleBlockPropertyControl()
-        {
-            InitializeComponent();
-        }
 
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register(
                 nameof(Value),
                 typeof(string),
-                typeof(TitleBlockPropertyControl));
+                typeof(TitleBlockPropertyControl),
+                new FrameworkPropertyMetadata(default(string),
+                                              FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                                              ValueChangedCallback));
         public string Value
         {
             get => (string)GetValue(ValueProperty);
-            set
-            {
-                SetValue(ValueProperty, value);
-                string name = value.Replace('.', '_')
-                                   .Replace("[", string.Empty)
-                                   .Replace("]", string.Empty)
-                                   .Replace("$", string.Empty);
-                MenuItem selected = FindName(name) as MenuItem;
-                if (selected != null)
-                {
-                    MenuItem main = FindName("MainItem") as MenuItem;
-                    main.Header = selected.Header;
-                }
+            set => SetValue(ValueProperty, value);
+        }
 
-                TextBox custom = FindName("CustomTextBox") as TextBox;
-                if (name == "Custom")
-                    custom.Visibility = Visibility.Visible;
-                else
-                    custom.Visibility = Visibility.Collapsed;
-            }
+        public TitleBlockPropertyControl()
+        {
+            InitializeComponent();
         }
 
         private void Menu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem selected = e.Source as MenuItem;
-            Value = $"${Regex.Replace(selected.Name.Replace('_', '.'), @"(\d)\b", @"[$1]")}";
+            if(selected.Name != "Custom")
+            {
+                Value = $"${Regex.Replace(selected.Name.Replace('_', '.'), @"(\d)\b", @"[$1]")}";
+                return;
+            }
+
+            TextBox custom = FindName("CustomTextBox") as TextBox;
+            Value = custom.Text;
+        }
+
+        private void CustomTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox custom = FindName("CustomTextBox") as TextBox;
+            Value = custom.Text;
+        }
+
+        private static void ValueChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            TitleBlockPropertyControl sender = (TitleBlockPropertyControl)dependencyObject;
+            string name = sender.Value.Replace('.', '_')
+                                      .Replace("[", string.Empty)
+                                      .Replace("]", string.Empty)
+                                      .Replace("$", string.Empty);
+
+            if (!(sender.FindName(name) is MenuItem selected))
+                selected = sender.FindName("Custom") as MenuItem;
+            
+            MenuItem main = sender.FindName("MainItem") as MenuItem;
+            TextBox custom = sender.FindName("CustomTextBox") as TextBox;
+
+            main.Header = selected.Header;
+
+            if (selected.Name == "Custom")
+            {
+                custom.Visibility = Visibility.Visible;
+                custom.Text = sender.Value;
+                return;
+            }
+
+            custom.Visibility = Visibility.Collapsed;
         }
     }
 }

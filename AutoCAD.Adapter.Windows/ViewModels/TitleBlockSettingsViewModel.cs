@@ -40,7 +40,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         private void UpdateAndClose()
         {
             _titleBlock.Attributes = Attributes.ToList();
-            _view.DialogResult = true;
+            //_view.DialogResult = true;
             _view.Close();
         }
 

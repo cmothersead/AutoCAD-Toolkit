@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
              mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TitleBlockPropertyControl}}">
         <Menu x:Name="Menu" MenuItem.Click="Menu_Click">
             <MenuItem Name="MainItem" Header="Properties" Width="100" Height="30" BorderBrush="Black">
                 <MenuItem Header="Customer">
@@ -33,6 +33,6 @@
                 <MenuItem Header="Custom Value" Name="Custom"/>
             </MenuItem>
         </Menu>
-        <TextBox Name="CustomTextBox" Visibility="Collapsed" Width="200" Padding="5" Margin="5,0,0,0" VerticalAlignment="Center"/>
+        <TextBox Name="CustomTextBox" Visibility="Collapsed" Width="200" Padding="5" Margin="5,0,0,0" VerticalAlignment="Center" TextChanged="CustomTextBox_TextChanged"/>
     </StackPanel>
 </UserControl>

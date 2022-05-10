@@ -7,7 +7,7 @@
         xmlns:controls="clr-namespace:ICA.AutoCAD.Adapter.Windows.Controls"
         xmlns:vm="clr-namespace:ICA.AutoCAD.Adapter.Windows.ViewModels" d:DataContext="{d:DesignInstance Type=vm:TitleBlockSettingsViewModel}"
         mc:Ignorable="d"
-        Title="Settings" d:Height="450" d:Width="600">
+        Title="Settings" Height="450" Width="420">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -17,7 +17,8 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Attributes}" AutoGenerateColumns="False" Margin="10px 10px 10px 0px">
+        <TextBlock Text="Set Title Block Properties" Grid.Row="0" Margin="10 10 10 0"/>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Attributes}" AutoGenerateColumns="False" Margin="10 5 10 0">
             <DataGrid.Columns>
                 <DataGridTextColumn x:Name="Attribute" Header="Attribute" Binding="{Binding Tag}" Width="Auto" IsReadOnly="True">
                     <DataGridTextColumn.ElementStyle>
@@ -30,11 +31,26 @@
                 <DataGridTemplateColumn x:Name="Value" Header="Value" Width="*" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <controls:TitleBlockPropertyControl Margin="2"/>
+                            <controls:TitleBlockPropertyControl Margin="2" Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
+            <DataGrid.Resources>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="Background" Value="{x:Null}"/>
+                        <Setter Property="BorderBrush" Value="{x:Null}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{x:Null}"/>
+                                <Setter Property="BorderBrush" Value="{x:Null}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ResourceDictionary>
+            </DataGrid.Resources>
         </DataGrid>
         <controls:OkCancelControl Grid.Row="2" x:Name="OkCancelControl" OkCommand="{Binding OKCommand}"/>
     </Grid>
