@@ -124,7 +124,7 @@ namespace ICA.AutoCAD.Adapter
         public bool RatingHidden
         {
             get => RatingAttribute != null && RatingAttribute.Invisible;
-            set => RatingAttribute.SetVisibility(!value);
+            set => RatingAttribute?.SetVisibility(!value);
         }
 
         public int Index
