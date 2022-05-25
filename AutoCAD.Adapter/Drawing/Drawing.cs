@@ -67,11 +67,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [XmlAttribute]
-        public string PageNumber
-        {
-            get => Database?.GetSheetNumber();
-            set => Database?.SetSheetNumber(value);
-        }
+        public string PageNumber { get; set; }
 
         [XmlAttribute, DefaultValue(false)]
         public bool Spare { get; set; }
@@ -90,7 +86,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Constructor
 
-        public Drawing() { }
+        public Drawing() {}
 
         public Drawing(string name)
         {
@@ -110,6 +106,12 @@ namespace ICA.AutoCAD.Adapter
             titleBlock.Attributes = TitleBlockAttributes.Cast<ITBAttribute>()
                                                         .ToList();
 
+            Save();
+        }
+
+        public void UpdatePageNumber()
+        {
+            Database.SetSheetNumber(PageNumber);
             Save();
         }
 

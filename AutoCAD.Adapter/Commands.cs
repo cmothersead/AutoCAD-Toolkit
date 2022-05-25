@@ -189,6 +189,9 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("INSERTCOMPONENT")]
         public static void InsertSymbol() => InsertSymbol(Symbol.PromptSymbolName(Editor));
 
+        [CommandMethod("DROP")]
+        public static void DropPower() => InsertSymbol("WD_DROP");
+
         public static void InsertSymbol(string symbolName)
         {
             Symbol symbol = SchematicSymbolRecord.GetRecord(CurrentDatabase, symbolName)?.InsertSymbol(CurrentDocument) as Symbol;
@@ -276,7 +279,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("COMPONENTS")]
         public static void Components()
         {
-            OpenFileDialog test = new OpenFileDialog("Load Project File", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
+            OpenFileDialog test = new OpenFileDialog("Select Project Folder", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
             test.ShowDialog();
             if (test.Filename != "")
             {
@@ -327,6 +330,24 @@ namespace ICA.AutoCAD.Adapter
         {
             CurrentDocument.CloseAndSave(CurrentDocument.Name);
             Application.DocumentManager.Open(changeTo.FullPath, false);
+        }
+
+        [CommandMethod("PAGENUMBERS")]
+        public static void PageNumbers()
+        {
+            CurrentProject.RunOnAllDrawings(drawing => drawing.UpdatePageNumber());
+        }
+
+        [CommandMethod("PAGENUMBER")]
+        public static void PageNumber()
+        {
+            Drawing drawing = new Drawing()
+            {
+                Name = Path.GetFileNameWithoutExtension(CurrentDocument.Name),
+                Project = CurrentProject,
+                TitleBlockAttributes = CurrentProject.Settings.TitleBlockAttributes
+            };
+            drawing.UpdatePageNumber();
         }
 
         #endregion

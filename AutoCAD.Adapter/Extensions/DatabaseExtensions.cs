@@ -176,7 +176,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Drawing GetDrawing(this Database database) => new Drawing() { Name = Path.GetFileNameWithoutExtension(database.OriginalFileName), Project = database.GetProject() };
+        public static Drawing GetDrawing(this Database database) => new Drawing() { Name = Path.GetFileNameWithoutExtension(database.OriginalFileName), Project = database.GetProject(), PageNumber = database.GetSheetNumber()};
 
         public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
 

@@ -206,6 +206,7 @@ namespace ICA.AutoCAD.Adapter
             project.DirectoryUri = new Uri(directoryPath);
             project.Drawings.ForEach(drawing =>
             {
+                drawing.Name = drawing.Name ?? $"{project.Job.Code}PG{int.Parse(drawing.PageNumber):D2}";
                 drawing.Project = project;
                 drawing.TitleBlockAttributes = project.Settings.TitleBlockAttributes;
             });
