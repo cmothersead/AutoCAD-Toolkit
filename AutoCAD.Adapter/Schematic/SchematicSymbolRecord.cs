@@ -51,7 +51,7 @@ namespace ICA.AutoCAD.Adapter
 
             Symbol symbol = GetSymbol(blockReference, document.Editor) as Symbol;
 
-            symbol.Insert(transaction, Database);
+            symbol?.Insert(transaction, Database);
 
             if (SymbolJig.Run(document, symbol) != PromptStatus.OK)
                 return null;

@@ -174,7 +174,7 @@ namespace ICA.AutoCAD.Adapter
         {
             BlockReference = blockReference;
             Stack = new AttributeStack(BlockReference, AttributeLayers);
-            if (Database != null & FamilyAttribute != null)
+            if (Database != null && FamilyAttribute != null)
             {
                 Stack.Position = FamilyAttribute.Justify == AttachmentPoint.BaseLeft ?
                            FamilyAttribute.Position.ToPoint2D() :
