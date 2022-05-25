@@ -328,15 +328,38 @@ namespace ICA.AutoCAD.Adapter
 
         public static void ChangeDrawing(Drawing changeTo)
         {
-            CurrentDocument.CloseAndSave(CurrentDocument.Name);
-            Application.DocumentManager.Open(changeTo.FullPath, false);
+            //CurrentDocument.CloseAndSave(CurrentDocument.Name);
+            if (Application.DocumentManager.Contains(changeTo.FileUri))
+            {
+                Document drawing = Application.DocumentManager.Get(changeTo.FullPath);
+                Application.DocumentManager.MdiActiveDocument = drawing;
+            }
+            else
+            {
+                Application.DocumentManager.Open(changeTo.FullPath, false);
+            }
+        }
+
+        [CommandMethod("GOTODRAWING", CommandFlags.Session)]
+        public static void GoToDrawing()
+        {
+            PromptResult result = Editor.GetString("Sheet Number:");
+
+            if (result.Status != PromptStatus.OK)
+                return;
+
+            if (!int.TryParse(result.StringResult, out int sheetNumber))
+                return;
+
+            if (CurrentProject.Drawings.Count < sheetNumber)
+                return;
+
+
+            ChangeDrawing(CurrentProject.Drawings[sheetNumber-1]);
         }
 
         [CommandMethod("PAGENUMBERS")]
-        public static void PageNumbers()
-        {
-            CurrentProject.RunOnAllDrawings(drawing => drawing.UpdatePageNumber());
-        }
+        public static void PageNumbers() => CurrentProject.RunOnAllDrawings(drawing => drawing.UpdatePageNumber());
 
         [CommandMethod("PAGENUMBER")]
         public static void PageNumber()
@@ -455,7 +478,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Multiplexers
 
-        [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet | CommandFlags.Redraw)]
+        [CommandMethod("BLOCKEDIT", CommandFlags.UsePickSet | CommandFlags.Redraw | CommandFlags.Session)]
         public static void AttributeBlockEdit()
         {
             try
@@ -472,6 +495,9 @@ namespace ICA.AutoCAD.Adapter
                         break;
                     case "SYMS":
                         EditSymbol(reference);
+                        break;
+                    case "SIGNAL":
+                        FollowSignal(reference);
                         break;
                     default:
                         Editor.SetImpliedSelection(new ObjectId[1] { reference.ObjectId });
@@ -533,6 +559,13 @@ namespace ICA.AutoCAD.Adapter
             //snap signal to nearest wire end as jig...
 
             //then insert
+        }
+
+        public static void FollowSignal(BlockReference reference)
+        {
+            SignalSymbol signal = new SignalSymbol(reference);
+            if (int.TryParse(signal.XrefSheet, out int sheet))
+                ChangeDrawing(CurrentProject.Drawings[sheet - 1]);
         }
 
         [CommandMethod("TOGGLEOVERRULES")]

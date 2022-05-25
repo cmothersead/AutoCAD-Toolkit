@@ -1,6 +1,7 @@
 ﻿using ICA.AutoCAD.Adapter.Windows.Models;
 using ICA.Schematic;
 using ICA.Schematic.Data;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -40,6 +41,7 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
         public bool PartInfoHidden { get; set; }
         public string Rating { get; set; }
         public bool RatingHidden { get; set; }
+        public List<string> Pins { get; set; }
 
         public CharacterCasing CharacterCasing { get; set; } = CharacterCasing.Upper;
 

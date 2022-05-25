@@ -10,8 +10,8 @@ namespace ICA.AutoCAD
                                                                                               .Where(document => document.IsNamedDrawing)
                                                                                               .Any(document => document.Name == uri.LocalPath);
 
-        public static Document Get(this DocumentCollection collection, string name) => collection.Cast<Document>()
+        public static Document Get(this DocumentCollection collection, string fullPath) => collection.Cast<Document>()
                                                                                                  .Where(document => document.IsNamedDrawing)
-                                                                                                 .FirstOrDefault(document => document.Name == name);
+                                                                                                 .FirstOrDefault(document => document.Name == fullPath);
     }
 }
