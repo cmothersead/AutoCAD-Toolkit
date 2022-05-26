@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,21 +25,21 @@ namespace ICA.AutoCAD.Adapter
 
         #region Public Properties
 
-        [XmlIgnore]
+        [JsonIgnore, XmlIgnore]
         public Uri DirectoryUri { get; set; }
         public Job Job { get; set; }
         public List<Drawing> Drawings { get; set; } = new List<Drawing>();
-
-        [XmlIgnore]
+        [JsonIgnore, XmlIgnore]
         public Uri FileUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
+        [JsonIgnore, XmlIgnore]
+        public Uri JsonUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.aeproj");
+        [JsonIgnore, XmlIgnore]
         public string Name => $"{Job}";
-
-        [XmlIgnore]
+        [JsonIgnore, XmlIgnore]
         public int SheetCount => Drawings.Count();
 
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
-
-        [XmlIgnore]
+        [JsonIgnore, XmlIgnore]
         public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
                                                      .ToList();
 
@@ -129,6 +130,15 @@ namespace ICA.AutoCAD.Adapter
             writer.Serialize(file, this, ns);
             file.Close();
             File.SetAttributes(file.Name, File.GetAttributes(file.Name) | FileAttributes.Hidden);
+        }
+
+        public void SaveAsJSON()
+        {
+            string jsonString = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            {
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+            });
+            File.WriteAllText(JsonUri.LocalPath, jsonString);
         }
 
         public void Export() => WDP.Export(this, Path.ChangeExtension(FileUri.LocalPath, ".wdp"));

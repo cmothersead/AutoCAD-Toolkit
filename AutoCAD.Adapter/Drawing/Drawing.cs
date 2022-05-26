@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using ICA.Schematic;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,15 +48,18 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         #region Public Properties
-
+        [JsonIgnore]
         [XmlIgnore]
         public Uri FileUri => new Uri(Project.FileUri, $"{Name}.dwg");
+        [JsonIgnore]
         [XmlIgnore]
         public Project Project { get; set; }
+        [JsonIgnore]
         public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
+        [JsonIgnore]
         [XmlIgnore]
         public List<TBAttribute> TitleBlockAttributes { get; set; }
-
+        [JsonProperty]
         [XmlAttribute]
         public string Name { get; set; }
         public bool ShouldSerializeName() => Name != $"{Project.Job.Code}PG{int.Parse(PageNumber):D2}";
@@ -67,17 +71,18 @@ namespace ICA.AutoCAD.Adapter
         }
         public bool ShouldSerializeDescription()
         {
-            if (Description[0] == "SPARE SHEET")
+            if(Description.Count == 0)
                 return false;
 
-            return Description.Count > 0;
+            return Description[0] != "SPARE SHEET";
         }
-
+        [JsonProperty]
         [XmlAttribute]
         public string PageNumber { get; set; }
 
         private bool _spare;
-        [XmlAttribute, DefaultValue(false)]
+        [JsonProperty, DefaultValue(false)]
+        [XmlAttribute]
         public bool Spare 
         { 
             get => _spare;
@@ -87,10 +92,10 @@ namespace ICA.AutoCAD.Adapter
                 Description = new List<string> { "SPARE SHEET" };
             }
         }
-
+        [JsonIgnore]
         [XmlIgnore]
         public DrawingSettings Settings { get; set; }
-
+        [JsonIgnore]
         [XmlIgnore]
         public List<Component> Components => Database.GetParentSymbols()
                                                      .Select(symbol => new Component(symbol))
