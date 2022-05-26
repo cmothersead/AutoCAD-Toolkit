@@ -89,7 +89,7 @@ namespace ICA.AutoCAD.Adapter
             set => FamilyAttribute?.SetValue(value);
         }
 
-        public string FamilyView => Project?.Settings.FamilyCodes?.SingleOrDefault(family => family.Replace == Family)?.Code ?? Family;
+        public string FamilyView => Project?.Settings.FamilyCodes?.SingleOrDefault(family => family.Replace == Family)?.With ?? Family;
 
         public string Tag
         {

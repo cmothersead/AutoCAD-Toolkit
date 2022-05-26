@@ -10,8 +10,8 @@ namespace ICA.AutoCAD.Adapter
 
         [XmlAttribute]
         public string Replace { get; set; }
-        [XmlText]
-        public string Code { get; set; }
+        [XmlAttribute]
+        public string With { get; set; }
 
         #endregion
 

@@ -470,8 +470,34 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("SPARE")]
         public static void SpareSheet()
         {
-            CurrentDatabase.GetTitleBlock().Spare ^= true;
+            Drawing drawing = CurrentDatabase.GetDrawing();
+            TitleBlock titleBlock = CurrentDatabase.GetTitleBlock();
+            titleBlock.Spare ^= true;
+            if (titleBlock.Spare)
+                drawing.Spare = true;
+
+            drawing.UpdateTitleBlock();
             Editor.Regen();
+        }
+
+        [CommandMethod("DESCRIPTION")]
+        public static void SetDrawingDescription()
+        {
+            PromptStringOptions options = new PromptStringOptions("Value:")
+            {
+                AllowSpaces = true,
+            };
+            PromptResult result = Editor.GetString(options);
+
+            if (result.Status != PromptStatus.OK)
+                return;
+
+            Drawing drawing = CurrentDocument.Database.GetDrawing();
+
+            drawing.Description = new List<string> { result.StringResult };
+
+            drawing.UpdateTitleBlock();
+            drawing.Save();
         }
 
         #endregion

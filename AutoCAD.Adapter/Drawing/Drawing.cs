@@ -58,19 +58,35 @@ namespace ICA.AutoCAD.Adapter
 
         [XmlAttribute]
         public string Name { get; set; }
-
-        [XmlIgnore]
+        public bool ShouldSerializeName() => Name != $"{Project.Job.Code}PG{int.Parse(PageNumber):D2}";
+        [XmlArrayItem("Value")]
         public List<string> Description
         {
             get => Database?.GetDescription();
             set => Database?.SetDescription(value);
         }
+        public bool ShouldSerializeDescription()
+        {
+            if (Description[0] == "SPARE SHEET")
+                return false;
+
+            return Description.Count > 0;
+        }
 
         [XmlAttribute]
         public string PageNumber { get; set; }
 
+        private bool _spare;
         [XmlAttribute, DefaultValue(false)]
-        public bool Spare { get; set; }
+        public bool Spare 
+        { 
+            get => _spare;
+            set
+            {
+                _spare = value;
+                Description = new List<string> { "SPARE SHEET" };
+            }
+        }
 
         [XmlIgnore]
         public DrawingSettings Settings { get; set; }

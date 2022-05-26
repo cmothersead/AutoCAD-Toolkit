@@ -7,7 +7,7 @@ namespace ICA.AutoCAD.Adapter
     {
         [XmlAttribute]
         public string Tag { get; set; }
-        [XmlText]
+        [XmlAttribute]
         public string Value { get; set; }
 
         public override int GetHashCode() => base.GetHashCode();

@@ -41,7 +41,7 @@ namespace ICA.AutoCAD.Adapter
             database.RemoveCustomProperties(descriptions.Select(prop => prop.Key));
             database.SetCustomProperties(values.Select((value, index) => (value, index))
                                                .ToDictionary(item => $"Description {item.index + 1}", item => item.value));
-            database.SaveAs(database.Filename, DwgVersion.Current);
+            database.SaveFile();
         }
 
         public static void AddRegApp(this Database database, Transaction transaction)
@@ -176,7 +176,17 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Drawing GetDrawing(this Database database) => new Drawing() { Name = Path.GetFileNameWithoutExtension(database.OriginalFileName), Project = database.GetProject(), PageNumber = database.GetSheetNumber()};
+        public static Drawing GetDrawing(this Database database)
+        {
+            Project project = database.GetProject();
+            return new Drawing()
+            {
+                Name = Path.GetFileNameWithoutExtension(database.OriginalFileName),
+                Project = project,
+                PageNumber = database.GetSheetNumber(),
+                TitleBlockAttributes = project.Settings.TitleBlockAttributes,
+            };
+        }
 
         public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
 

@@ -316,7 +316,7 @@ namespace ICA.AutoCAD.Adapter
 
                 propertyObject = currentProperty.GetValue(propertyObject);
             }
-            if (int.TryParse(indexRegex.Match(name).Value, out int index) && propertyObject is IList list)
+            if (int.TryParse(indexRegex.Match(name).Value, out int index) && propertyObject is IList list && list.Count > index)
                 propertyObject = list[index];
             return propertyObject?.ToString();
         }
