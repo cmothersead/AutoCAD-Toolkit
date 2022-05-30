@@ -526,7 +526,8 @@ namespace ICA.AutoCAD.Adapter
                         TitleBlockSettings();
                         break;
                     case "SYMS":
-                        EditSymbol(reference);
+                        using (DocumentLock docLock = CurrentDocument.LockDocument())
+                            EditSymbol(reference);
                         break;
                     case "SIGNAL":
                         FollowSignal(reference);
