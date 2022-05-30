@@ -202,7 +202,7 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        public static Project Open(string directoryPath)
+        public static Project OpenXML(string directoryPath)
         {
             string filePath = Directory.GetFiles(directoryPath, "*.xml").FirstOrDefault();
 
@@ -220,6 +220,27 @@ namespace ICA.AutoCAD.Adapter
                 drawing.Project = project;
                 drawing.TitleBlockAttributes = project.Settings.TitleBlockAttributes;
             });
+            return project;
+        }
+
+        public static Project OpenJSON(string directoryPath)
+        {
+            string json = Directory.GetFiles(directoryPath, "*.aeproj").FirstOrDefault();
+
+            if (json is null)
+                return null;
+
+            string fileContents = File.ReadAllText(json);
+
+            Project project = JsonConvert.DeserializeObject<Project>(fileContents);
+            project.DirectoryUri = new Uri(directoryPath);
+            project.Drawings.ForEach(drawing =>
+            {
+                drawing.Name = drawing.Name ?? $"{project.Job.Code}PG{int.Parse(drawing.PageNumber):D2}";
+                drawing.Project = project;
+                drawing.TitleBlockAttributes = project.Settings.TitleBlockAttributes;
+            });
+
             return project;
         }
 

@@ -289,7 +289,7 @@ namespace ICA.AutoCAD.Adapter
             test.ShowDialog();
             if (test.Filename != "")
             {
-                using (Project project = Project.Open(test.Filename))
+                using (Project project = Project.OpenXML(test.Filename))
                 {
                     if (project is null)
                         return;

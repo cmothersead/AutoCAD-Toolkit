@@ -188,7 +188,7 @@ namespace ICA.AutoCAD.Adapter
             };
         }
 
-        public static Project GetProject(this Database database) => Project.Open(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
+        public static Project GetProject(this Database database) => Project.OpenJSON(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.OpenXML(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
 
         #endregion
 
