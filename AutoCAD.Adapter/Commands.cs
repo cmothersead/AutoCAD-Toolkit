@@ -264,13 +264,13 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
-        [CommandMethod("SAVEPROJECT")]
+        [CommandMethod("SAVEXML")]
         public static void SaveProject()
         {
             CurrentProject.Save();
         }
 
-        [CommandMethod("SAVEJSON")]
+        [CommandMethod("SAVEPROJECT")]
         public static void SaveProjectJson()
         {
             CurrentProject.SaveAsJSON();
@@ -300,6 +300,16 @@ namespace ICA.AutoCAD.Adapter
                     var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
                 }
             }
+        }
+
+        [CommandMethod("DRAWINGCOMPONENTS")]
+        public static void DrawingComponents()
+        {
+            Drawing currentDrawing = CurrentDatabase.GetDrawing();
+            currentDrawing.LogSymbols();
+            var test2 = new ComponentsListView(currentDrawing.Components.ToList());
+            Application.ShowModalWindow(test2);
+            var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
         }
 
         [CommandMethod("NEXTDRAWING", CommandFlags.Session)]
