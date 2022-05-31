@@ -80,15 +80,24 @@ namespace ICA.AutoCAD.Adapter
         [XmlAttribute]
         public string PageNumber { get; set; }
 
-        private bool _spare;
+        private bool? _spare;
         [JsonProperty, DefaultValue(false)]
         [XmlAttribute]
         public bool Spare 
         { 
-            get => _spare;
+            get
+            {
+                if (_spare != null)
+                    return (bool)_spare;
+
+                _spare = Database.GetTitleBlock().Spare;
+                return (bool)_spare;
+            }
             set
             {
                 _spare = value;
+                if(Database.GetTitleBlock() != null)
+                    Database.GetTitleBlock().Spare = value;
                 Description = new List<string> { "SPARE SHEET" };
             }
         }

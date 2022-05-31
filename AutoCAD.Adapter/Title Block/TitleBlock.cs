@@ -30,7 +30,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Private Properties
 
-        private AttributeDefinition SpareAttribute => _blockTableRecord.GetAttributeDefinitions().First(d => d.Tag == "SPARE");
+        private AttributeDefinition SpareAttribute => _blockTableRecord.GetAttributeDefinitions().FirstOrDefault(d => d.Tag == "SPARE");
 
         #endregion
 
@@ -66,10 +66,10 @@ namespace ICA.AutoCAD.Adapter
         public BlockReference Reference => IsInserted ? _blockTableRecord.GetBlockReferenceIds(true, false)[0].Open() as BlockReference : null;
         public bool Spare
         {
-            get => !SpareAttribute.Invisible;
+            get => !SpareAttribute?.Invisible ?? false;
             set
             {
-                SpareAttribute.SetVisibility(value);
+                SpareAttribute?.SetVisibility(value);
                 Reference.RecordGraphicsModified(true);
             }
         }

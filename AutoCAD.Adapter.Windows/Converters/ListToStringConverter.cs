@@ -13,7 +13,7 @@ namespace ICA.AutoCAD.Adapter.Windows.Converters
             if (targetType != typeof(string))
                 throw new InvalidOperationException("Target must be a string.");
 
-            return string.Join("\n", ((List<string>)value).ToArray());
+            return string.Join(" ", ((List<string>)value).ToArray());
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }

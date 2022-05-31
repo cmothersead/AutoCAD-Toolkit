@@ -324,6 +324,15 @@ namespace ICA.AutoCAD.Adapter
             ChangeDrawing(CurrentProject.Drawings[nextIndex]);
         }
 
+        [CommandMethod("NEXTUSED", CommandFlags.Session)]
+        public static void NextNonSpare()
+        {
+            List<Drawing> nonSpares = CurrentProject.Drawings.Where(drawing => !drawing.Spare)
+                                                             .ToList();
+            int index = nonSpares.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name);
+            ChangeDrawing(nonSpares[index+1]);
+        }
+
         [CommandMethod("PREVIOUSDRAWING", CommandFlags.Session)]
         public static void Previous()
         {

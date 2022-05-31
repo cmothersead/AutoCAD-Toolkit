@@ -35,6 +35,11 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
 
         #region Private Methods
 
+        private void SelectAndEdit()
+        {
+            //((ComponentsListViewModel)_view.DataContext).SelectedComponent.
+        }
+
         private void SelectAndClose()
         {
             _view.DialogResult = true;

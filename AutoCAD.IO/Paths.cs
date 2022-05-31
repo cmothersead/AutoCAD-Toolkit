@@ -22,9 +22,9 @@ namespace ICA.AutoCAD.IO
 
                 List<string> searchDirectories = new List<string>
                 {
-                    Path.GetFullPath($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}//OneDrive - icacontrol.com//Electrical Library"),
-                    Path.GetFullPath($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}//OneDrive - icacontrol.com"),
-                    Path.GetFullPath($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}//icacontrol.com"),
+                    Path.GetFullPath($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}//OneDrive - Industrial Controls & Automation//Electrical Library"),
+                    Path.GetFullPath($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}//OneDrive - Industrial Controls & Automation"),
+                    Path.GetFullPath($"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}//Industrial Controls & Automation"),
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     @"C:\",
                 };
