@@ -604,10 +604,10 @@ namespace ICA.AutoCAD.Adapter
 
             Point3d point = result.Value;
             var entity = CurrentDatabase.GetEntities()
-                                                 .OfType<Line>()
-                                                 .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
-                                                 .Select(line => new { Line = line, Dist = line.GetClosestPointTo(point, false).DistanceTo(point) })
-                                                 .Aggregate((l1, l2) => l1.Dist < l2.Dist ? l1 : l2);
+                                        .OfType<Line>()
+                                        .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
+                                        .Select(line => new { Line = line, Dist = line.GetClosestPointTo(point, false).DistanceTo(point) })
+                                        .Aggregate((l1, l2) => l1.Dist < l2.Dist ? l1 : l2);
 
             if (entity != null)
                 entity.Line.Highlight();
@@ -615,6 +615,23 @@ namespace ICA.AutoCAD.Adapter
 
             //then insert
         }
+
+        //[CommandMethod("MOVESIGNALS")]
+        //public static void MoveSignals()
+        //{
+        //    CurrentProject.Drawings.ForEach(drawing =>
+        //        {
+        //            LayerTableRecord signalLayer = drawing.Database.GetLayer(ElectricalLayers.SignalLayer);
+        //            if(!signalLayer.IsErased)
+        //                signalLayer.UnlockWithoutWarning();
+        //            drawing.Database.GetEntities()
+        //                       .OfType<BlockReference>()
+        //                       .Where(blockReference => blockReference.Name.StartsWith("HA1"))
+        //                       .ForEach(blockReference => blockReference.SetLayer(ElectricalLayers.SignalLayer));
+        //            if(!signalLayer.IsErased)
+        //                signalLayer.LockWithWarning();
+        //        });
+        //}
 
         public static void FollowSignal(BlockReference reference)
         {

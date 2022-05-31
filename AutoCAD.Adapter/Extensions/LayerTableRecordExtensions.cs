@@ -8,6 +8,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static void UnlockWithoutWarning(this LayerTableRecord layer, Transaction transaction)
         {
+            if (layer.IsErased)
+                return;
+
             LayerTableRecord layerForWrite = layer.GetForWrite(transaction);
             layerForWrite.Modified -= ElectricalLayers.UnlockWarning;
             layerForWrite.IsLocked = false;
@@ -17,6 +20,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static void LockWithWarning(this LayerTableRecord layer, Transaction transaction)
         {
+            if (layer.IsErased)
+                return;
+
             LayerTableRecord layerForWrite = layer.GetForWrite(transaction);
             layerForWrite.IsLocked = true;
             layerForWrite.Modified += ElectricalLayers.UnlockWarning;

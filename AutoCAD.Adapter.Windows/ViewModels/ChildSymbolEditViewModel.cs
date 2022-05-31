@@ -47,10 +47,19 @@ namespace ICA.AutoCAD.Adapter.Windows.ViewModels
             ChildSymbol.Description = Description.Select(d => d.Value).Where(v => v != null).ToList();
             ChildSymbol.DescriptionHidden = DescriptionHidden;
             ChildSymbol.CollapseAttributeStack();
-            base.UpdateAndClose();
+            UpdateAndClose();
         }
 
-        private void SelectParent() => Tag = ChildSymbol?.SelectParent()?.Tag;
+        private void SelectParent()
+        {
+            IParentSymbol parent = ChildSymbol?.SelectParent();
+
+            if (parent is null)
+                return;
+
+            Tag = parent.Tag;
+            Description = new DescriptionCollection(parent.Description);
+        }
 
         #endregion
 

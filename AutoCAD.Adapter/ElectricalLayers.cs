@@ -139,6 +139,13 @@ namespace ICA.AutoCAD.Adapter
             Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
             Description = "Ground wires layer"
         };
+        public static LayerTableRecord SignalLayer => new LayerTableRecord()
+        {
+            Name = "SIGNAL",
+            Color = Color.FromColorIndex(ColorMethod.ByAci, 7),
+            Description = "Signal references",
+            IsLocked = true
+        };
 
         public static LayerTableRecord MountingLayer => new LayerTableRecord()
         {
