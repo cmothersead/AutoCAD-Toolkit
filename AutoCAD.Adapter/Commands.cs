@@ -40,6 +40,7 @@ namespace ICA.AutoCAD.Adapter
         public static Database CurrentDatabase => CurrentDocument.Database;
         public static Editor Editor => CurrentDocument.Editor;
         public static Project CurrentProject => CurrentDatabase.GetProject();
+        public static Drawing CurrentDrawing => CurrentDatabase.GetDrawing();
 
         public static bool? MountMode
         {
@@ -72,6 +73,8 @@ namespace ICA.AutoCAD.Adapter
                 Editor.Regen();
             }
         }
+
+        public static bool SkipSpares { get; set; } = true;
 
         #endregion
 
@@ -312,37 +315,42 @@ namespace ICA.AutoCAD.Adapter
             var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
         }
 
+        [CommandMethod("SKIPSPARES")]
+        public static void ToggleSkipSpares()
+        {
+            SkipSpares ^= true;
+            if (SkipSpares)
+                Editor.WriteMessage("Now skipping spare sheets.");
+            else
+                Editor.WriteMessage("No longer skipping spare sheets.");
+        }
+
         [CommandMethod("NEXTDRAWING", CommandFlags.Session)]
         public static void Next()
         {
-            int nextIndex = CurrentProject.Drawings.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name) + 1;
-            if (nextIndex >= CurrentProject.Drawings.Count)
-            {
-                Editor.WriteMessage("\nProject contains no more drawings.");
-                return;
-            }
-            ChangeDrawing(CurrentProject.Drawings[nextIndex]);
-        }
+            IEnumerable<Drawing> drawings = CurrentProject.Drawings;
 
-        [CommandMethod("NEXTUSED", CommandFlags.Session)]
-        public static void NextNonSpare()
-        {
-            List<Drawing> nonSpares = CurrentProject.Drawings.Where(drawing => !drawing.Spare)
-                                                             .ToList();
-            int index = nonSpares.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name);
-            ChangeDrawing(nonSpares[index+1]);
+            if(SkipSpares)
+                drawings = drawings.Where(drawing => !drawing.Spare);
+
+            Drawing nextDrawing = drawings.SkipWhile(drawing => int.Parse(drawing.PageNumber) <= int.Parse(CurrentDrawing.PageNumber))
+                                          .FirstOrDefault();
+
+            ChangeDrawing(nextDrawing);
         }
 
         [CommandMethod("PREVIOUSDRAWING", CommandFlags.Session)]
         public static void Previous()
         {
-            int previousIndex = CurrentProject.Drawings.FindIndex(drawing => drawing.FullPath == CurrentDocument.Name) - 1;
-            if (previousIndex < 0)
-            {
-                Editor.WriteMessage("\nNo previous drawing.");
-                return;
-            }
-            ChangeDrawing(CurrentProject.Drawings[previousIndex]);
+            IEnumerable<Drawing> drawings = CurrentProject.Drawings;
+
+            if (SkipSpares)
+                drawings = drawings.Where(drawing => !drawing.Spare);
+
+            Drawing previousDrawing = drawings.SkipWhile(drawing => int.Parse(drawing.PageNumber) >= int.Parse(CurrentDrawing.PageNumber))
+                                              .FirstOrDefault();
+
+            ChangeDrawing(previousDrawing);
         }
 
         [CommandMethod("FIRSTDRAWING", CommandFlags.Session)]
@@ -353,7 +361,6 @@ namespace ICA.AutoCAD.Adapter
 
         public static void ChangeDrawing(Drawing changeTo)
         {
-            //CurrentDocument.CloseAndSave(CurrentDocument.Name);
             if (Application.DocumentManager.Contains(changeTo.FileUri))
             {
                 Document drawing = Application.DocumentManager.Get(changeTo.FullPath);
@@ -374,11 +381,16 @@ namespace ICA.AutoCAD.Adapter
                 return;
 
             if (!int.TryParse(result.StringResult, out int sheetNumber))
+            {
+                Editor.WriteMessage("Invalid input. Must be a number.");
                 return;
+            }
 
-            if (CurrentProject.Drawings.Count < sheetNumber)
+            if (sheetNumber < 1 || sheetNumber > CurrentProject.Drawings.Count)
+            {
+                Editor.WriteMessage("Invalid input. Number not a valid page within this project.");
                 return;
-
+            }
 
             ChangeDrawing(CurrentProject.Drawings[sheetNumber-1]);
         }
@@ -387,16 +399,7 @@ namespace ICA.AutoCAD.Adapter
         public static void PageNumbers() => CurrentProject.RunOnAllDrawings(drawing => drawing.UpdatePageNumber());
 
         [CommandMethod("PAGENUMBER")]
-        public static void PageNumber()
-        {
-            Drawing drawing = new Drawing()
-            {
-                Name = Path.GetFileNameWithoutExtension(CurrentDocument.Name),
-                Project = CurrentProject,
-                TitleBlockAttributes = CurrentProject.Settings.TitleBlockAttributes
-            };
-            drawing.UpdatePageNumber();
-        }
+        public static void PageNumber() => CurrentDatabase.GetDrawing().UpdatePageNumber();
 
         #endregion
 

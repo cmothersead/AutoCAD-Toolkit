@@ -39,6 +39,7 @@ namespace ICA.AutoCAD.Adapter
         public int SheetCount => Drawings.Count();
 
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
+
         [JsonIgnore, XmlIgnore]
         public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
                                                      .ToList();
