@@ -361,6 +361,9 @@ namespace ICA.AutoCAD.Adapter
 
         public static void ChangeDrawing(Drawing changeTo)
         {
+            if (changeTo is null)
+                return;
+
             if (Application.DocumentManager.Contains(changeTo.FileUri))
             {
                 Document drawing = Application.DocumentManager.Get(changeTo.FullPath);
@@ -596,6 +599,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("INSERTSIGNAL")]
         public static void InsertSignal()
         {
+            //TODO: snap signal to nearest wire end as jig...
             PromptPointOptions options = new PromptPointOptions("Select a point");
             PromptPointResult result = Editor.GetPoint(options);
 
@@ -605,15 +609,35 @@ namespace ICA.AutoCAD.Adapter
             Point3d point = result.Value;
             var entity = CurrentDatabase.GetEntities()
                                         .OfType<Line>()
-                                        .Where(line => line.Layer == ElectricalLayers.WireLayer.Name)
+                                        .Where(line => line.Layer == ElectricalLayers.WireLayer.Name || line.Layer == ElectricalLayers.LadderLayer.Name)
                                         .Select(line => new { Line = line, Dist = line.GetClosestPointTo(point, false).DistanceTo(point) })
                                         .Aggregate((l1, l2) => l1.Dist < l2.Dist ? l1 : l2);
 
-            if (entity != null)
-                entity.Line.Highlight();
-            //snap signal to nearest wire end as jig...
 
-            //then insert
+            Point3d close = entity.Line.StartPoint.DistanceTo(point) > entity.Line.EndPoint.DistanceTo(point) ? entity.Line.EndPoint : entity.Line.StartPoint;
+            Point3d far = entity.Line.StartPoint.DistanceTo(point) > entity.Line.EndPoint.DistanceTo(point) ? entity.Line.StartPoint : entity.Line.EndPoint;
+
+            int direction;
+
+            double angle = close == entity.Line.StartPoint ? (entity.Line.Angle) % (2 * Math.PI) : (entity.Line.Angle + Math.PI) % (2 * Math.PI);
+
+            switch (angle)
+            {
+                case Math.PI / 2:
+                    direction = 4;
+                    break;
+                case Math.PI:
+                    direction = 1;
+                    break;
+                case Math.PI * 3 / 2:
+                    direction = 2;
+                    break;
+                default:
+                    direction = 3;
+                    break;
+            }
+
+            SignalSymbol.Insert(CurrentDatabase, close.ToPoint2D(), "1", direction).AssignLayers();
         }
 
         //[CommandMethod("MOVESIGNALS")]

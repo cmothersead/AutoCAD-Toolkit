@@ -5,6 +5,8 @@ using Autodesk.AutoCAD.Geometry;
 using ICA.AutoCAD.IO;
 using ICA.Schematic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICA.AutoCAD.Adapter
 {
@@ -25,6 +27,14 @@ namespace ICA.AutoCAD.Adapter
         private AttributeReference XrefLineAttribute => BlockReference.GetAttributeReference("XREF");
 
         private AttributeReference WireNumberAttribute => BlockReference.GetAttributeReference("WIRENO");
+
+        private Dictionary<string, LayerTableRecord> AttributeLayers => new Dictionary<string, LayerTableRecord>()
+        {
+            { "DESC", ElectricalLayers.DescriptionLayer },
+            { "WIRENO", ElectricalLayers.WireNumberLayer },
+            { "SHEET", ElectricalLayers.XrefLayer },
+            { "XREF", ElectricalLayers.XrefLayer },
+        };
 
         #endregion
 
@@ -87,67 +97,90 @@ namespace ICA.AutoCAD.Adapter
             referenceSymbol.SignalCode = SignalCode;
         }
 
+        public void AssignLayers()
+        {
+            using (Transaction transaction = BlockReference.Database.TransactionManager.StartTransaction())
+            {
+                BlockReference.GetAttributeReferences(transaction)
+                              .ForEach(reference => reference.SetLayer(AttributeLayers.FirstOrDefault(pair => reference.Tag.Contains(pair.Key)).Value));
+                transaction.Commit();
+            }
+        }
+
         #endregion
 
         #region Public Static Methods
 
-        public static SignalSymbol Insert(Transaction transaction, Database database, Point2d location, string name)
+        public static SignalSymbol Insert(Transaction transaction, Database database, Point2d location, string style, int direction)
         {
             BlockTable blockTable = database.GetBlockTable();
+
+            string name = $"HA{style}{direction}";
+
             BlockTableRecord record = blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
 
             if (record is null)
                 throw new ArgumentException($"Symbol \"{name}\" not found in library.");
 
             BlockReference blockReference = new BlockReference(location.ToPoint3d(), record.ObjectId);
-            blockReference.Insert(transaction, database);
+            blockReference.Insert(transaction, database, ElectricalLayers.SignalLayer);
 
             return new SignalSymbol(blockReference);
         }
 
-        public static SignalSymbol Insert(Transaction transaction, Document document, string name)
-        {
-            BlockTable blockTable = document.Database.GetBlockTable();
+        //public static SignalSymbol Insert(Transaction transaction, Document document, string style)
+        //{
+        //    BlockTable blockTable = document.Database.GetBlockTable();
 
-            BlockTableRecord record = blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name));
+        //    List<string> names = new List<string>
+        //    {
+        //        $"HA{style}1",
+        //        $"HA{style}2",
+        //        $"HA{style}3",
+        //        $"HA{style}4",
+        //    };
 
-            if (record is null)
-                throw new ArgumentException($"Symbol \"{name}\" not found in library.");
+        //    List<BlockTableRecord> records = names.Select(name => blockTable.Has(name) ? blockTable.GetRecord(name) : blockTable.LoadExternalBlockTableRecord(Paths.FindSchematic(name)))
+        //                                          .ToList();
 
-            BlockReference blockReference = new BlockReference(new Point3d(), record.ObjectId);
 
-            blockReference.Insert(transaction, document.Database);
+        //    if (records.Any(record => record is null))
+        //        throw new ArgumentException($"Symbol style {style} not complete in library.");
 
-            if (blockReference.Position == new Point3d())
-            {
-                SymbolJig jig = new SymbolJig(document.Editor.CurrentUserCoordinateSystem, transaction, blockReference, "Select location:");
+        //    BlockReference blockReference = new BlockReference(new Point3d(), records[0].ObjectId);
 
-                if (jig.Run(document) != PromptStatus.OK)
-                    return null;
-            }
+        //    blockReference.Insert(transaction, document.Database);
 
-            return new SignalSymbol(blockReference);
-        }
+        //    if (blockReference.Position == new Point3d())
+        //    {
+        //        SymbolJig jig = new SymbolJig(document.Editor.CurrentUserCoordinateSystem, transaction, blockReference, "Select location:");
 
-        public static SignalSymbol Insert(Database database, Point2d location, string name)
+        //        if (jig.Run(document) != PromptStatus.OK)
+        //            return null;
+        //    }
+
+        //    return new SignalSymbol(blockReference);
+        //}
+
+        public static SignalSymbol Insert(Database database, Point2d location, string style, int direction)
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                SignalSymbol symbol = Insert(transaction, database, location, name);
+                SignalSymbol symbol = Insert(transaction, database, location, style, direction);
                 transaction.Commit();
                 return symbol;
             }
         }
 
-        public static SignalSymbol Insert(Document document, string name)
-        {
-            using (Transaction transaction = document.Database.TransactionManager.StartTransaction())
-            {
-                SignalSymbol symbol = Insert(transaction, document, name);
-                transaction.Commit();
-                return symbol;
-            }
-        }
+        //public static SignalSymbol Insert(Document document, string name)
+        //{
+        //    using (Transaction transaction = document.Database.TransactionManager.StartTransaction())
+        //    {
+        //        SignalSymbol symbol = Insert(transaction, document, name);
+        //        transaction.Commit();
+        //        return symbol;
+        //    }
+        //}
 
         #endregion
 
