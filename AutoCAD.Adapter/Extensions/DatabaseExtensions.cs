@@ -75,18 +75,19 @@ namespace ICA.AutoCAD.Adapter
             DBDictionary parents = database.GetNamedDictionary(transaction, "Parents").GetForWrite(transaction);
             database.GetEntities(transaction)
                     .OfType<BlockReference>()
-                    .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG1"))
+                    .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG1") && !parents.Contains(blockReference.ObjectId))
                     .ForEach(blockReference => parents.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
 
             DBDictionary children = database.GetNamedDictionary(transaction, "Children").GetForWrite(transaction);
             database.GetEntities(transaction)
                     .OfType<BlockReference>()
-                    .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG2"))
+                    .Where(blockReference => blockReference.Layer == ElectricalLayers.SymbolLayer.Name && blockReference.HasAttributeReference("TAG2") && !children.Contains(blockReference.ObjectId))
                     .ForEach(blockReference => children.SetAt(blockReference.Handle.ToString(), blockReference.GetForWrite(transaction)));
         }
 
         public static List<ParentSymbol> GetParentSymbols(this Database database, Transaction transaction)
         {
+            database.LogSymbols(transaction);
             List<ParentSymbol> parents = new List<ParentSymbol>();
             foreach (var entry in database.GetNamedDictionary(transaction, "Parents"))
                 parents.Add(new ParentSymbol(entry.Value.Open(transaction) as BlockReference));
@@ -95,6 +96,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static List<ChildSymbol> GetChildSymbols(this Database database, Transaction transaction)
         {
+            database.LogSymbols(transaction);
             List<ChildSymbol> children = new List<ChildSymbol>();
             foreach (var entry in database.GetNamedDictionary(transaction, "Children"))
                 children.Add(new ChildSymbol(entry.Value.Open(transaction) as BlockReference));
