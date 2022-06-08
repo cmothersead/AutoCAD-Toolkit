@@ -30,7 +30,7 @@ namespace ICA.AutoCAD.Adapter
         public Job Job { get; set; }
         public List<Drawing> Drawings { get; set; } = new List<Drawing>();
         [JsonIgnore, XmlIgnore]
-        public Uri FileUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
+        public Uri XmlUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
         [JsonIgnore, XmlIgnore]
         public Uri JsonUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.aeproj");
         [JsonIgnore, XmlIgnore]
@@ -41,7 +41,7 @@ namespace ICA.AutoCAD.Adapter
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
 
         [JsonIgnore, XmlIgnore]
-        public List<Component> Components => Drawings.SelectMany(drawing => drawing.Components)
+        public List<Component> Components => Drawings.Where(drawing => !drawing.Spare).SelectMany(drawing => drawing.Components)
                                                      .ToList();
 
         #endregion
@@ -126,7 +126,7 @@ namespace ICA.AutoCAD.Adapter
             ns.Add("", "");
 
             XmlSerializer writer = new XmlSerializer(typeof(Project));
-            FileStream file = File.OpenWrite(FileUri.LocalPath);
+            FileStream file = File.OpenWrite(XmlUri.LocalPath);
             file.SetLength(0);
             writer.Serialize(file, this, ns);
             file.Close();
@@ -135,14 +135,16 @@ namespace ICA.AutoCAD.Adapter
 
         public void SaveAsJSON()
         {
-            string jsonString = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            Project project = this;
+            project.Drawings = Drawings.Where(drawing => !drawing.Spare).ToList();
+            string jsonString = JsonConvert.SerializeObject(project, Formatting.Indented, new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Ignore,
             });
             File.WriteAllText(JsonUri.LocalPath, jsonString);
         }
 
-        public void Export() => WDP.Export(this, Path.ChangeExtension(FileUri.LocalPath, ".wdp"));
+        public void Export() => WDP.Export(this, Path.ChangeExtension(XmlUri.LocalPath, ".wdp"));
 
         #endregion
 

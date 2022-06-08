@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
 {
+    [DataContract]
     public class Drawing : IDisposable
     {
         #region Properties
@@ -39,6 +41,7 @@ namespace ICA.AutoCAD.Adapter
                     _database = new Database(false, true);
                     _database.ReadDwgFile(FullPath, FileOpenMode.OpenForReadAndAllShare, true, null);
                     _database.CloseInput(true);
+                    IsLoaded = true;
                 }
 
                 return _database;
@@ -48,43 +51,34 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         #region Public Properties
-        [JsonIgnore]
-        [XmlIgnore]
-        public Uri FileUri => new Uri(Project.FileUri, $"{Name}.dwg");
-        [JsonIgnore]
-        [XmlIgnore]
-        public Project Project { get; set; }
-        [JsonIgnore]
-        public string FullPath => new Uri(Project.FileUri, FileUri).LocalPath;
-        [JsonIgnore]
-        [XmlIgnore]
-        public List<TBAttribute> TitleBlockAttributes { get; set; }
-        [JsonProperty]
-        [XmlAttribute]
+
+        [DataMember, XmlAttribute]
+        public string PageNumber { get; set; }
+        [DataMember, XmlAttribute]
         public string Name { get; set; }
         public bool ShouldSerializeName() => Name != $"{Project.Job.Code}PG{int.Parse(PageNumber):D2}";
-        [XmlArrayItem("Value")]
+
+        private List<string> _description;
+        [DataMember, XmlArrayItem("Value")]
         public List<string> Description
         {
-            get => Database?.GetDescription();
-            set => Database?.SetDescription(value);
-        }
-        public bool ShouldSerializeDescription()
-        {
-            if(Description.Count == 0)
-                return false;
+            get => _description ?? Database?.GetDescription();
+            set
+            {
+                _description = value;
 
-            return Description[0] != "SPARE SHEET";
+                if (!IsLoaded)
+                    return;
+
+                _database?.SetDescription(value);
+            }
         }
-        [JsonProperty]
-        [XmlAttribute]
-        public string PageNumber { get; set; }
+        public bool ShouldSerializeDescription() => Description.Count != 0 && Description[0] != "SPARE SHEET";
 
         private bool? _spare;
-        [JsonProperty, DefaultValue(false)]
-        [XmlAttribute]
-        public bool Spare 
-        { 
+        [DataMember, XmlAttribute, DefaultValue(false)]
+        public bool Spare
+        {
             get
             {
                 if (_spare != null)
@@ -96,19 +90,26 @@ namespace ICA.AutoCAD.Adapter
             set
             {
                 _spare = value;
-                if(Database.GetTitleBlock() != null)
-                    Database.GetTitleBlock().Spare = value;
+
+                if (!IsLoaded)
+                    return;
+
+                if (_database?.GetTitleBlock() != null)
+                    _database.GetTitleBlock().Spare = value;
                 Description = new List<string> { "SPARE SHEET" };
             }
         }
-        [JsonIgnore]
-        [XmlIgnore]
+
+
+        public Uri FileUri => new Uri(Project.XmlUri, $"{Name}.dwg");
+        public Project Project { get; set; }
+        public string FullPath => new Uri(Project.XmlUri, FileUri).LocalPath;
+        public List<TBAttribute> TitleBlockAttributes { get; set; }
         public DrawingSettings Settings { get; set; }
-        [JsonIgnore]
-        [XmlIgnore]
         public List<Component> Components => Database.GetParentSymbols()
                                                      .Select(symbol => new Component(symbol))
                                                      .ToList();
+        public bool IsLoaded { get; set; }
 
         #endregion
 

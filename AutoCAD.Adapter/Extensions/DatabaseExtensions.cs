@@ -87,7 +87,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static List<ParentSymbol> GetParentSymbols(this Database database, Transaction transaction)
         {
-            database.LogSymbols(transaction);
+            //database.LogSymbols(transaction);
             List<ParentSymbol> parents = new List<ParentSymbol>();
             foreach (var entry in database.GetNamedDictionary(transaction, "Parents"))
                 parents.Add(new ParentSymbol(entry.Value.Open(transaction) as BlockReference));
@@ -96,7 +96,7 @@ namespace ICA.AutoCAD.Adapter
 
         public static List<ChildSymbol> GetChildSymbols(this Database database, Transaction transaction)
         {
-            database.LogSymbols(transaction);
+            //database.LogSymbols(transaction);
             List<ChildSymbol> children = new List<ChildSymbol>();
             foreach (var entry in database.GetNamedDictionary(transaction, "Children"))
                 children.Add(new ChildSymbol(entry.Value.Open(transaction) as BlockReference));

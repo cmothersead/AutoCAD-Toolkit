@@ -83,12 +83,13 @@ namespace ICA.AutoCAD.Adapter
 
         public IParentSymbol SelectParent()
         {
-            var components = Database.GetProject().Components
+            var components = Database.GetProject().Components;
+            components = components
                                      .Where(component => component.Family == Family)
                                      .ToList();
             var view = new ComponentsListView(components);
-            if (Application.ShowModalWindow(view) == true)
-                return ((ComponentsListViewModel)view.DataContext).SelectedComponent.Symbol;
+            if (Application.ShowModalWindow(view) == true && ((ComponentsListViewModel)view.DataContext).SelectedComponent is IComponent selected)
+                return selected.Symbol;
 
             return null;
         }

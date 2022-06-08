@@ -42,9 +42,9 @@ namespace ICA.AutoCAD.Adapter
         public Component(ParentSymbol parent)
         {
             Symbol = parent;
-            Children = ((ParentSymbol)Symbol).Database.GetChildSymbols()
-                                                      .Where(child => child.Tag == Tag)
-                                                      .Cast<IChildSymbol>().ToList();
+            //Children = ((ParentSymbol)Symbol).Database.GetChildSymbols()
+            //                                          .Where(child => child.Tag == Tag)
+            //                                          .Cast<IChildSymbol>().ToList();
         }
 
         public override string ToString() => Tag;

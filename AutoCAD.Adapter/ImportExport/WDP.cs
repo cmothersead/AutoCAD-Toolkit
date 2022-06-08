@@ -270,7 +270,7 @@ namespace ICA.AutoCAD.Adapter
             input.Drawings.ForEach(drawing =>
             {
                 drawing.Description.ForEach(description => lines.Add($"==={description}"));
-                lines.Add($"{input.FileUri.MakeRelativeUri(drawing.FileUri)}");
+                lines.Add($"{input.XmlUri.MakeRelativeUri(drawing.FileUri)}");
             });
 
             File.WriteAllLines(savePath, lines.ToArray());
