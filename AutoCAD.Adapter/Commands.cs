@@ -59,10 +59,10 @@ namespace ICA.AutoCAD.Adapter
             get
             {
                 if(_currentDrawing is null)
-                    _currentDrawing = CurrentDatabase.GetDrawing();
+                    _currentDrawing = CurrentDatabase.GetDrawing(CurrentProject);
 
                 if (_currentDrawing.FullPath != CurrentDatabase.OriginalFileName)
-                    _currentDrawing = CurrentDatabase.GetDrawing();
+                    _currentDrawing = CurrentDatabase.GetDrawing(CurrentProject);
 
                 return _currentDrawing;
             }
@@ -373,7 +373,8 @@ namespace ICA.AutoCAD.Adapter
             if (SkipSpares)
                 drawings = drawings.Where(drawing => !drawing.Spare);
 
-            Drawing previousDrawing = drawings.SkipWhile(drawing => int.Parse(drawing.PageNumber) >= int.Parse(CurrentDrawing.PageNumber))
+            Drawing previousDrawing = drawings.Reverse()
+                                              .SkipWhile(drawing => int.Parse(drawing.PageNumber) >= int.Parse(CurrentDrawing.PageNumber))
                                               .FirstOrDefault();
 
             ChangeDrawing(previousDrawing);

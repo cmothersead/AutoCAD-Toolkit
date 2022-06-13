@@ -1,10 +1,12 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
+using ICA.AutoCAD.Adapter.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace ICA.AutoCAD.Adapter
@@ -30,9 +32,9 @@ namespace ICA.AutoCAD.Adapter
         public Job Job { get; set; }
         public List<Drawing> Drawings { get; set; } = new List<Drawing>();
         [JsonIgnore, XmlIgnore]
-        public Uri XmlUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.xml");
+        public Uri XmlUri => new Uri($@"{DirectoryUri.LocalPath}/{Name}.xml");
         [JsonIgnore, XmlIgnore]
-        public Uri JsonUri => new Uri($"{DirectoryUri.LocalPath}\\{Name}.aeproj");
+        public Uri JsonUri => new Uri($@"{DirectoryUri.LocalPath}/{Name}.aeproj");
         [JsonIgnore, XmlIgnore]
         public string Name => $"{Job}";
         [JsonIgnore, XmlIgnore]
@@ -49,6 +51,14 @@ namespace ICA.AutoCAD.Adapter
         #region Private Properties
 
         private string NextDrawingName => $"{Job.Customer.Id:D3}-{Job.Id:D3}PG{Drawings.Count + 1:D3}";
+
+
+        private Dictionary<string, string> Replacements => new Dictionary<string, string>
+        {
+            { "%P", $"{Job.Code}" },
+            { "%S", @"(\d{2,3})" },
+        };
+        public Regex DrawingNameFormat => new Regex(Settings.FileNameFormat.Replace(Replacements) + @"$");
 
         #endregion
 
@@ -117,6 +127,8 @@ namespace ICA.AutoCAD.Adapter
         }
 
         public bool Contains(string filePath) => Drawings.Any(drawing => drawing.FullPath == filePath);
+
+        public Drawing GetDrawing(string filePath) => Drawings.FirstOrDefault(drawing => drawing.FullPath == filePath);
 
         #region File IO
 
@@ -221,7 +233,7 @@ namespace ICA.AutoCAD.Adapter
             project.DirectoryUri = new Uri(directoryPath);
             project.Drawings.ForEach(drawing =>
             {
-                drawing.Name = drawing.Name ?? $"{project.Job.Code}PG{int.Parse(drawing.PageNumber):D2}";
+                drawing.Name = drawing.Name ?? drawing.ReplaceParameters(project.Settings.FileNameFormat);
                 drawing.Project = project;
                 drawing.TitleBlockAttributes = project.Settings.TitleBlockAttributes;
             });
@@ -241,10 +253,28 @@ namespace ICA.AutoCAD.Adapter
             project.DirectoryUri = new Uri(directoryPath);
             project.Drawings.ForEach(drawing =>
             {
-                drawing.Name = drawing.Name ?? $"{project.Job.Code}PG{int.Parse(drawing.PageNumber):D2}";
                 drawing.Project = project;
+                drawing.Name = drawing.Name ?? drawing.ReplaceParameters(project.Settings.FileNameFormat);
                 drawing.TitleBlockAttributes = project.Settings.TitleBlockAttributes;
             });
+
+            //If page numbers are integers, then attempt to find existing spare drawings
+            if (int.TryParse(project.Drawings.First().PageNumber, out int result))
+            {
+                project.Drawings.AddRange(Directory.EnumerateFiles(project.DirectoryUri.LocalPath)
+                                                    .Where(filePath => !project.Contains(filePath))
+                                                    .Where(filePath => Path.GetExtension(filePath) == ".dwg")
+                                                    .Where(filePath => project.DrawingNameFormat.IsMatch(Path.GetFileNameWithoutExtension(filePath)))
+                                                    .Select(filePath => new Drawing
+                                                    {
+                                                        Name = Path.GetFileNameWithoutExtension(filePath),
+                                                        Project = project,
+                                                        TitleBlockAttributes = project.Settings.TitleBlockAttributes,
+                                                        PageNumber = project.DrawingNameFormat.Match(Path.GetFileNameWithoutExtension(filePath)).Groups[1].Value,
+                                                        Spare = true,
+                                                    }));
+                project.Drawings = project.Drawings.OrderBy(drawing => int.Parse(drawing.PageNumber)).ToList();
+            }
 
             return project;
         }

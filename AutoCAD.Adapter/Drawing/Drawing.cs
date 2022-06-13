@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using ICA.AutoCAD.Adapter.Extensions;
 using ICA.Schematic;
 using Newtonsoft.Json;
 using System;
@@ -42,11 +43,20 @@ namespace ICA.AutoCAD.Adapter
                     _database.ReadDwgFile(FullPath, FileOpenMode.OpenForReadAndAllShare, true, null);
                     _database.CloseInput(true);
                     IsLoaded = true;
+
+                    if (_spare != null)
+                        _database.GetTitleBlock().Spare = (bool)_spare;
                 }
 
                 return _database;
             }
         }
+
+        private Dictionary<string, string> Replacements => new Dictionary<string, string>
+        {
+            { "%P", $"{Project.Job.Code}" },
+            { "%S", $"{int.Parse(PageNumber):D2}" },
+        };
 
         #endregion
 
@@ -101,9 +111,9 @@ namespace ICA.AutoCAD.Adapter
         }
 
 
-        public Uri FileUri => new Uri(Project.XmlUri, $"{Name}.dwg");
+        public Uri FileUri => new Uri($@"{Project.DirectoryUri}/{Name}.dwg");
         public Project Project { get; set; }
-        public string FullPath => new Uri(Project.XmlUri, FileUri).LocalPath;
+        public string FullPath => FileUri.LocalPath;
         [XmlIgnore]
         public List<TBAttribute> TitleBlockAttributes { get; set; }
         [XmlIgnore]
@@ -130,6 +140,8 @@ namespace ICA.AutoCAD.Adapter
         #endregion
 
         #region Methods
+
+        public string ReplaceParameters(string formatString) => formatString.Replace(Replacements);
 
         public void UpdateTitleBlock()
         {

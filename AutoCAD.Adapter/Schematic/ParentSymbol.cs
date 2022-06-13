@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using ICA.AutoCAD.Adapter.Extensions;
 using ICA.Schematic;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,7 +183,7 @@ namespace ICA.AutoCAD.Adapter
         {
             if (format is null)
                 format = Database.GetProject()?.Settings.Component.Format ?? "%F%S%N%X"; // TODO: Replace hard-coded default with application setting default.
-            Tag = Replacements.Keys.Aggregate(format, (current, toReplace) => current.Replace(toReplace, Replacements[toReplace]));
+            Tag = format.Replace(Replacements);
         }
 
         #endregion

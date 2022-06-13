@@ -120,6 +120,7 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\TitleBlockSettings.cs" />
     <Compile Include="EntityNode.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Overrules\EraseLinksOverrule.cs" />
     <Compile Include="Extensions\DBObjectExtensions.cs" />
     <Compile Include="Extensions\XData.cs" />

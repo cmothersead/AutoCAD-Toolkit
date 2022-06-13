@@ -178,9 +178,11 @@ namespace ICA.AutoCAD.Adapter
 
         #region Project
 
-        public static Drawing GetDrawing(this Database database)
+        public static Drawing GetDrawing(this Database database, Project project = null)
         {
-            Project project = database.GetProject();
+            if(project is null)
+                project = database.GetProject();
+
             return new Drawing()
             {
                 Name = Path.GetFileNameWithoutExtension(database.OriginalFileName),
