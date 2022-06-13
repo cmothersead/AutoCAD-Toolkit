@@ -116,6 +116,8 @@ namespace ICA.AutoCAD.Adapter
             }
         }
 
+        public bool Contains(string filePath) => Drawings.Any(drawing => drawing.FullPath == filePath);
+
         #region File IO
 
         public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";

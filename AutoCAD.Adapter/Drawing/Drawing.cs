@@ -104,8 +104,11 @@ namespace ICA.AutoCAD.Adapter
         public Uri FileUri => new Uri(Project.XmlUri, $"{Name}.dwg");
         public Project Project { get; set; }
         public string FullPath => new Uri(Project.XmlUri, FileUri).LocalPath;
+        [XmlIgnore]
         public List<TBAttribute> TitleBlockAttributes { get; set; }
+        [XmlIgnore]
         public DrawingSettings Settings { get; set; }
+        [XmlIgnore]
         public List<Component> Components => Database.GetParentSymbols()
                                                      .Select(symbol => new Component(symbol))
                                                      .ToList();

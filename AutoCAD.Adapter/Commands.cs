@@ -24,7 +24,9 @@ namespace ICA.AutoCAD.Adapter
 
         private static bool? _mountMode;
         private static bool PreviousGridSnap;
-        public static ObjectSnap PreviousObjectSnap;
+        private static ObjectSnap PreviousObjectSnap;
+        private static Project _currentProject;
+        private static Drawing _currentDrawing;
 
         #endregion
 
@@ -39,8 +41,32 @@ namespace ICA.AutoCAD.Adapter
         public static Document CurrentDocument => Application.DocumentManager.MdiActiveDocument;
         public static Database CurrentDatabase => CurrentDocument.Database;
         public static Editor Editor => CurrentDocument.Editor;
-        public static Project CurrentProject => CurrentDatabase.GetProject();
-        public static Drawing CurrentDrawing => CurrentDatabase.GetDrawing();
+        public static Project CurrentProject
+        {
+            get
+            {
+                if(_currentProject is null)
+                    _currentProject = CurrentDatabase.GetProject();
+
+                if (!_currentProject.Contains(CurrentDatabase.OriginalFileName))
+                    _currentProject = CurrentDatabase.GetProject();
+
+                return _currentProject;
+            }
+        }
+        public static Drawing CurrentDrawing
+        {
+            get
+            {
+                if(_currentDrawing is null)
+                    _currentDrawing = CurrentDatabase.GetDrawing();
+
+                if (_currentDrawing.FullPath != CurrentDatabase.OriginalFileName)
+                    _currentDrawing = CurrentDatabase.GetDrawing();
+
+                return _currentDrawing;
+            }
+        }
 
         public static bool? MountMode
         {
