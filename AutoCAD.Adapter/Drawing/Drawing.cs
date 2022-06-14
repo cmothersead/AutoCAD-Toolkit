@@ -34,7 +34,11 @@ namespace ICA.AutoCAD.Adapter
                 if (_database is null)
                 {
                     if (Application.DocumentManager.Contains(new Uri(FullPath)))
+                    {
+                        IsLoaded = true;
                         return Application.DocumentManager.Get(FullPath).Database;
+                    }
+                        
 
                     if (!File.Exists(FullPath))
                         return null;
@@ -42,10 +46,11 @@ namespace ICA.AutoCAD.Adapter
                     _database = new Database(false, true);
                     _database.ReadDwgFile(FullPath, FileOpenMode.OpenForReadAndAllShare, true, null);
                     _database.CloseInput(true);
-                    IsLoaded = true;
 
                     if (_spare != null)
                         _database.GetTitleBlock().Spare = (bool)_spare;
+
+                    IsLoaded = true;
                 }
 
                 return _database;
@@ -81,6 +86,7 @@ namespace ICA.AutoCAD.Adapter
                     return;
 
                 _database?.SetDescription(value);
+                UpdateTitleBlock();
             }
         }
         public bool ShouldSerializeDescription() => Description.Count != 0 && Description[0] != "SPARE SHEET";
@@ -94,18 +100,18 @@ namespace ICA.AutoCAD.Adapter
                 if (_spare != null)
                     return (bool)_spare;
 
-                _spare = Database.GetTitleBlock().Spare;
+                _spare = TitleBlock.Spare;
                 return (bool)_spare;
             }
             set
             {
                 _spare = value;
 
-                if (!IsLoaded)
-                    return;
+                //if (!IsLoaded)
+                //    return;
 
-                if (_database?.GetTitleBlock() != null)
-                    _database.GetTitleBlock().Spare = value;
+                if (TitleBlock != null)
+                    TitleBlock.Spare = value;
                 Description = new List<string> { "SPARE SHEET" };
             }
         }
@@ -118,6 +124,19 @@ namespace ICA.AutoCAD.Adapter
         public List<TBAttribute> TitleBlockAttributes { get; set; }
         [XmlIgnore]
         public DrawingSettings Settings { get; set; }
+        [XmlIgnore]
+        private TitleBlock _titleBlock;
+        public TitleBlock TitleBlock
+        {
+            get
+            {
+                if( _titleBlock != null)
+                    return _titleBlock;
+
+                _titleBlock = Database.GetTitleBlock(this);
+                return _titleBlock;
+            }
+        }
         [XmlIgnore]
         public List<Component> Components => Database.GetParentSymbols()
                                                      .Select(symbol => new Component(symbol))
@@ -145,11 +164,10 @@ namespace ICA.AutoCAD.Adapter
 
         public void UpdateTitleBlock()
         {
-            TitleBlock titleBlock = Database.GetTitleBlock();
-            if (titleBlock is null)
+            if (TitleBlock is null)
                 return;
 
-            titleBlock.Attributes = TitleBlockAttributes.Cast<ITBAttribute>()
+            TitleBlock.Attributes = TitleBlockAttributes.Cast<ITBAttribute>()
                                                         .ToList();
 
             Save();

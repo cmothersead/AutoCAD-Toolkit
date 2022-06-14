@@ -115,6 +115,14 @@ namespace ICA.AutoCAD.Adapter
             return titleBlockRecord == null ? null : new TitleBlock(titleBlockRecord);
         }
 
+        public static TitleBlock GetTitleBlock(this Database database, Drawing drawing)
+        {
+            BlockTableRecord titleBlockRecord = database.GetBlockTable()
+                                                        .GetRecords()
+                                                        .FirstOrDefault(record => record.Name.Contains("Title Block") && record.HasAttribute("TB"));
+            return titleBlockRecord == null ? null : new TitleBlock(titleBlockRecord, drawing);
+        }
+
         public static bool ContainsTBAtrribute(this Database database) => database.GetModelSpace()
                                                                                   .Cast<ObjectId>()
                                                                                   .Select(id => id.Open())

@@ -91,6 +91,20 @@ namespace ICA.AutoCAD.Adapter
             _blockTableRecord = record;
         }
 
+        public TitleBlock(BlockTableRecord record, Drawing drawing)
+        {
+            if (!record.Name.Contains("Title Block"))
+                throw new ArgumentException($"\"{record.Name}\" is not a valid title block. Name must contain \"Title Block\".");
+
+            if (!record.HasAttribute("TB"))
+                throw new ArgumentException($"\"{record.Name}\" is not a valid title block. Block must contain an attribute called \"TB\".");
+
+            _blockTableRecord = record;
+
+            if(record.Database.OriginalFileName == drawing.FileUri.LocalPath)
+                _drawing = drawing;
+        }
+
         public TitleBlock(Uri blockFileUri)
         {
             FileUri = blockFileUri;
@@ -101,9 +115,11 @@ namespace ICA.AutoCAD.Adapter
 
             Database tempDatabase = Commands.LoadDatabase(blockFileUri);
 
-            if (!tempDatabase.GetModelSpace().OfType<ObjectId>().Select(id => id.Open())
-                                                                      .OfType<AttributeDefinition>()
-                                                                      .Any(definition => definition.Tag == "TB"))
+            if (!tempDatabase.GetModelSpace()
+                             .OfType<ObjectId>()
+                             .Select(id => id.Open())
+                             .OfType<AttributeDefinition>()
+                             .Any(definition => definition.Tag == "TB"))
                 throw new ArgumentException($"\"{Path.GetFileName(blockFileUri.LocalPath)}\" is not a valid title block file. File must contain an attribute called \"TB\".");
         }
 
