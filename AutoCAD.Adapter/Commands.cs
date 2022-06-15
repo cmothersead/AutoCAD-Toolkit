@@ -48,7 +48,7 @@ namespace ICA.AutoCAD.Adapter
                 if(_currentProject is null)
                     _currentProject = CurrentDatabase.GetProject();
 
-                if (!_currentProject.Contains(CurrentDatabase.Filename))
+                if (!_currentProject.Drawings.Any(drawing => drawing.FullPath == CurrentDatabase.Filename))
                     _currentProject = CurrentDatabase.GetProject();
 
                 return _currentProject;
@@ -403,7 +403,7 @@ namespace ICA.AutoCAD.Adapter
             if (sheetNumber < 1 || sheetNumber > project.SheetCount)
                 throw new ArgumentOutOfRangeException("input", "Invalid input. Page number out of range.");
 
-            Drawing found = project.GetDrawing(drawing => int.Parse(drawing.PageNumber) == sheetNumber);
+            Drawing found = project.Drawings.FirstOrDefault(drawing => int.Parse(drawing.PageNumber) == sheetNumber);
 
             if (found is null)
                 throw new ArgumentException("Page number not found within project.");

@@ -191,13 +191,7 @@ namespace ICA.AutoCAD.Adapter
             if(project is null)
                 project = database.GetProject();
 
-            return new Drawing()
-            {
-                Name = Path.GetFileNameWithoutExtension(database.Filename),
-                Project = project,
-                PageNumber = database.GetSheetNumber(),
-                TitleBlockAttributes = project.Settings.TitleBlockAttributes,
-            };
+            return project.Drawings.FirstOrDefault(drawing => drawing.FullPath == database.Filename);
         }
 
         public static Project GetProject(this Database database) => Project.OpenJSON(Path.GetDirectoryName(database.Filename))

@@ -10,7 +10,17 @@ namespace AutoCAD.Adapter.Tests
 {
     public class ProjectTests
     {
-        private readonly Project project = new Project
+        private readonly Project projectWithNoPageNumbers = new Project
+        {
+            Drawings = new List<Drawing>
+            {
+                new Drawing(),
+                new Drawing(),
+                new Drawing(),
+            }
+        };
+
+        private readonly Project projectWithSpare = new Project
         {
             Drawings = new List<Drawing>
                 {
@@ -20,24 +30,76 @@ namespace AutoCAD.Adapter.Tests
                 }
         };
 
+        private readonly Project projectWithOutOfOrderPageNumbers = new Project
+        {
+            Drawings = new List<Drawing>
+            {
+                new Drawing { PageNumber = "4" },
+                new Drawing { PageNumber = "162" },
+                new Drawing { PageNumber = "5" },
+            }
+        };
+
+        #region SheetCount
+
+        [Fact]
+        public void SheetCountReturnsCountIfNoPageNumbers()
+        {
+            int expected = projectWithNoPageNumbers.Drawings.Count;
+            int actual = projectWithNoPageNumbers.SheetCount;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void SheetCountReturnsHighestPageNumber()
+        {
+            var expected = projectWithOutOfOrderPageNumbers.Drawings.Max(drawing => int.Parse(drawing.PageNumber));
+            var actual = projectWithOutOfOrderPageNumbers.SheetCount;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void SheetCountIgnoresNullPageNumbers()
+        {
+            int expected = 16;
+
+            Project projectWithSomePageNumbers = new Project
+            {
+                Drawings = new List<Drawing>
+                {
+                    new Drawing { PageNumber = $"{expected}" },
+                    new Drawing(),
+                    new Drawing(),
+                }
+            };
+
+            int actual = projectWithSomePageNumbers.SheetCount;
+
+            Assert.Equal(expected, actual);
+        }
+
+        #endregion
+
         #region NextDrawing
 
         [Fact]
         public void NextDrawingSkipsSpares()
         {
-            Drawing current = project.Drawings[0];
+            Drawing current = projectWithSpare.Drawings[0];
 
-            Assert.Equal(project.Drawings[1], project.NextDrawing(current, false));
-            Assert.Equal(project.Drawings[2], project.NextDrawing(current, true));
+            Assert.Equal(projectWithSpare.Drawings[1], projectWithSpare.NextDrawing(current, false));
+            Assert.Equal(projectWithSpare.Drawings[2], projectWithSpare.NextDrawing(current, true));
         }
 
         [Fact]
         public void NextDrawingReturnsNullForLastDrawing()
         {
-            Drawing current = project.Drawings.Last();
+            Drawing current = projectWithSpare.Drawings.Last();
 
-            Assert.Null(project.NextDrawing(current, true));
-            Assert.Null(project.NextDrawing(current, false));
+            Assert.Null(projectWithSpare.NextDrawing(current, true));
+            Assert.Null(projectWithSpare.NextDrawing(current, false));
         }
 
         #endregion
@@ -47,19 +109,19 @@ namespace AutoCAD.Adapter.Tests
         [Fact]
         public void PreviousDrawingSkipsSpares()
         {
-            Drawing current = project.Drawings[2];
+            Drawing current = projectWithSpare.Drawings[2];
 
-            Assert.Equal(project.Drawings[1], project.PreviousDrawing(current, false));
-            Assert.Equal(project.Drawings[0], project.PreviousDrawing(current, true));
+            Assert.Equal(projectWithSpare.Drawings[1], projectWithSpare.PreviousDrawing(current, false));
+            Assert.Equal(projectWithSpare.Drawings[0], projectWithSpare.PreviousDrawing(current, true));
         }
 
         [Fact]
         public void PreviousDrawingReturnsNullForFirstDrawing()
         {
-            Drawing current = project.Drawings.First();
+            Drawing current = projectWithSpare.Drawings.First();
 
-            Assert.Null(project.PreviousDrawing(current, true));
-            Assert.Null(project.PreviousDrawing(current, false));
+            Assert.Null(projectWithSpare.PreviousDrawing(current, true));
+            Assert.Null(projectWithSpare.PreviousDrawing(current, false));
         }
 
         #endregion

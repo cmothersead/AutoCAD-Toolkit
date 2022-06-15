@@ -45,7 +45,7 @@ namespace ICA.AutoCAD.Adapter
                 int max = 0;
                 if (Drawings.Any(drawing => drawing.PageNumber != null))
                     max = Drawings.Where(drawing => drawing.PageNumber != null)
-                                          .Max(drawing => int.Parse(drawing.PageNumber));
+                                  .Max(drawing => int.Parse(drawing.PageNumber));
                 if (max < Drawings.Count)
                     max = Drawings.Count;
 
@@ -56,7 +56,8 @@ namespace ICA.AutoCAD.Adapter
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
 
         [JsonIgnore, XmlIgnore]
-        public List<Component> Components => Drawings.Where(drawing => !drawing.Spare).SelectMany(drawing => drawing.Components)
+        public List<Component> Components => Drawings.Where(drawing => !drawing.Spare)
+                                                     .SelectMany(drawing => drawing.Components)
                                                      .ToList();
 
         #endregion
@@ -138,12 +139,6 @@ namespace ICA.AutoCAD.Adapter
                 }
             }
         }
-
-        public bool Contains(string filePath) => Drawings.Any(drawing => drawing.FullPath == filePath);
-
-        public Drawing GetDrawing(string filePath) => Drawings.FirstOrDefault(drawing => drawing.FullPath == filePath);
-
-        public Drawing GetDrawing(Func<Drawing, bool> predicate) => Drawings.FirstOrDefault(drawing => predicate(drawing));
 
         public Drawing NextDrawing(Drawing current, bool skipSpares) => Drawings.Where(drawing => !skipSpares || !drawing.Spare)
                                                                                 .SkipWhile(drawing => int.Parse(drawing.PageNumber) <= int.Parse(current.PageNumber))
@@ -285,7 +280,7 @@ namespace ICA.AutoCAD.Adapter
             if (int.TryParse(project.Drawings.First().PageNumber, out int result))
             {
                 project.Drawings.AddRange(Directory.EnumerateFiles(project.DirectoryUri.LocalPath)
-                                                    .Where(filePath => !project.Contains(filePath))
+                                                    .Where(filePath => !project.Drawings.Any(drawing => drawing.FullPath == filePath))
                                                     .Where(filePath => Path.GetExtension(filePath) == ".dwg")
                                                     .Where(filePath => project.DrawingNameFormat.IsMatch(Path.GetFileNameWithoutExtension(filePath)))
                                                     .Select(filePath => new Drawing
