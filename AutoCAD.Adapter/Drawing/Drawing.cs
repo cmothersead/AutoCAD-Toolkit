@@ -97,8 +97,10 @@ namespace ICA.AutoCAD.Adapter
                 if (_spare != null)
                     return (bool)_spare;
 
-                _spare = TitleBlock.Spare;
-                return (bool)_spare;
+                if(IsLoaded)
+                    _spare = TitleBlock.Spare;
+
+                return (bool)(_spare ?? false);
             }
             set
             {

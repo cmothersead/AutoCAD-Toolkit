@@ -145,6 +145,14 @@ namespace ICA.AutoCAD.Adapter
 
         public Drawing GetDrawing(Func<Drawing, bool> predicate) => Drawings.FirstOrDefault(drawing => predicate(drawing));
 
+        public Drawing NextDrawing(Drawing current, bool skipSpares) => Drawings.Where(drawing => !skipSpares || !drawing.Spare)
+                                                                                .SkipWhile(drawing => int.Parse(drawing.PageNumber) <= int.Parse(current.PageNumber))
+                                                                                .FirstOrDefault();
+        public Drawing PreviousDrawing(Drawing current, bool skipSpares) => Drawings.Where(drawing => !skipSpares || !drawing.Spare)
+                                                                                    .Reverse()
+                                                                                    .SkipWhile(drawing => int.Parse(drawing.PageNumber) >= int.Parse(current.PageNumber))
+                                                                                    .FirstOrDefault();
+
         #region File IO
 
         public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";

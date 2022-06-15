@@ -352,33 +352,10 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("NEXTDRAWING", CommandFlags.Session)]
-        public static void Next()
-        {
-            IEnumerable<Drawing> drawings = CurrentProject.Drawings;
-
-            if(SkipSpares)
-                drawings = drawings.Where(drawing => !drawing.Spare);
-
-            Drawing nextDrawing = drawings.SkipWhile(drawing => int.Parse(drawing.PageNumber) <= int.Parse(CurrentDrawing.PageNumber))
-                                          .FirstOrDefault();
-
-            ChangeDrawing(nextDrawing);
-        }
+        public static void Next() => ChangeDrawing(CurrentProject.NextDrawing(CurrentDrawing, SkipSpares));
 
         [CommandMethod("PREVIOUSDRAWING", CommandFlags.Session)]
-        public static void Previous()
-        {
-            IEnumerable<Drawing> drawings = CurrentProject.Drawings;
-
-            if (SkipSpares)
-                drawings = drawings.Where(drawing => !drawing.Spare);
-
-            Drawing previousDrawing = drawings.Reverse()
-                                              .SkipWhile(drawing => int.Parse(drawing.PageNumber) >= int.Parse(CurrentDrawing.PageNumber))
-                                              .FirstOrDefault();
-
-            ChangeDrawing(previousDrawing);
-        }
+        public static void Previous() => ChangeDrawing(CurrentProject.PreviousDrawing(CurrentDrawing, SkipSpares));
 
         [CommandMethod("FIRSTDRAWING", CommandFlags.Session)]
         public static void First() => ChangeDrawing(CurrentProject.Drawings.First());
@@ -389,7 +366,10 @@ namespace ICA.AutoCAD.Adapter
         public static void ChangeDrawing(Drawing changeTo)
         {
             if (changeTo is null)
+            {
+                Editor.WriteMessage("Requested drawing does not exist.");
                 return;
+            }
 
             if (Application.DocumentManager.Contains(changeTo.FileUri))
             {
