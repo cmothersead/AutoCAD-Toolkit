@@ -81,7 +81,7 @@ namespace ICA.AutoCAD.Adapter
 
         public Project Project => Database.GetProject();
 
-        public Drawing Drawing => Project.Drawings.FirstOrDefault(drawing => drawing.Name == Path.GetFileNameWithoutExtension(Database.OriginalFileName));
+        public Drawing Drawing => Project.Drawings.FirstOrDefault(drawing => drawing.Name == Path.GetFileNameWithoutExtension(Database.Filename));
 
         public string Family
         {

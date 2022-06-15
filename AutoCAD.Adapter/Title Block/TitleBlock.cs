@@ -101,7 +101,7 @@ namespace ICA.AutoCAD.Adapter
 
             _blockTableRecord = record;
 
-            if(record.Database.OriginalFileName == drawing.FileUri.LocalPath)
+            if(record.Database.Filename == drawing.FileUri.LocalPath)
                 _drawing = drawing;
         }
 

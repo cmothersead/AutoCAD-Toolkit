@@ -48,7 +48,7 @@ namespace ICA.AutoCAD.Adapter
                 if(_currentProject is null)
                     _currentProject = CurrentDatabase.GetProject();
 
-                if (!_currentProject.Contains(CurrentDatabase.OriginalFileName))
+                if (!_currentProject.Contains(CurrentDatabase.Filename))
                     _currentProject = CurrentDatabase.GetProject();
 
                 return _currentProject;
@@ -61,7 +61,7 @@ namespace ICA.AutoCAD.Adapter
                 if(_currentDrawing is null)
                     _currentDrawing = CurrentDatabase.GetDrawing(CurrentProject);
 
-                if (_currentDrawing.FullPath != CurrentDatabase.OriginalFileName)
+                if (_currentDrawing.FullPath != CurrentDatabase.Filename)
                     _currentDrawing = CurrentDatabase.GetDrawing(CurrentProject);
 
                 return _currentDrawing;

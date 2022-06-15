@@ -193,14 +193,14 @@ namespace ICA.AutoCAD.Adapter
 
             return new Drawing()
             {
-                Name = Path.GetFileNameWithoutExtension(database.OriginalFileName),
+                Name = Path.GetFileNameWithoutExtension(database.Filename),
                 Project = project,
                 PageNumber = database.GetSheetNumber(),
                 TitleBlockAttributes = project.Settings.TitleBlockAttributes,
             };
         }
 
-        public static Project GetProject(this Database database) => Project.OpenJSON(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.OpenXML(Path.GetDirectoryName(database.OriginalFileName)) ?? Project.Import(Path.GetDirectoryName(database.OriginalFileName));
+        public static Project GetProject(this Database database) => Project.OpenJSON(Path.GetDirectoryName(database.Filename)) ?? Project.OpenXML(Path.GetDirectoryName(database.Filename)) ?? Project.Import(Path.GetDirectoryName(database.Filename));
 
         #endregion
 
