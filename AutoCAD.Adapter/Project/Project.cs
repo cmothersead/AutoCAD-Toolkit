@@ -114,7 +114,7 @@ namespace ICA.AutoCAD.Adapter
                     return;
             }
             Drawings.Add(Drawing.CreateFromTemplate(this, path, name));
-            Save();
+            SaveAsXML();
         }
 
         public void RunOnAllDrawings(Action<Drawing> action)
@@ -150,9 +150,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region File IO
 
-        public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";
-
-        public void Save()
+        public void SaveAsXML()
         {
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             ns.Add("", "");

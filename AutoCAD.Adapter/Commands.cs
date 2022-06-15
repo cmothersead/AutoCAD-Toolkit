@@ -288,7 +288,7 @@ namespace ICA.AutoCAD.Adapter
 
                     project.Drawings.ForEach(drawing => drawing.RemoveDescription(project.Job.Name.ToUpper()));
                     project.Drawings.ForEach(drawing => drawing.RemoveDescription(""));
-                    project.Save();
+                    project.SaveAsXML();
                 }
             }
         }
@@ -296,7 +296,7 @@ namespace ICA.AutoCAD.Adapter
         [CommandMethod("SAVEXML")]
         public static void SaveProject()
         {
-            CurrentProject.Save();
+            CurrentProject.SaveAsXML();
         }
 
         [CommandMethod("SAVEPROJECT")]
