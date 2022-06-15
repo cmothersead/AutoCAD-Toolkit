@@ -96,6 +96,8 @@ namespace ICA.AutoCAD
             database.SummaryInfo = infoBuilder.ToDatabaseSummaryInfo();
         }
 
+        //This overload of the function is required to save over the current file. bBakAndRename variable seems to enable creation of bak file, deletion of
+        //original file and rename of .bak as .dwg. This fails with eFilerError if the original file's database is left undisposed in some other context.
         public static void SaveFile(this Database database) => database.SaveAs(database.OriginalFileName, true, DwgVersion.Current, database.SecurityParameters);
 
         #endregion
