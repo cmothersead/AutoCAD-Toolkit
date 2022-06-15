@@ -21,7 +21,6 @@ namespace ICA.AutoCAD.Adapter
 
         #region Private Properties
 
-        private Database _database;
         private bool disposedValue;
 
         private Database Database
@@ -31,29 +30,27 @@ namespace ICA.AutoCAD.Adapter
                 if (Project is null)
                     return null;
 
-                if (_database is null)
+                Database database;
+
+                if (Application.DocumentManager.Contains(new Uri(FullPath)))
                 {
-                    if (Application.DocumentManager.Contains(new Uri(FullPath)))
-                    {
-                        IsLoaded = true;
-                        return Application.DocumentManager.Get(FullPath).Database;
-                    }
-                        
-
-                    if (!File.Exists(FullPath))
-                        return null;
-
-                    _database = new Database(false, true);
-                    _database.ReadDwgFile(FullPath, FileOpenMode.OpenForReadAndAllShare, true, null);
-                    _database.CloseInput(true);
-
-                    if (_spare != null)
-                        _database.GetTitleBlock().Spare = (bool)_spare;
-
                     IsLoaded = true;
+                    return Application.DocumentManager.Get(FullPath).Database;
                 }
+                        
+                if (!File.Exists(FullPath))
+                    return null;
 
-                return _database;
+                database = new Database(false, true);
+                database.ReadDwgFile(FullPath, FileOpenMode.OpenForReadAndAllShare, true, null);
+                database.CloseInput(true);
+
+                if (_spare != null)
+                    database.GetTitleBlock().Spare = (bool)_spare;
+
+                IsLoaded = true;
+
+                return database;
             }
         }
 
@@ -85,7 +82,7 @@ namespace ICA.AutoCAD.Adapter
                 if (!IsLoaded)
                     return;
 
-                _database?.SetDescription(value);
+                Database?.SetDescription(value);
                 UpdateTitleBlock();
             }
         }
@@ -107,12 +104,14 @@ namespace ICA.AutoCAD.Adapter
             {
                 _spare = value;
 
-                //if (!IsLoaded)
-                //    return;
+                if (!IsLoaded)
+                    return;
 
                 if (TitleBlock != null)
                     TitleBlock.Spare = value;
-                Description = new List<string> { "SPARE SHEET" };
+
+                if(value)
+                    Description = new List<string> { "SPARE SHEET" };
             }
         }
 

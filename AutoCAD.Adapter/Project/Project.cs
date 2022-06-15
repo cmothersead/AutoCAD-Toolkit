@@ -130,6 +130,8 @@ namespace ICA.AutoCAD.Adapter
 
         public Drawing GetDrawing(string filePath) => Drawings.FirstOrDefault(drawing => drawing.FullPath == filePath);
 
+        public Drawing GetDrawing(Func<Drawing, bool> predicate) => Drawings.FirstOrDefault(drawing => predicate(drawing));
+
         #region File IO
 
         public string GetFilePath(string fileName) => $"{DirectoryUri.LocalPath}\\{fileName}.dwg";

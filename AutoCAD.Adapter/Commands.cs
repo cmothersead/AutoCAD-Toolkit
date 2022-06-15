@@ -410,19 +410,25 @@ namespace ICA.AutoCAD.Adapter
             if (result.Status != PromptStatus.OK)
                 return;
 
-            if (!int.TryParse(result.StringResult, out int sheetNumber))
-            {
-                Editor.WriteMessage("Invalid input. Must be a number.");
-                return;
-            }
+            Drawing drawing = GetDrawing(result.StringResult, CurrentProject);
 
-            if (sheetNumber < 1 || sheetNumber > CurrentProject.Drawings.Count)
-            {
-                Editor.WriteMessage("Invalid input. Number not a valid page within this project.");
-                return;
-            }
+            ChangeDrawing(drawing);
+        }
 
-            ChangeDrawing(CurrentProject.Drawings[sheetNumber-1]);
+        public static Drawing GetDrawing(string input, Project project)
+        {
+            if (!int.TryParse(input, out int sheetNumber))
+                throw new ArgumentException("Invalid input. Must be a number.");
+
+            if (sheetNumber < 1 || sheetNumber > project.Drawings.Max(drawing => int.Parse(drawing.PageNumber)))
+                throw new ArgumentOutOfRangeException("Invalid input. Page number out of range.");
+
+            Drawing found = project.GetDrawing(drawing => int.Parse(drawing.PageNumber) == sheetNumber);
+
+            if (found is null)
+                throw new ArgumentException("Page number not found within project.");
+
+            return found;
         }
 
         [CommandMethod("PAGENUMBERS")]
