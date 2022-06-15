@@ -420,8 +420,8 @@ namespace ICA.AutoCAD.Adapter
             if (!int.TryParse(input, out int sheetNumber))
                 throw new ArgumentException("Invalid input. Must be a number.");
 
-            if (sheetNumber < 1 || sheetNumber > project.Drawings.Max(drawing => int.Parse(drawing.PageNumber)))
-                throw new ArgumentOutOfRangeException("Invalid input. Page number out of range.");
+            if (sheetNumber < 1 || sheetNumber > project.SheetCount)
+                throw new ArgumentOutOfRangeException("input", "Invalid input. Page number out of range.");
 
             Drawing found = project.GetDrawing(drawing => int.Parse(drawing.PageNumber) == sheetNumber);
 

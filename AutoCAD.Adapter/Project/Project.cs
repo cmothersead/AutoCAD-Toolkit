@@ -38,7 +38,20 @@ namespace ICA.AutoCAD.Adapter
         [JsonIgnore, XmlIgnore]
         public string Name => $"{Job}";
         [JsonIgnore, XmlIgnore]
-        public int SheetCount => Drawings.Count();
+        public int SheetCount
+        {
+            get
+            {
+                int max = 0;
+                if (Drawings.Any(drawing => drawing.PageNumber != null))
+                    max = Drawings.Where(drawing => drawing.PageNumber != null)
+                                          .Max(drawing => int.Parse(drawing.PageNumber));
+                if (max < Drawings.Count)
+                    max = Drawings.Count;
+
+                return max;
+            }
+        }
 
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
 

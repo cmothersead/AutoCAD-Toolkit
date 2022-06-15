@@ -34,7 +34,7 @@ namespace AutoCAD.Adapter.Tests
                 }
             };
 
-            string message = "Invalid input. Page number out of range.";
+            string message = "Invalid input. Page number out of range.\r\nParameter name: input";
 
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => Commands.GetDrawing("4", project));
             Assert.Equal(message, ex.Message);
@@ -72,6 +72,7 @@ namespace AutoCAD.Adapter.Tests
                     new Drawing { PageNumber = "1" },
                     new Drawing { PageNumber = "2" },
                     new Drawing { PageNumber = "4" },
+                    new Drawing { PageNumber = "5" },
                 }
             };
 
