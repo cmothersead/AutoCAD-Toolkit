@@ -458,7 +458,7 @@ namespace ICA.AutoCAD.Adapter
             RemoveLadder();
             Database database = CurrentDatabase;
             AddTitleBlock(database, newTitleBlock);
-            ZoomExtents(CurrentDocument, newTitleBlock.Reference.GeometricExtents);
+            CurrentDocument.ZoomExtents(newTitleBlock.Reference.GeometricExtents);
         }
 
         public static Database LoadDatabase(Uri uri)
@@ -482,11 +482,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("PROJECTTITLEBLOCK", CommandFlags.Session)]
-        public static void ProjectTitleBlock()
-        {
-            //TitleBlock titleBlock = TitleBlock.Select();
-            CurrentProject.RunOnAllDrawings(drawing => drawing.UpdateTitleBlock());
-        }
+        public static void ProjectTitleBlock() => CurrentProject.RunOnAllDrawings(drawing => drawing.UpdateTitleBlock());
 
         public static void AddTitleBlock(Database database, TitleBlock titleBlock)
         {
@@ -600,6 +596,8 @@ namespace ICA.AutoCAD.Adapter
 
         #endregion
 
+        #region Signal
+
         [CommandMethod("INSERTSIGNAL")]
         public static void InsertSignal()
         {
@@ -668,6 +666,8 @@ namespace ICA.AutoCAD.Adapter
                 ChangeDrawing(CurrentProject.Drawings[sheet - 1]);
         }
 
+        #endregion
+
         [CommandMethod("TOGGLEOVERRULES")]
         public static void EnableOverrule()
         {
@@ -726,16 +726,10 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("ADDDOUBLECLICK", CommandFlags.Session)]
-        public static void AddDoubleClick()
-        {
-            Application.BeginDoubleClick += Application_BeginDoubleClick;
-        }
+        public static void AddDoubleClick() => Application.BeginDoubleClick += Application_BeginDoubleClick;
 
         [CommandMethod("REMOVEDOUBLECLICK")]
-        public static void RemoveDoubleClick()
-        {
-            Application.BeginDoubleClick -= Application_BeginDoubleClick;
-        }
+        public static void RemoveDoubleClick() => Application.BeginDoubleClick -= Application_BeginDoubleClick;
 
         private static void Application_BeginDoubleClick(object sender, BeginDoubleClickEventArgs e)
         {
@@ -758,8 +752,7 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("LOGSYMBOLS")]
-        public static void LogSymbols(Database database) => CurrentDatabase.GetProject().Drawings
-                                                                           .ForEach(drawing => drawing.LogSymbols());
+        public static void LogSymbols() => CurrentProject.Drawings.ForEach(drawing => drawing.LogSymbols());
 
         [CommandMethod("GETSYMBOLS")]
         public static void GetSymbols()
@@ -768,19 +761,6 @@ namespace ICA.AutoCAD.Adapter
             test1.ForEach(symbol => symbol.BlockReference.Highlight());
             var test2 = CurrentDatabase.GetChildSymbols();
             test2.ForEach(symbol => symbol.BlockReference.Highlight());
-        }
-
-        public static void ZoomExtents(Document document, Extents3d extents)
-        {
-            using (ViewTableRecord view = document.Editor.GetCurrentView())
-            {
-                view.Width = extents.MaxPoint.X - extents.MinPoint.X;
-                view.Height = extents.MaxPoint.Y - extents.MinPoint.Y;
-                view.CenterPoint = new Point2d(
-                    (extents.MaxPoint.X + extents.MinPoint.X) / 2.0,
-                    (extents.MaxPoint.Y + extents.MinPoint.Y) / 2.0);
-                document.Editor.SetCurrentView(view);
-            }
         }
 
         #endregion

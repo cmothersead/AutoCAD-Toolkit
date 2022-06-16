@@ -25,10 +25,10 @@ namespace ICA.AutoCAD.Adapter
         private void DocumentCreated(object sender, DocumentCollectionEventArgs args)
         {
             ElectricalLayers.HandleLocks(args.Document.Database);
-            if (args.Document.Database.GetTitleBlock() is TitleBlock titleBlock && titleBlock.Reference != null)
+            if (args.Document.Database.GetTitleBlock() is TitleBlock titleBlock && titleBlock.IsInserted)
             {
                 SystemVariables.GridDisplay &= ~GridDisplay.BeyondLimits;
-                Commands.ZoomExtents(args.Document, titleBlock.Reference.GeometricExtents);
+                args.Document.ZoomExtents(titleBlock.Reference.GeometricExtents);
             }
         }
 

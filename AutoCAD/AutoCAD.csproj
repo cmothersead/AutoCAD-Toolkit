@@ -97,6 +97,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentExtensions.cs" />
     <Compile Include="Extensions\AttributeDefinitionExtensions.cs" />
     <Compile Include="Extensions\DocumentCollectionExtensions.cs" />
     <Compile Include="Extensions\GroupExtensions.cs" />
