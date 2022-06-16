@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using ICA.AutoCAD.Adapter.Extensions;
 using ICA.Schematic;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -60,6 +59,8 @@ namespace ICA.AutoCAD.Adapter
             { "%S", $"{int.Parse(PageNumber):D2}" },
         };
 
+        private string ExpectedDrawingName => ReplaceParameters(Project.Settings.FileNameFormat);
+
         #endregion
 
         #region Public Properties
@@ -68,7 +69,7 @@ namespace ICA.AutoCAD.Adapter
         public string PageNumber { get; set; }
         [DataMember, XmlAttribute]
         public string Name { get; set; }
-        public bool ShouldSerializeName() => Name != $"{Project.Job.Code}PG{int.Parse(PageNumber):D2}";
+        public bool ShouldSerializeName() => Name != ExpectedDrawingName;
 
         private List<string> _description;
         [DataMember, XmlArrayItem("Value")]
@@ -105,9 +106,6 @@ namespace ICA.AutoCAD.Adapter
             set
             {
                 _spare = value;
-
-                if (!IsLoaded)
-                    return;
 
                 if (TitleBlock != null)
                     TitleBlock.Spare = value;

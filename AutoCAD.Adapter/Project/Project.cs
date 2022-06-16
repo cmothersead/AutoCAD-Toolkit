@@ -64,8 +64,7 @@ namespace ICA.AutoCAD.Adapter
 
         #region Private Properties
 
-        private string NextDrawingName => $"{Job.Customer.Id:D3}-{Job.Id:D3}PG{Drawings.Count + 1:D3}";
-
+        private string NextDrawingName => $"{Job.Code}PG{Drawings.Count + 1:D3}";
 
         private Dictionary<string, string> Replacements => new Dictionary<string, string>
         {

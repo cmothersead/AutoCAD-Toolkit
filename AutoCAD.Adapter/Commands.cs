@@ -294,16 +294,10 @@ namespace ICA.AutoCAD.Adapter
         }
 
         [CommandMethod("SAVEXML")]
-        public static void SaveProject()
-        {
-            CurrentProject.SaveAsXML();
-        }
+        public static void SaveProject() => CurrentProject.SaveAsXML();
 
         [CommandMethod("SAVEPROJECT")]
-        public static void SaveProjectJson()
-        {
-            CurrentProject.SaveAsJSON();
-        }
+        public static void SaveProjectJson() => CurrentProject.SaveAsJSON();
 
         //[CommandMethod("EXPORTCURRENTPROJECT")]
         //public static void ExportCurrentProject() => WDP.Export(CurrentProject, "C:\\Users\\cmotherseadicacontro\\Documents\\test.wdp");
@@ -312,31 +306,23 @@ namespace ICA.AutoCAD.Adapter
         public static void ProjectAddPage() => CurrentProject.AddPage(Project.PromptDrawingType(Editor));
 
         [CommandMethod("COMPONENTS")]
-        public static void Components()
-        {
-            OpenFileDialog test = new OpenFileDialog("Select Project Folder", "", "", "", OpenFileDialog.OpenFileDialogFlags.AllowFoldersOnly);
-            test.ShowDialog();
-            if (test.Filename != "")
-            {
-                using (Project project = Project.OpenXML(test.Filename))
-                {
-                    if (project is null)
-                        return;
+        public static void Components() => Components(CurrentProject);
 
-                    var test1 = project.Components.ToList();
-                    var test2 = new ComponentsListView(test1);
-                    Application.ShowModalWindow(test2);
-                    var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
-                }
-            }
+        public static void Components(Project project)
+        {
+            if (project is null)
+                return;
+
+            var test1 = project.Components.ToList();
+            var test2 = new ComponentsListView(test1);
+            Application.ShowModalWindow(test2);
+            var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
         }
 
         [CommandMethod("DRAWINGCOMPONENTS")]
         public static void DrawingComponents()
         {
-            Drawing currentDrawing = CurrentDatabase.GetDrawing();
-            currentDrawing.LogSymbols();
-            var test2 = new ComponentsListView(currentDrawing.Components.ToList());
+            var test2 = new ComponentsListView(CurrentDrawing.Components.ToList());
             Application.ShowModalWindow(test2);
             var test3 = ((ComponentsListViewModel)test2.DataContext).SelectedComponent;
         }
@@ -390,9 +376,16 @@ namespace ICA.AutoCAD.Adapter
             if (result.Status != PromptStatus.OK)
                 return;
 
-            Drawing drawing = GetDrawing(result.StringResult, CurrentProject);
+            try
+            {
+                Drawing drawing = GetDrawing(result.StringResult, CurrentProject);
 
-            ChangeDrawing(drawing);
+                ChangeDrawing(drawing);
+            }
+            catch(System.Exception ex)
+            {
+                Editor.WriteMessage(ex.Message);
+            }
         }
 
         public static Drawing GetDrawing(string input, Project project)
